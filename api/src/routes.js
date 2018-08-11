@@ -1,7 +1,7 @@
 const express = require('express')
 const requireDir = require('require-dir')
 
-const routes = express.Router()
+const Router = express.Router()
 
 const controllers = requireDir('./Controllers')
 const middlewares = requireDir('./Middlewares')
@@ -9,13 +9,16 @@ const middlewares = requireDir('./Middlewares')
 /**
  * Auth
  */
-routes.post('/auth/register', controllers.AuthController.register)
+Router.post('/auth/signup', controllers.AuthController.signup)
+Router.post('/auth/signin', controllers.AuthController.signin)
+Router.post('/auth/forgot_password', controllers.AuthController.forgotPass)
+Router.post('/auth/reset_password', controllers.AuthController.resetPass)
 
-routes.use(middlewares.Authorization)
+Router.use(middlewares.Authorization)
 
 /**
  * Error
  */
-routes.use(middlewares.Error)
+Router.use(middlewares.Error)
 
-module.exports = routes
+module.exports = Router

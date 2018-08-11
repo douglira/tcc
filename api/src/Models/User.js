@@ -1,3 +1,4 @@
+const crypto = require('crypto')
 const bcrypt = require('bcryptjs')
 
 const Person = require('./Person')
@@ -15,6 +16,7 @@ module.exports = class User {
     this.status = undefined
     this.lastActive = undefined
     this.lastInactive = undefined
+    this.statusChangedBy = undefined
     this.createdAt = undefined
     this.updatedAt = undefined
     this.person = new Person()
@@ -51,5 +53,32 @@ module.exports = class User {
 
   async hashPassword (password) {
     this.password = await bcrypt.hash(password, 10)
+  }
+
+  async verifyPassword (password) {
+    return bcrypt.compare(password, this.password)
+  }
+
+  resetPassword () {
+    this.passwordResetToken = crypto
+      .randomBytes(10)
+      .toString('hex')
+      .toUpperCase()
+    const expiresIn = new Date()
+    expiresIn.setMinutes(expiresIn.getMinutes() + 10)
+
+    this.passwordExpiresIn = expiresIn
+  }
+
+  isExpiredResetPassword () {
+    const now = new Date()
+    let isValid = false
+
+    if (now > this.passwordExpiresIn) {
+      return isValid
+    }
+
+    isValid = true
+    return isValid
   }
 }

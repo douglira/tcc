@@ -7,7 +7,11 @@ module.exports = class Token {
       throw new Error('Missing user properties')
     }
 
-    return jwt.sign(user, process.env.APP_KEY, { expiresIn: '1d' })
+    return jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.APP_KEY,
+      { expiresIn: '1d' }
+    )
   }
 
   static checkScheme (bearer) {

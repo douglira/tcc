@@ -1,5 +1,7 @@
 const ConnectionFactory = require('../Models/Factories/ConnectionFactory')
 
+const User = require('../Models/User')
+
 class UserDAO {
   constructor () {
     this.conn = ConnectionFactory.getConnection()
@@ -62,6 +64,73 @@ class UserDAO {
         )
         .into('people')
     })
+  }
+
+  async checkIfExists (user) {
+    const result = await this.conn
+      .select('*')
+      .from('users')
+      .where('email', user.email)
+      .first()
+
+    if (!result) {
+      return undefined
+    }
+
+    const userData = new User()
+    userData.id = result.id
+    userData.avatar = result.avatar
+    userData.displayName = result.displayName
+    userData.email = result.email
+    userData.password = result.password
+    userData.role = result.role
+    userData.createdAt = result.createdAt
+    userData.updatedAt = result.updatedAt
+    userData.status = result.status
+    userData.lastActive = result.lastActive
+    userData.lastInactive = result.lastInactive
+    userData.statusChangedBy = result.statusChangedBy
+
+    return userData
+  }
+
+  async resetPassword (user) {
+    await this.conn('users')
+      .where('id', user.id)
+      .update({
+        passwordResetToken: user.passwordResetToken,
+        passwordExpiresIn: user.passwordExpiresIn
+      })
+  }
+
+  async findByPasswordToken (user) {
+    const result = await this.conn
+      .select(['id', 'email', 'passwordResetToken', 'passwordExpiresIn'])
+      .from('users')
+      .where('passwordResetToken', user.passwordResetToken)
+      .first()
+
+    if (!result) {
+      return undefined
+    }
+
+    const userData = new User()
+    userData.id = result.id
+    userData.email = result.email
+    userData.passwordResetToken = result.passwordResetToken
+    userData.passwordExpiresIn = result.passwordExpiresIn
+
+    return userData
+  }
+
+  async updateResetPassword (user) {
+    return this.conn('users')
+      .where('id', user.id)
+      .update({
+        password: user.password,
+        passwordResetToken: null,
+        passwordExpiresIn: null
+      })
   }
 }
 
