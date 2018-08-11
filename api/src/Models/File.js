@@ -1,13 +1,11 @@
-class File {
+module.exports = class File {
   constructor () {
-    this.id = null
-    this.fileName = null
-    this.name = null
-    this.type = null
-    this.subtype = null
-    this.createdAt = null
-    this.updatedAt = null
+    this.id = undefined
+    this.fileName = undefined
+    this.name = undefined
+    this.type = undefined
+    this.subtype = undefined
+    this.createdAt = undefined
+    this.updatedAt = undefined
   }
 }
-
-module.exports = File

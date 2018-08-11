@@ -11,6 +11,8 @@ const middlewares = requireDir('./Middlewares')
  */
 routes.post('/auth/register', controllers.AuthController.register)
 
+routes.use(middlewares.Authorization)
+
 /**
  * Error
  */

@@ -1,10 +1,8 @@
-const File = require('File')
+const File = require('./File')
 
-class Image extends File {
-  constructor (url) {
+module.exports = class Image extends File {
+  constructor (url = null) {
     super()
-    this.url = url || null
+    this.url = undefined
   }
 }
-
-module.exports = Image

@@ -1,12 +1,12 @@
-const config = require('../../../knexfile')
+const config = require('../../../config/database')
 
 class ConnectionFactory {
-  constructor () {
-    this.db = require('knex')(config)
-  }
-
   static getConnection () {
-    return this.db
+    return require('knex')({
+      client: config.client,
+      connection: config[config.client],
+      pool: { min: 2, max: 10 }
+    })
   }
 }
 
