@@ -14,7 +14,18 @@ Router.post('/auth/signin', controllers.AuthController.signin)
 Router.post('/auth/forgot_password', controllers.AuthController.forgotPass)
 Router.post('/auth/reset_password', controllers.AuthController.resetPass)
 
-Router.use(middlewares.Authorization)
+Router.use(middlewares.Authorization, middlewares.Role())
+
+Router.get(
+  '/admin/users/',
+  middlewares.Role('admin'),
+  controllers.AdminController.usersAll
+)
+Router.post(
+  '/admin/users/:id/status',
+  middlewares.Role('admin'),
+  controllers.AdminController.userToggleStatus
+)
 
 /**
  * Error

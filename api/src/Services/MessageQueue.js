@@ -10,7 +10,7 @@ class MessageQueue {
   }
 
   sendMailForgotPass (data, done) {
-    this.queue
+    return this.queue
       .create('mailer:forgotPass', data)
       .attempts(3)
       .removeOnComplete(true)

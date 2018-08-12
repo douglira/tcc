@@ -2,11 +2,11 @@ const crypto = require('crypto')
 const bcrypt = require('bcryptjs')
 
 const Person = require('./Person')
-const Image = require('./Image')
 
 module.exports = class User {
   constructor (email = undefined, password = undefined) {
     this.id = undefined
+    this.avatar = undefined
     this.displayName = undefined
     this.email = email
     this.password = password
@@ -20,7 +20,6 @@ module.exports = class User {
     this.createdAt = undefined
     this.updatedAt = undefined
     this.person = new Person()
-    this.avatar = new Image()
   }
 
   setDisplayName () {
