@@ -28,6 +28,11 @@ Router.post(
 )
 
 /**
+ * User
+ */
+Router.get('/users/me', controllers.UserController.me)
+
+/**
  * Error
  */
 Router.use(middlewares.Error)

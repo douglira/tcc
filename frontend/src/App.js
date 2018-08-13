@@ -7,6 +7,8 @@ import { ToastContainer } from 'react-toastify';
 import '~/config/reactotron';
 import '~/styles/global';
 
+import { Container, Content } from './styles/components';
+
 import Header from '~/components/Header';
 
 import store from '~/store';
@@ -18,7 +20,11 @@ const App = () => (
       <Fragment>
         <Header />
         <ToastContainer />
-        <Routes />
+        <Container>
+          <Content>
+            <Routes />
+          </Content>
+        </Container>
       </Fragment>
     </BrowserRouter>
   </Provider>

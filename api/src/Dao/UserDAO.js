@@ -136,25 +136,33 @@ class UserDAO {
 
   async index (page, perPage) {
     const offset = (page - 1) * perPage
-    const result = await this.conn('users')
-      .select(
-        'users.id as user_id',
-        'users.avatar as user_avatar',
-        'users.email as user_email',
-        'users.displayName as user_displayName',
-        'users.status as user_status',
-        'people.id as people_id',
-        'people.name as people_name',
-        'people.birthday as people_birthday',
-        'people.tel as people_tel',
-        'people.cel as people_cel',
-        'people.rg as people_rg',
-        'people.cpf as people_cpf'
-      )
-      .innerJoin('people', 'users.id', 'people.userId')
-      .orderBy('people_name', 'asc')
-      .offset(offset)
-      .limit(perPage)
+
+    const [result, { count: total }] = await Promise.all([
+      this.conn('users')
+        .select(
+          'users.id as user_id',
+          'users.avatar as user_avatar',
+          'users.email as user_email',
+          'users.displayName as user_displayName',
+          'users.status as user_status',
+          'people.id as people_id',
+          'people.name as people_name',
+          'people.birthday as people_birthday',
+          'people.tel as people_tel',
+          'people.cel as people_cel',
+          'people.rg as people_rg',
+          'people.cpf as people_cpf'
+        )
+        .innerJoin('people', 'users.id', 'people.userId')
+        .orderBy('people_name', 'asc')
+        .offset(offset)
+        .limit(perPage),
+      this.conn
+        .count('*')
+        .from('users')
+        .innerJoin('people', 'users.id', 'people.userId')
+        .first()
+    ])
 
     const users = result.map(row => {
       const user = new User()
@@ -177,16 +185,9 @@ class UserDAO {
       return user
     })
 
-    let [total] = await this.conn
-      .count('*')
-      .from('users')
-      .innerJoin('people', 'users.id', 'people.userId')
-
-    total = parseInt(total.count, 10)
-
     return {
-      total,
-      page,
+      total: parseInt(total, 10),
+      page: parseInt(page, 10),
       perPage,
       lastPage: Math.ceil(total / perPage),
       data: users

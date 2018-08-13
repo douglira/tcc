@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-const AdminHome = () => (
-  <div>
-    <h1>Admin Page</h1>
-  </div>
-);
+class AdminHome extends Component {
+  componentDidMount() {
+    console.log('Buscar dados');
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>Admin Home Page</h1>
+      </div>
+    );
+  }
+}
 
 export default AdminHome;

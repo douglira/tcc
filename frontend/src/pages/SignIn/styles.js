@@ -18,15 +18,17 @@ export const Content = styled.div`
   align-items: center;
   width: 100%;
   max-width: 400px;
+  min-height: fit-content;
   background: #f1f1f1;
   margin-top: 50px;
   padding: 20px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 
   h1 {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 400;
     color: #666;
+    text-transform: uppercase;
     padding: 0 15px;
   }
 
