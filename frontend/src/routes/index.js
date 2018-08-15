@@ -9,7 +9,7 @@ import LoginPage from '~/pages/SignIn';
 
 import UserHomePage from '~/pages/User/Home';
 
-import AdminHomePage from '~/pages/Admin/Home';
+import AdminHomePage from '~/pages/Admin';
 
 const Routes = () => (
   <Switch>

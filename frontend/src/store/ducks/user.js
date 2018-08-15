@@ -31,7 +31,9 @@ const INITIAL_STATE = {
   isSigningin: false,
   loading: false,
   error: null,
-  data: {},
+  data: {
+    role: '',
+  },
 };
 
 export default function userReducer(state = INITIAL_STATE, action) {

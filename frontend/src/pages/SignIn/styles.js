@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { colors } from '~/styles';
 
 export const Container = styled.div`
   display: flex;
@@ -7,7 +8,7 @@ export const Container = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
-  background: #f9f9f9;
+  background: ${props => props.theme.main.white};
   padding: 20px;
 `;
 
@@ -19,7 +20,7 @@ export const Content = styled.div`
   width: 100%;
   max-width: 400px;
   min-height: fit-content;
-  background: #f1f1f1;
+  background: ${props => props.theme.main.lighter};
   margin-top: 50px;
   padding: 20px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
@@ -27,7 +28,7 @@ export const Content = styled.div`
   h1 {
     font-size: 20px;
     font-weight: 400;
-    color: #666;
+    color: ${props => props.theme.main.darker};
     text-transform: uppercase;
     padding: 0 15px;
   }
@@ -44,16 +45,16 @@ export const Content = styled.div`
       margin-top: 30px;
       padding: 10px;
       align-self: stretch;
-      color: #fff;
+      color: ${props => props.theme.main.lighter};
       border: 0;
-      background: #ff5722;
+      background: ${props => props.theme.main.secondary};
       font-size: 14px;
       font-weight: 700;
       border-radius: 1px;
       cursor: pointer;
 
       &:hover {
-        background: #cc4318;
+        background: ${props => props.theme.main.secondaryLighter};
       }
     }
   }
@@ -62,13 +63,21 @@ export const Content = styled.div`
 export const MaterialUI = () => ({
   cssLabel: {
     '&$cssFocused': {
-      color: '#ff5722',
+      color: colors.main.primary,
     },
   },
   cssFocused: {},
   cssUnderline: {
     '&:after': {
-      borderBottomColor: '#ff5722',
+      borderBottomColor: colors.main.primary,
+    },
+  },
+  cssUnderlineError: {
+    '&:after': {
+      borderBottomColor: colors.main.danger,
+    },
+    '&:before': {
+      borderBottomColor: colors.main.danger,
     },
   },
   formControl: {
@@ -76,7 +85,7 @@ export const MaterialUI = () => ({
     marginTop: '15px',
   },
   inputLabel: {
-    fontSize: '14px',
+    fontSize: '15px',
   },
   inputText: {
     fontSize: '14px',
