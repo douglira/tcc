@@ -5,10 +5,12 @@ import { colors } from '~/styles';
 
 import { Container } from './styles';
 
+import { connect } from 'react-redux';
+
 import CartIcon from '~/assets/images/cart_icon.svg';
 import WishlistIcon from '~/assets/images/wishlist_icon.svg';
 
-const HeaderActions = () => (
+const HeaderActions = ({ user }) => (
   <ThemeProvider theme={colors}>
     <Container>
       <button type="button">
@@ -17,10 +19,22 @@ const HeaderActions = () => (
       <button type="button">
         <img src={CartIcon} alt="Carrinho" />
       </button>
-      <Link to="/">Meus pedidos</Link>
-      <Link to="/signin">Minha conta</Link>
+      {user.isAuthenticated ? (
+        <p>
+          Olá, {user.displayName} <Link to="/signin">Minha conta</Link>
+        </p>
+      ) : (
+        <Link to="/signin">Minha conta</Link>
+      )}
     </Container>
   </ThemeProvider>
 );
 
-export default HeaderActions;
+const mapStateToProps = state => ({
+  user: {
+    isAuthenticated: state.user.isAuthenticated,
+    displayName: state.user.data.displayName,
+  },
+});
+
+export default connect(mapStateToProps)(HeaderActions);

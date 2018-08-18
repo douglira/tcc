@@ -118,19 +118,16 @@ module.exports = {
       await new UserDAO().resetPassword(user)
 
       const mq = new MessageQueue()
-      mq.sendMailForgotPass(
-        {
-          from: 'SmartSearch <noreply@smartsearch.com>',
-          to: user.email,
-          subject: 'SmartSearch - Redefinição de senha',
-          template: 'forgotPass',
-          context: {
-            displayName: user.displayName,
-            token: user.passwordResetToken
-          }
-        },
-        () => console.log('Enviou o email')
-      )
+      mq.sendMailForgotPass({
+        from: 'SmartSearch <noreply@smartsearch.com>',
+        to: user.email,
+        subject: 'SmartSearch - Redefinição de senha',
+        template: 'forgotPass',
+        context: {
+          displayName: user.displayName,
+          token: user.passwordResetToken
+        }
+      })
 
       return res.json({
         message:

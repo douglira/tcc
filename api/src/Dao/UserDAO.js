@@ -1,5 +1,7 @@
 const ConnectionFactory = require('../Models/Factories/ConnectionFactory')
 
+const Pagination = require('../Models/Utils/Pagination')
+
 const User = require('../Models/User')
 const Person = require('../Models/Person')
 
@@ -173,6 +175,7 @@ class UserDAO {
       user.email = row.user_email
       user.displayName = row.user_displayName
       user.status = row.user_status
+
       person.id = row.people_id
       person.name = row.people_name
       person.birthday = row.people_birthday
@@ -180,18 +183,13 @@ class UserDAO {
       person.cel = row.people_cel
       person.rg = row.people_rg
       person.cpf = row.people_cpf
+
       user.person = person
 
       return user
     })
 
-    return {
-      total: parseInt(total, 10),
-      page: parseInt(page, 10),
-      perPage: parseInt(perPage, 10),
-      lastPage: Math.ceil(total / perPage),
-      data: users
-    }
+    return Pagination.template(page, perPage, total, users)
   }
 
   async toggleStatus (user, changedBy) {

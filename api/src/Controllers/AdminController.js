@@ -1,3 +1,5 @@
+const Pagination = require('../Models/Utils/Pagination')
+
 const User = require('../Models/User')
 
 const UserDAO = require('../Dao/UserDAO')
@@ -7,10 +9,10 @@ module.exports = {
     try {
       const { page = 1, perPage = 20 } = req.query
 
-      let users = []
-      users = await new UserDAO().index(page, perPage)
+      let paginatedUsers = new Pagination()
+      paginatedUsers = await new UserDAO().index(page, perPage)
 
-      return res.json(users)
+      return res.json(paginatedUsers)
     } catch (err) {
       return next(err)
     }

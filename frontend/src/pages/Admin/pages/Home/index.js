@@ -60,7 +60,7 @@ class Home extends Component {
       return null;
     }
 
-    allUsersRequest(page, users.perPage);
+    return allUsersRequest(page, users.perPage);
   };
 
   handleChangeRowsPerPage = (event) => {
