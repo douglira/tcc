@@ -40,7 +40,7 @@ const signinFailure = (state = INITIAL_STATE, action) => ({
   isSigningin: false,
   loading: false,
   isAuthenticated: false,
-  error: action.payload.error,
+  error: action.error,
 });
 
 export default createReducer(INITIAL_STATE, {

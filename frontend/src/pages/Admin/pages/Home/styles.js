@@ -18,7 +18,7 @@ export const MaterialUI = () => ({
   title: {
     alignSelf: 'flex-start',
     padding: '7px 0',
-    borderBottom: `0.625px solid ${colors.main.light}`,
+    borderBottom: `0.625px solid ${colors.main.light.normal}`,
     width: '100%',
   },
   table: {

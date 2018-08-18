@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { colors } from '~/styles';
@@ -21,7 +22,7 @@ const HeaderActions = ({ user }) => (
       </button>
       {user.isAuthenticated ? (
         <p>
-          Olá, {user.displayName} <Link to="/signin">Minha conta</Link>
+          Olá, <strong>{user.displayName}</strong> <i className="fa fa-angle-down" />
         </p>
       ) : (
         <Link to="/signin">Minha conta</Link>
@@ -29,6 +30,13 @@ const HeaderActions = ({ user }) => (
     </Container>
   </ThemeProvider>
 );
+
+HeaderActions.propTypes = {
+  user: PropTypes.shape({
+    isAuthenticated: PropTypes.bool,
+    displayName: PropTypes.string,
+  }).isRequired,
+};
 
 const mapStateToProps = state => ({
   user: {

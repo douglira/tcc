@@ -1,22 +1,94 @@
+import Color from 'color';
+
 export default {
   main: {
-    primaryDarker: '#6d8e46',
-    primary: '#9ccc65',
-    primaryLighter: '#afd683',
+    primary: {
+      darken: '#6d8e46',
+      normal: '#9ccc65',
+      lighten: '#afd683',
+    },
 
-    secondaryDarker: '#45568C',
-    secondary: '#6B84D9',
-    secondaryLighter: '#98AFFF',
+    secondary: {
+      darken: '#45568C',
+      normal: '#6B84D9',
+      lighten: '#98AFFF',
+    },
 
-    white: '#FFF',
-    lighter: '#EEE',
-    light: '#DDD',
-    smoke: '#CCC',
-    shadow: '#BBB',
-    regular: '#999',
-    dark: '#666',
-    darker: '#333',
-    black: '#000',
+    white: {
+      darken: Color('#FFF')
+        .darken(0.05)
+        .hex(),
+      normal: '#FFF',
+    },
+    lighter: {
+      darken: Color('#EEE')
+        .darken(0.05)
+        .hex(),
+      normal: '#EEE',
+      lighten: Color('#EEE')
+        .lighten(0.05)
+        .hex(),
+    },
+    light: {
+      darken: Color('#DDD')
+        .darken(0.05)
+        .hex(),
+      normal: '#DDD',
+      lighten: Color('#DDD')
+        .lighten(0.05)
+        .hex(),
+    },
+    smoke: {
+      darken: Color('#CCC')
+        .darken(0.05)
+        .hex(),
+      normal: '#CCC',
+      lighten: Color('#CCC')
+        .lighten(0.05)
+        .hex(),
+    },
+    shadow: {
+      darken: Color('#BBB')
+        .darken(0.05)
+        .hex(),
+      normal: '#BBB',
+      lighten: Color('#BBB')
+        .lighten(0.05)
+        .hex(),
+    },
+    regular: {
+      darken: Color('#999')
+        .darken(0.1)
+        .hex(),
+      normal: '#999',
+      lighten: Color('#999')
+        .lighten(0.1)
+        .hex(),
+    },
+    dark: {
+      darken: Color('#666')
+        .darken(0.1)
+        .hex(),
+      normal: '#666',
+      lighten: Color('#666')
+        .lighten(0.1)
+        .hex(),
+    },
+    darker: {
+      darken: Color('#333')
+        .darken(0.1)
+        .hex(),
+      normal: '#333',
+      lighten: Color('#333')
+        .lighten(0.1)
+        .hex(),
+    },
+    black: {
+      normal: '#000',
+      lighten: Color('#000')
+        .lighten(0.05)
+        .hex(),
+    },
 
     transparent: 'transparent',
     darkTransparent: 'rgba(0, 0, 0, 0.6)',

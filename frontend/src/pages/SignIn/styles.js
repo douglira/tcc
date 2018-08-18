@@ -8,7 +8,7 @@ export const Container = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
-  background: ${props => props.theme.main.white};
+  background: ${props => props.theme.main.white.normal};
   padding: 20px;
 `;
 
@@ -20,7 +20,7 @@ export const Content = styled.div`
   width: 100%;
   max-width: 400px;
   min-height: fit-content;
-  background: ${props => props.theme.main.lighter};
+  background: ${props => props.theme.main.lighter.normal};
   margin-top: 50px;
   padding: 20px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
@@ -28,7 +28,7 @@ export const Content = styled.div`
   h1 {
     font-size: 20px;
     font-weight: 400;
-    color: ${props => props.theme.main.darker};
+    color: ${props => props.theme.main.darker.normal};
     text-transform: uppercase;
     padding: 0 15px;
   }
@@ -45,16 +45,16 @@ export const Content = styled.div`
       margin-top: 30px;
       padding: 10px;
       align-self: stretch;
-      color: ${props => props.theme.main.lighter};
+      color: ${props => props.theme.main.lighter.normal};
       border: 0;
-      background: ${props => props.theme.main.secondary};
+      background: ${props => props.theme.main.secondary.normal};
       font-size: 14px;
       font-weight: 700;
       border-radius: 1px;
       cursor: pointer;
 
       &:hover {
-        background: ${props => props.theme.main.secondaryLighter};
+        background: ${props => props.theme.main.secondary.lighten};
       }
     }
   }
@@ -63,13 +63,13 @@ export const Content = styled.div`
 export const MaterialUI = () => ({
   cssLabel: {
     '&$cssFocused': {
-      color: colors.main.primary,
+      color: colors.main.primary.normal,
     },
   },
   cssFocused: {},
   cssUnderline: {
     '&:after': {
-      borderBottomColor: colors.main.primary,
+      borderBottomColor: colors.main.primary.normal,
     },
   },
   cssUnderlineError: {

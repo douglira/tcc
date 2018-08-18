@@ -33,15 +33,31 @@ export const Container = styled.section`
     margin-left: 0 !important;
 
     &:hover {
-      background: #eaeaea;
+      background: ${props => props.theme.main.light.lighten};
     }
 
     img {
       align-self: flex-end;
       box-sizing: border-box;
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       cursor: pointer;
+    }
+  }
+
+  p {
+    font-size: 14px;
+
+    i {
+      font-weight: bold;
+      margin-left: 5px !important;
+      padding: 7px;
+      border-radius: 50%;
+      cursor: pointer;
+
+      &:hover {
+        background: ${props => props.theme.main.light.lighten};
+      }
     }
   }
 `;

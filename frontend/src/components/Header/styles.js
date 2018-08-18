@@ -7,7 +7,7 @@ export const HeaderContainer = styled.header`
   align-items: center;
   height: 150px;
   width: 100%;
-  background: ${props => props.theme.main.lighter};
+  background: ${props => props.theme.main.lighter.normal};
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   margin-bottom: 15px;
   padding: 10px 0 0 0;
@@ -25,7 +25,7 @@ export const SearchBar = styled.div`
   a {
     text-decoration: inherit;
     font-size: 20px;
-    color: ${props => props.theme.main.darker};
+    color: ${props => props.theme.main.darker.normal};
     font-weight: 400;
     text-align: center;
     font-weight: bold;
@@ -52,12 +52,12 @@ export const SearchBar = styled.div`
       padding: 10px;
       box-sizing: border-box;
       font-size: 14px;
-      color: ${props => props.theme.main.regular};
+      color: ${props => props.theme.main.regular.normal};
       border-radius: 2px 0 0 2px;
-      background: ${props => props.theme.main.white};
+      background: ${props => props.theme.main.white.normal};
 
       &::placeholder {
-        color: ${props => props.theme.main.regular};
+        color: ${props => props.theme.main.regular.normal};
       }
     }
 
@@ -65,15 +65,15 @@ export const SearchBar = styled.div`
       padding: 5px 15px;
       align-self: stretch;
       font-size: 14px;
-      background: ${props => props.theme.main.primary};
+      background: ${props => props.theme.main.primary.normal};
       border: 0;
-      color: ${props => props.theme.main.white};
+      color: ${props => props.theme.main.white.normal};
       cursor: pointer;
       border-radius: 0 2px 2px 0;
       font-weight: 700;
 
       &:hover {
-        background: ${props => props.theme.main.primaryLighter};
+        background: ${props => props.theme.main.primary.lighten};
       }
     }
   }
@@ -83,7 +83,7 @@ export const NavBar = styled.section`
   display: flex;
   width: 100%;
   justify-content: center;
-  background: ${props => props.theme.main.primary};
+  background: ${props => props.theme.main.primary.normal};
 
   nav {
     display: flex;
@@ -102,12 +102,12 @@ export const NavBar = styled.section`
       border-radius: 2px;
       flex: 1;
       font-size: 16px;
-      color: ${props => props.theme.main.darker};
+      color: ${props => props.theme.main.darker.normal};
       font-weight: 600;
       text-align: center;
 
       &:hover {
-        background: ${props => props.theme.main.primaryLighter};
+        background: ${props => props.theme.main.primary.lighten};
       }
 
       &:first-child {
