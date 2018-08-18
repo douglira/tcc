@@ -14,7 +14,7 @@ import { colors } from '~/styles';
 import { Container, Content, MaterialUI } from './styles';
 
 const SignIn = ({
-  classes, isAuthenticated, location, signinRequest,
+  classes, isAuthenticated, isSigningin, location, signinRequest,
 }) => {
   const { from } = location.state || { from: { pathname: '/admin/home' } };
 
@@ -42,7 +42,7 @@ const SignIn = ({
                 .required(),
             })
             }
-            onSubmit={(values, { setSubmitting }) => {
+            onSubmit={(values) => {
               signinRequest(values);
             }}
             render={({
@@ -52,7 +52,6 @@ const SignIn = ({
               handleChange,
               handleBlur,
               handleSubmit,
-              isSubmitting,
             }) => (
               <form onSubmit={handleSubmit}>
                 <FormControl className={classes.formControl}>
@@ -110,8 +109,12 @@ const SignIn = ({
                     value={values.password}
                   />
                 </FormControl>
-                <button type="submit">
-                  Entrar
+                <button type="submit" disabled={isSigningin}>
+                  {isSigningin ? (
+                    <i className="fa fa-spinner fa-pulse fa-1x" />
+                  ) : (
+                    <span>Entrar</span>
+                  )}
                 </button>
               </form>
             )}
@@ -126,14 +129,13 @@ SignIn.propTypes = {
   classes: PropTypes.shape().isRequired,
   location: PropTypes.shape().isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
+  isSigningin: PropTypes.bool.isRequired,
   signinRequest: PropTypes.func.isRequired,
-  history: PropTypes.shape({
-    redirect: PropTypes.func,
-  }).isRequired,
 };
 
 const mapStateToProps = ({ user }) => ({
   isAuthenticated: user.isAuthenticated,
+  isSigningin: user.isSigningin,
 });
 
 const mapDispatchToProps = dispatch => ({

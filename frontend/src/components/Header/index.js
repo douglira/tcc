@@ -6,6 +6,9 @@ import { colors } from '~/styles';
 import HeaderActions from './components/HeaderActions';
 import { HeaderContainer, SearchBar, NavBar } from './styles';
 
+import CartIcon from '~/assets/images/cart_icon.svg';
+import WishlistIcon from '~/assets/images/wishlist_icon.svg';
+
 const Header = () => (
   <ThemeProvider theme={colors}>
     <HeaderContainer>
@@ -23,6 +26,14 @@ const Header = () => (
           <NavLink to="/">Ofertas</NavLink>
           <NavLink to="/">Destaques</NavLink>
           <NavLink to="/">Pra você</NavLink>
+          <section>
+            <button type="button">
+              <img src={WishlistIcon} alt="Lista de desejos" />
+            </button>
+            <button type="button">
+              <img src={CartIcon} alt="Carrinho" />
+            </button>
+          </section>
         </nav>
       </NavBar>
     </HeaderContainer>

@@ -44,6 +44,10 @@ export const SearchBar = styled.div`
     max-width: 50%;
     border-radius: 2px;
 
+    & > input:focus {
+      border: 0.625px solid ${props => props.theme.main.primary.normal};
+    }
+
     input {
       flex: 1;
       align-self: stretch;
@@ -114,6 +118,39 @@ export const NavBar = styled.section`
         display: flex;
         justify-content: space-evenly;
         align-items: center;
+      }
+    }
+
+    section {
+      display: flex;
+      flex-direction: row;
+
+      button {
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        border: 0;
+        background: ${props => props.theme.main.lighter.normal};
+        padding: 7px 15px;
+        box-sizing: border-box;
+        margin-right: 0 !important;
+        margin-left: 20px !important;
+        cursor: pointer;
+
+        &:last-child {
+          margin-right: 20px !important;
+        }
+
+        &:hover {
+          background: ${props => props.theme.main.light.lighten};
+        }
+
+        img {
+          align-self: flex-end;
+          box-sizing: border-box;
+          width: 24px;
+          height: 24px;
+        }
       }
     }
   }

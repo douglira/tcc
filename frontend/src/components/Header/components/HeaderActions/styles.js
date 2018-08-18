@@ -20,44 +20,28 @@ export const Container = styled.section`
     flex: 0 !important;
   }
 
-  & > button {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    border: 0;
-    background: inherit;
-    padding: 7px;
-    box-sizing: border-box;
-    border-radius: 50%;
-    margin-right: 10px !important;
-    margin-left: 0 !important;
-
-    &:hover {
-      background: ${props => props.theme.main.light.lighten};
-    }
-
-    img {
-      align-self: flex-end;
-      box-sizing: border-box;
-      width: 24px;
-      height: 24px;
-      cursor: pointer;
-    }
-  }
-
   p {
     font-size: 14px;
 
-    i {
-      font-weight: bold;
-      margin-left: 5px !important;
-      padding: 7px;
-      border-radius: 50%;
-      cursor: pointer;
+    button {
+      border: 0;
+      background: inherit;
 
-      &:hover {
-        background: ${props => props.theme.main.light.lighten};
+      i {
+        font-weight: bold;
+        margin-left: 5px !important;
+        padding: 7px;
+        border-radius: 50%;
+        cursor: pointer;
+
+        &:hover {
+          background: ${props => props.theme.main.light.lighten};
+        }
       }
     }
   }
+`;
+
+export const MenuItemText = styled.span`
+  font-size: 13.5px;
 `;

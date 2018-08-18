@@ -14,12 +14,10 @@ function* verifyAuth() {
 
       yield put(UserActions.signinSuccess(data.user));
     } else {
-      yield put(UserActions.signinFailure(null));
-      Cookies.remove('SS_TOKEN');
+      yield put(UserActions.signout());
     }
   } catch (err) {
-    yield put(UserActions.signinFailure(null));
-    Cookies.remove('SS_TOKEN');
+    yield put(UserActions.signout(false));
   }
 }
 

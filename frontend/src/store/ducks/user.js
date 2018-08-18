@@ -1,11 +1,17 @@
 import { createActions, createReducer } from 'reduxsauce';
 
-export const { Types, Creators } = createActions({
-  verifyAuth: [],
-  signinRequest: ['credentials'],
-  signinSuccess: ['user'],
-  signinFailure: ['error'],
-});
+export const { Types, Creators } = createActions(
+  {
+    verifyAuth: [],
+
+    signinRequest: ['credentials'],
+    signinSuccess: ['user'],
+    signinFailure: ['error'],
+
+    signout: (logout = true) => ({ type: 'SIGNOUT', logout }),
+  },
+  { prefix: 'user/' },
+);
 
 const INITIAL_STATE = {
   isAuthenticated: false,
@@ -45,6 +51,7 @@ const signinFailure = (state = INITIAL_STATE, action) => ({
 
 export default createReducer(INITIAL_STATE, {
   [Types.VERIFY_AUTH]: verifyAuth,
+
   [Types.SIGNIN_REQUEST]: signinRequest,
   [Types.SIGNIN_SUCCESS]: signinSuccess,
   [Types.SIGNIN_FAILURE]: signinFailure,
