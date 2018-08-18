@@ -157,12 +157,14 @@ class UserDAO {
         )
         .innerJoin('people', 'users.id', 'people.userId')
         .orderBy('people_name', 'asc')
+        .where('users.role', 'user')
         .offset(offset)
         .limit(perPage),
       this.conn
         .count('*')
         .from('users')
         .innerJoin('people', 'users.id', 'people.userId')
+        .where('users.role', 'user')
         .first()
     ])
 

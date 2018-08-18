@@ -14,10 +14,9 @@ export const Container = styled.section`
   }
 
   & > a {
-    align-self: flex-end;
+    align-self: center;
     font-size: 14px !important;
     font-weight: 500 !important;
-    flex: 0 !important;
   }
 
   p {

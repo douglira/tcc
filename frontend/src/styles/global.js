@@ -17,6 +17,6 @@ injectGlobal`
     text-rendering: optimizeLegibility !important;
     -webkit-font-smoothing: antialiased !important;
     font-family: 'Montserrat', sans-serif;
-    background: #f9f9f9;
+    background: #fff;
   }
 `;

@@ -8,7 +8,7 @@ export const Container = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
-  background: ${props => props.theme.main.white.normal};
+  background: inherit;
   padding: 20px;
 `;
 
@@ -20,9 +20,9 @@ export const Content = styled.div`
   width: 100%;
   max-width: 400px;
   min-height: fit-content;
-  background: ${props => props.theme.main.lighter.normal};
+  background: ${props => props.theme.main.white.normal};
   margin-top: 50px;
-  padding: 20px;
+  padding: 40px 20px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 
   h1 {
