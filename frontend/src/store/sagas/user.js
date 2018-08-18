@@ -25,7 +25,7 @@ function* verifyAuth() {
 
 function* signin(action) {
   try {
-    const { data } = yield call(api.post, '/auth/signin', action.payload.credentials);
+    const { data } = yield call(api.post, '/auth/signin', action.credentials);
 
     Cookies.set('SS_TOKEN', data.token);
 

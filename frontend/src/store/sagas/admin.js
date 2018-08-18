@@ -5,7 +5,7 @@ import { Types as AdminTypes, Creators as AdminActions } from '~/store/ducks/adm
 
 function* fetchUsers(action) {
   try {
-    const { page, perPage } = action.payload;
+    const { page, perPage } = action;
     const { data } = yield call(api.get, '/admin/users', { params: { page, perPage } });
     yield put(AdminActions.allUsersSuccess(data));
   } catch (err) {
