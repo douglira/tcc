@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import { Input, InputLabel, FormControl } from '@material-ui/core';
 import { Formik } from 'formik';
@@ -11,7 +11,9 @@ import { Creators as UserActions } from '~/store/ducks/user';
 
 import { ThemeProvider } from 'styled-components';
 import { colors } from '~/styles';
-import { Container, Content, MaterialUI } from './styles';
+import {
+  Container, Content, MaterialUI, RegisterOption,
+} from './styles';
 
 const SignIn = ({
   classes, isAuthenticated, isSigningin, location, signinRequest,
@@ -46,12 +48,7 @@ const SignIn = ({
               signinRequest(values);
             }}
             render={({
-              values,
-              errors,
-              touched,
-              handleChange,
-              handleBlur,
-              handleSubmit,
+              values, errors, touched, handleChange, handleBlur, handleSubmit,
             }) => (
               <form onSubmit={handleSubmit}>
                 <FormControl className={classes.formControl}>
@@ -109,6 +106,7 @@ const SignIn = ({
                     value={values.password}
                   />
                 </FormControl>
+                <Link to="/forgot_pass">Esqueceu sua senha?</Link>
                 <button type="submit" disabled={isSigningin}>
                   {isSigningin ? (
                     <i className="fa fa-spinner fa-pulse fa-1x" />
@@ -119,6 +117,10 @@ const SignIn = ({
               </form>
             )}
           />
+          <RegisterOption>
+            <p>ou</p>
+            <Link to="/cadastro">Cadastrar-se</Link>
+          </RegisterOption>
         </Content>
       </Container>
     </ThemeProvider>

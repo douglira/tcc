@@ -19,7 +19,7 @@ export const SearchBar = styled.div`
   align-items: center;
   width: 100%;
   max-width: 920px;
-  height: 50px;
+  height: 45px;
   margin-top: 15px;
 
   a {
