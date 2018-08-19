@@ -1,8 +1,9 @@
 const moment = require('moment')
 
 const User = require('../Models/User')
-const Person = require('../Models/Person')
-const Address = require('../Models/Address')
+const NaturalPerson = require('../Models/NaturalPerson')
+const LegalPerson = require('../Models/LegalPerson')
+// const Address = require('../Models/Address')
 const Token = require('../Models/Token')
 
 const UserDAO = require('../Dao/UserDAO')
@@ -14,48 +15,52 @@ module.exports = {
     try {
       const data = req.body
 
-      if (
-        !data.user.email ||
-        !data.user.password ||
-        !data.user.confirm_password
-      ) {
+      if (!data.user.email || !data.user.password) {
         return res.status(400).json({ error: 'Campos inválidos' })
       }
 
-      if (data.user.password !== data.user.confirmPassword) {
-        return res.status(400).json({ error: 'Senhas não coincidem' })
+      if (data.user.person.cpf) {
+        const person = new NaturalPerson()
+        const user = new User()
+
+        person.name = data.user.person.name
+        person.gender = data.user.person.gender
+        person.birthday = moment(
+          data.user.person.birthday,
+          'DD/MM/YYYY'
+        ).toDate()
+        person.cpf = data.user.person.cpf
+        person.tel = data.user.person.tel
+        person.cel = data.user.person.cel
+
+        user.email = data.user.email
+        user.password = data.user.password
+        user.role = 'user'
+
+        user.person = person
+
+        user.setDisplayName()
+        await user.hashPassword(user.password)
+        await new UserDAO().createNaturalPerson(user)
+      } else {
+        const person = new LegalPerson()
+        const user = new User()
+
+        person.name = data.user.person.name
+        person.corporateName = data.user.person.corporateName
+        person.cnpj = data.user.person.cnpj
+        person.stateRegistration = data.user.person.stateRegistration
+        person.tel = data.user.person.tel
+
+        user.email = data.user.email
+        user.password = data.user.password
+        user.role = 'user'
+
+        user.person = person
+        user.setDisplayName()
+        await user.hashPassword(user.password)
+        await new UserDAO().createLegalPerson(user)
       }
-
-      const address = new Address()
-      const person = new Person()
-      const user = new User()
-
-      address.zipCode = data.address.zipCode
-      address.street = data.address.street
-      address.district = data.address.district
-      address.city = data.address.city
-      address.provinceCode = data.address.provinceCode
-      address.countryName = data.address.countryName
-      address.buildingNumber = data.address.buildingNumber
-      address.additionalData = data.address.additionalData
-
-      person.name = data.person.name
-      person.birthday = moment(data.person.birthday, 'DD/MM/YYYY').toDate()
-      person.tel = data.person.tel
-      person.cel = data.person.cel
-      person.rg = data.person.rg
-      person.cpf = data.person.cpf
-
-      user.email = data.user.email
-      user.password = data.user.password
-      user.role = 'user'
-
-      person.address = address
-      user.person = person
-
-      user.setDisplayName()
-      await user.hashPassword(user.password)
-      await new UserDAO().create(user)
 
       return res.status(201).json()
     } catch (err) {

@@ -1,8 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { ThemeProvider } from 'styled-components';
-import { colors } from '~/styles';
 
 import { connect } from 'react-redux';
 import { Creators as UserActions } from '~/store/ducks/user';
@@ -88,18 +86,16 @@ class HeaderActions extends Component {
     const { user } = this.props;
 
     return (
-      <ThemeProvider theme={colors}>
-        <Container>
-          {user.isAuthenticated ? (
-            <p>
-              Olá, <strong>{user.displayName}</strong>
-              {this.isAdmin()} {this.renderMenu()}
-            </p>
-          ) : (
-            <Link to="/signin">Minha conta</Link>
-          )}
-        </Container>
-      </ThemeProvider>
+      <Container>
+        {user.isAuthenticated ? (
+          <p>
+            Olá, <strong>{user.displayName}</strong>
+            {this.isAdmin()} {this.renderMenu()}
+          </p>
+        ) : (
+          <Link to="/signin">Minha conta</Link>
+        )}
+      </Container>
     );
   }
 }

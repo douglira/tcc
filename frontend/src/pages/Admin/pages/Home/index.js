@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import { connect } from 'react-redux';
 import { Creators as AdminActions } from '~/store/ducks/admin';
@@ -34,10 +35,6 @@ class Home extends Component {
         id: PropTypes.number,
         displayName: PropTypes.string,
         email: PropTypes.string,
-        person: PropTypes.shape({
-          cpf: PropTypes.string,
-          rg: PropTypes.string,
-        }),
       })),
     }).isRequired,
   };
@@ -78,8 +75,7 @@ class Home extends Component {
         {user.displayName}
       </TableCell>
       <TableCell>{user.email}</TableCell>
-      <TableCell numeric>{user.person.rg}</TableCell>
-      <TableCell numeric>{user.person.cpf}</TableCell>
+      <TableCell numeric>{moment(user.createdAt).format('DD/MM/YYYY HH:mm')}</TableCell>
     </TableRow>
   ));
 
@@ -102,8 +98,7 @@ class Home extends Component {
                 <TableRow>
                   <TableCell>Nome do usuário</TableCell>
                   <TableCell>E-mail</TableCell>
-                  <TableCell numeric>RG</TableCell>
-                  <TableCell numeric>CPF</TableCell>
+                  <TableCell numeric>Data de criação</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>{this.renderTableContent()}</TableBody>

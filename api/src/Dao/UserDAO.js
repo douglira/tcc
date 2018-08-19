@@ -14,7 +14,7 @@ class UserDAO {
     }
   }
 
-  async create (user) {
+  async createNaturalPerson (user) {
     await this.conn.transaction(async trx => {
       const [userId] = await trx
         .insert(
@@ -30,37 +30,51 @@ class UserDAO {
         )
         .into('users')
 
-      const [addressId] = await trx
+      await trx
         .insert(
           {
-            zipCode: user.person.address.zipCode,
-            street: user.person.address.street,
-            district: user.person.address.district,
-            city: user.person.address.city,
-            provinceCode: user.person.address.provinceCode,
-            countryName: user.person.address.countryName,
-            buildingNumber: user.person.address.buildingNumber,
-            additionalData: user.person.address.additionalData,
+            name: user.person.name,
+            gender: user.person.gender,
+            birthday: user.person.birthday,
+            tel: user.person.tel,
+            cel: user.person.cel,
+            cpf: user.person.cpf,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            userId
+          },
+          'id'
+        )
+        .into('people')
+    })
+  }
+
+  async createLegalPerson (user) {
+    await this.conn.transaction(async trx => {
+      const [userId] = await trx
+        .insert(
+          {
+            displayName: user.displayName,
+            email: user.email,
+            password: user.password,
+            role: user.role,
             createdAt: new Date(),
             updatedAt: new Date()
           },
           'id'
         )
-        .into('addresses')
+        .into('users')
 
-      delete user.person.address
       await trx
         .insert(
           {
             name: user.person.name,
-            birthday: user.person.birthday,
+            corporateName: user.person.corporateName,
+            cnpj: user.person.cnpj,
+            stateRegistration: user.person.stateRegistration,
             tel: user.person.tel,
-            cel: user.person.cel,
-            rg: user.person.rg,
-            cpf: user.person.cpf,
             createdAt: new Date(),
             updatedAt: new Date(),
-            addressId,
             userId
           },
           'id'
@@ -147,13 +161,9 @@ class UserDAO {
           'users.email as user_email',
           'users.displayName as user_displayName',
           'users.status as user_status',
+          'users.createdAt as users_createdAt',
           'people.id as people_id',
-          'people.name as people_name',
-          'people.birthday as people_birthday',
-          'people.tel as people_tel',
-          'people.cel as people_cel',
-          'people.rg as people_rg',
-          'people.cpf as people_cpf'
+          'people.name as people_name'
         )
         .innerJoin('people', 'users.id', 'people.userId')
         .orderBy('people_name', 'asc')
@@ -177,14 +187,10 @@ class UserDAO {
       user.email = row.user_email
       user.displayName = row.user_displayName
       user.status = row.user_status
+      user.createdAt = row.users_createdAt
 
       person.id = row.people_id
       person.name = row.people_name
-      person.birthday = row.people_birthday
-      person.tel = row.people_tel
-      person.cel = row.people_cel
-      person.rg = row.people_rg
-      person.cpf = row.people_cpf
 
       user.person = person
 

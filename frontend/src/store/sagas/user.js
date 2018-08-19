@@ -38,9 +38,27 @@ function* signin(action) {
   }
 }
 
+function* signup(action) {
+  try {
+    yield call(api.post, '/auth/signup', action.data);
+
+    action.cbNavigation();
+
+    yield put(UserActions.signupSuccess());
+  } catch (err) {
+    if (err.response.data && err.response.data.error) {
+      yield put({
+        ...UserActions(err.response.data.error),
+        toast: buildToastify(err.response.data.error, ToastifyTypes.ERROR),
+      });
+    }
+  }
+}
+
 export default function* root() {
   yield takeLatest(UserTypes.VERIFY_AUTH, verifyAuth);
   yield takeLatest(UserTypes.SIGNIN_REQUEST, signin);
+  yield takeLatest(UserTypes.SIGNUP_REQUEST, signup);
 
   yield put(UserActions.verifyAuth());
 }

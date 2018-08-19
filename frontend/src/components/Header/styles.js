@@ -18,7 +18,7 @@ export const SearchBar = styled.div`
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-  max-width: 920px;
+  max-width: 960px;
   height: 45px;
   margin-top: 15px;
 
@@ -94,7 +94,7 @@ export const NavBar = styled.section`
     justify-content: space-evenly;
     align-items: center;
     width: 100%;
-    max-width: 920px;
+    max-width: 960px;
     height: 35px;
 
     a {

@@ -6164,6 +6164,13 @@ react-fast-compare@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-1.0.0.tgz#813a039155e49b43ceffe99528fe5e9d97a6c938"
 
+react-input-mask@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/react-input-mask/-/react-input-mask-2.0.3.tgz#bbc84c14d745dc49134ba47a4c8e97e7470ceb1e"
+  dependencies:
+    invariant "^2.2.4"
+    warning "^3.0.0"
+
 react-is@^16.3.1:
   version "16.4.2"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.4.2.tgz#84891b56c2b6d9efdee577cc83501dfc5ecead88"

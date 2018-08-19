@@ -14,6 +14,14 @@ exports.up = knex => {
     table.text('additionalData').nullable()
     table.timestamp('createdAt', true)
     table.timestamp('updatedAt', true)
+    table
+      .integer('personId')
+      .unsigned()
+      .notNullable()
+      .references('id')
+      .inTable('people')
+      .onUpdate('CASCADE')
+      .onDelete('CASCADE')
   })
 }
 

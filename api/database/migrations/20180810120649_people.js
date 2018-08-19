@@ -2,26 +2,27 @@ exports.up = function (knex) {
   return knex.schema.createTable('people', table => {
     table.increments()
     table.string('name').notNullable()
-    table.date('birthday').notNullable()
+    table.date('birthday').nullable()
+    table
+      .enu('gender', ['male', 'female'], {
+        useNative: true,
+        enumName: 'people_gender'
+      })
+      .nullable()
+
     table.bigInteger('tel', 15).notNullable()
     table.bigInteger('cel', 15).nullable()
     table
-      .bigInteger('rg', 11)
-      .notNullable()
-      .unique()
-    table
       .bigInteger('cpf', 11)
-      .notNullable()
+      .nullable()
       .unique()
-
     table
-      .integer('addressId')
-      .notNullable()
-      .unsigned()
-      .references('id')
-      .inTable('addresses')
-      .onUpdate('CASCADE')
-      .onDelete('CASCADE')
+      .bigInteger('cnpj', 20)
+      .nullable()
+      .unique()
+    table.string('corporateName').nullable()
+
+    table.integer('stateRegistration').nullable()
 
     table
       .integer('userId')

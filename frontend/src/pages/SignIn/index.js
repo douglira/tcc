@@ -9,8 +9,6 @@ import * as Yup from 'yup';
 import { connect } from 'react-redux';
 import { Creators as UserActions } from '~/store/ducks/user';
 
-import { ThemeProvider } from 'styled-components';
-import { colors } from '~/styles';
 import {
   Container, Content, MaterialUI, RegisterOption,
 } from './styles';
@@ -25,105 +23,99 @@ const SignIn = ({
   }
 
   return (
-    <ThemeProvider theme={colors}>
-      <Container>
-        <Content>
-          <h1>Login</h1>
+    <Container>
+      <Content>
+        <h1>Login</h1>
 
-          <Formik
-            initialValues={{
-              email: '',
-              password: '',
-            }}
-            validationSchema={() => Yup.object().shape({
-              email: Yup.string()
-                .email()
-                .required(),
-              password: Yup.string()
-                .min(4)
-                .required(),
-            })
-            }
-            onSubmit={(values) => {
-              signinRequest(values);
-            }}
-            render={({
-              values, errors, touched, handleChange, handleBlur, handleSubmit,
-            }) => (
-              <form onSubmit={handleSubmit}>
-                <FormControl className={classes.formControl}>
-                  <InputLabel
-                    className={classes.inputLabel}
-                    FormLabelClasses={{
-                      root: classes.cssLabel,
-                      focused: classes.cssFocused,
-                    }}
-                    htmlFor="email"
-                  >
-                    Email
-                  </InputLabel>
-                  <Input
-                    className={classes.inputText}
-                    classes={{
-                      underline:
-                        touched.email && errors.email
-                          ? classes.cssUnderlineError
-                          : classes.cssUnderline,
-                    }}
-                    autoFocus
-                    id="email"
-                    type="email"
-                    placeholder="Email cadastrado"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.email}
-                  />
-                </FormControl>
-                <FormControl className={classes.formControl}>
-                  <InputLabel
-                    className={classes.inputLabel}
-                    FormLabelClasses={{
-                      root: classes.cssLabel,
-                      focused: classes.cssFocused,
-                    }}
-                    htmlFor="password"
-                  >
-                    Senha
-                  </InputLabel>
-                  <Input
-                    className={classes.inputText}
-                    classes={{
-                      underline:
-                        touched.password && errors.password
-                          ? classes.cssUnderlineError
-                          : classes.cssUnderline,
-                    }}
-                    id="password"
-                    type="password"
-                    placeholder="Sua senha de acesso"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values.password}
-                  />
-                </FormControl>
-                <Link to="/forgot_pass">Esqueceu sua senha?</Link>
-                <button type="submit" disabled={isSigningin}>
-                  {isSigningin ? (
-                    <i className="fa fa-spinner fa-pulse fa-1x" />
-                  ) : (
-                    <span>Entrar</span>
-                  )}
-                </button>
-              </form>
-            )}
-          />
-          <RegisterOption>
-            <p>ou</p>
-            <Link to="/cadastro">Cadastrar-se</Link>
-          </RegisterOption>
-        </Content>
-      </Container>
-    </ThemeProvider>
+        <Formik
+          initialValues={{
+            email: '',
+            password: '',
+          }}
+          validationSchema={() => Yup.object().shape({
+            email: Yup.string()
+              .email()
+              .required(),
+            password: Yup.string()
+              .min(4)
+              .required(),
+          })
+          }
+          onSubmit={(values) => {
+            signinRequest(values);
+          }}
+          render={({
+            values, errors, touched, handleChange, handleBlur, handleSubmit,
+          }) => (
+            <form onSubmit={handleSubmit}>
+              <FormControl className={classes.formControl}>
+                <InputLabel
+                  className={classes.inputLabel}
+                  FormLabelClasses={{
+                    root: classes.cssLabel,
+                    focused: classes.cssFocused,
+                  }}
+                  htmlFor="email"
+                >
+                  Email
+                </InputLabel>
+                <Input
+                  className={classes.inputText}
+                  classes={{
+                    underline:
+                      touched.email && errors.email
+                        ? classes.cssUnderlineError
+                        : classes.cssUnderline,
+                  }}
+                  autoFocus
+                  id="email"
+                  type="email"
+                  placeholder="Email cadastrado"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.email}
+                />
+              </FormControl>
+              <FormControl className={classes.formControl}>
+                <InputLabel
+                  className={classes.inputLabel}
+                  FormLabelClasses={{
+                    root: classes.cssLabel,
+                    focused: classes.cssFocused,
+                  }}
+                  htmlFor="password"
+                >
+                  Senha
+                </InputLabel>
+                <Input
+                  className={classes.inputText}
+                  classes={{
+                    underline:
+                      touched.password && errors.password
+                        ? classes.cssUnderlineError
+                        : classes.cssUnderline,
+                  }}
+                  id="password"
+                  type="password"
+                  placeholder="Sua senha de acesso"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  value={values.password}
+                />
+              </FormControl>
+              <Link to="/forgot_pass">Esqueceu sua senha?</Link>
+              <button type="submit" disabled={isSigningin}>
+                {isSigningin ? <i className="fa fa-spinner fa-pulse fa-1x" /> : <span>Entrar</span>}
+              </button>
+            </form>
+          )}
+        />
+        <RegisterOption>
+          <p>ou</p>
+          <Link to="/signup/natural">Cliente novo? Cadastrar</Link>
+        </RegisterOption>
+      </Content>
+    </Container>
   );
 };
 

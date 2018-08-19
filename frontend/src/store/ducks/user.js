@@ -8,6 +8,10 @@ export const { Types, Creators } = createActions(
     signinSuccess: ['user'],
     signinFailure: ['error'],
 
+    signupRequest: ['data', 'cbNavigation'],
+    signupSuccess: [],
+    signupFailure: ['error'],
+
     signout: (logout = true) => ({ type: 'SIGNOUT', logout }),
   },
   { prefix: 'user/' },
@@ -16,6 +20,7 @@ export const { Types, Creators } = createActions(
 const INITIAL_STATE = {
   isAuthenticated: false,
   isSigningin: false,
+  isSigningup: false,
   loading: false,
   error: null,
   data: {
@@ -49,10 +54,31 @@ const signinFailure = (state = INITIAL_STATE, action) => ({
   error: action.error,
 });
 
+const signupRequest = (state = INITIAL_STATE) => ({
+  ...state,
+  isSigningup: true,
+  error: false,
+});
+
+const signupSuccess = (state = INITIAL_STATE) => ({
+  ...state,
+  isSigningup: false,
+});
+
+const signupFailure = (state = INITIAL_STATE, action) => ({
+  ...state,
+  isSigningup: false,
+  error: action.error,
+});
+
 export default createReducer(INITIAL_STATE, {
   [Types.VERIFY_AUTH]: verifyAuth,
 
   [Types.SIGNIN_REQUEST]: signinRequest,
   [Types.SIGNIN_SUCCESS]: signinSuccess,
   [Types.SIGNIN_FAILURE]: signinFailure,
+
+  [Types.SIGNUP_REQUEST]: signupRequest,
+  [Types.SIGNUP_SUCCESS]: signupSuccess,
+  [Types.SIGNUP_FAILURE]: signupFailure,
 });
