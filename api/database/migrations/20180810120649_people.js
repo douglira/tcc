@@ -22,7 +22,7 @@ exports.up = function (knex) {
       .unique()
     table.string('corporateName').nullable()
 
-    table.integer('stateRegistration').nullable()
+    table.bigInteger('stateRegistration', 25).nullable()
 
     table
       .integer('userId')

@@ -112,7 +112,7 @@ const SignIn = ({
         />
         <RegisterOption>
           <p>ou</p>
-          <Link to="/signup/natural">Cliente novo? Cadastrar</Link>
+          <Link to="/signup/natural">Não possui conta? Cadastrar</Link>
         </RegisterOption>
       </Content>
     </Container>
