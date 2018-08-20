@@ -7,18 +7,20 @@ import AdminRoute from './AdminRoute';
 import IndexPage from '~/pages/Index';
 import SignInPage from '~/pages/SignIn';
 import SignUpPage from '~/pages/SignUp';
+import RedefinePassword from '~/pages/RedefinePassword';
 
-import UserHomePage from '~/pages/User/pages/Home';
+import UserPage from '~/pages/User/pages/Home';
 
-import AdminHomePage from '~/pages/Admin';
+import AdminPage from '~/pages/Admin';
 
 const Routes = () => (
   <Switch>
     <Route exact path="/" component={IndexPage} />
     <Route exact path="/signin" component={SignInPage} />
     <Route path="/signup" component={SignUpPage} />
-    <PrivateRoute exact path="/home" component={UserHomePage} />
-    <AdminRoute exact path="/admin/home" component={AdminHomePage} />
+    <Route path="/redefine" component={RedefinePassword} />
+    <PrivateRoute path="/home" component={UserPage} />
+    <AdminRoute path="/admin/home" component={AdminPage} />
     <Route render={() => <Redirect to="/" />} />
   </Switch>
 );

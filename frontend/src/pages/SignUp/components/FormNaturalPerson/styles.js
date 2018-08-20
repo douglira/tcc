@@ -34,10 +34,10 @@ export const Form = styled.form`
     width: 100%;
     max-width: 65%;
     border-radius: 1px;
+    font-weight: bold;
 
     &:hover {
       background: ${props => props.theme.main.secondary.lighten};
-      font-weight: 500;
     }
   }
 
@@ -146,7 +146,7 @@ export const MaterialUI = () => ({
   },
 
   formControlBirthday: {
-    width: '30%',
+    width: '40%',
     marginTop: '10px',
   },
 

@@ -37,9 +37,16 @@ module.exports = class User {
 
     let displayName
 
+    if (splittedName.length === 1) {
+      displayName = fullName
+      this.displayName = displayName
+      return
+    }
+
     if (splittedName.length === 2) {
       displayName = `${first} ${last}`
-      return displayName
+      this.displayName = displayName
+      return
     }
 
     if (first.length <= 3) {

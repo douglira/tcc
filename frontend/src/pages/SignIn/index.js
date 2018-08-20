@@ -103,7 +103,7 @@ const SignIn = ({
                   value={values.password}
                 />
               </FormControl>
-              <Link to="/forgot_pass">Esqueceu sua senha?</Link>
+              <Link to="/redefine/form/forgot_pass">Esqueceu sua senha?</Link>
               <button type="submit" disabled={isSigningin}>
                 {isSigningin ? <i className="fa fa-spinner fa-pulse fa-1x" /> : <span>Entrar</span>}
               </button>

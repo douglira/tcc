@@ -136,7 +136,7 @@ module.exports = {
 
       return res.json({
         message:
-          'Solicitação efetuada com sucesso. Em breve receberá um email para redefinir de senha'
+          'Solicitação efetuada com sucesso. Em breve receberá um email para redefinição de senha'
       })
     } catch (err) {
       return next(err)

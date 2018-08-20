@@ -1,16 +1,24 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { Switch, Route, Redirect } from 'react-router-dom';
 
 import { Container } from './styles';
 
-import HomePage from './pages/Home';
+import Home from './pages/Home';
 
-const AdminHome = () => (
+const Admin = ({ match }) => (
   <Container>
     <Switch>
-      <Route exact path="/admin/home" component={HomePage} />
+      <Route exact path={`${match.path}`} component={Home} />
+      <Route render={() => <Redirect to={`${match.path}`} />} />
     </Switch>
   </Container>
 );
 
-export default AdminHome;
+Admin.propTypes = {
+  match: PropTypes.shape({
+    path: PropTypes.string,
+  }).isRequired,
+};
+
+export default Admin;

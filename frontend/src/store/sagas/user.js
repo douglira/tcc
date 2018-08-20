@@ -48,7 +48,28 @@ function* signup(action) {
   } catch (err) {
     if (err.response.data && err.response.data.error) {
       yield put({
-        ...UserActions(err.response.data.error),
+        ...UserActions.signupFailure(err.response.data.error),
+        toast: buildToastify(err.response.data.error, ToastifyTypes.ERROR),
+      });
+    }
+  }
+}
+
+function* forgotPassRequest(action) {
+  try {
+    const { email } = action;
+    const { data } = yield call(api.post, '/auth/forgot_password', { email });
+
+    yield put({
+      ...UserActions.forgotPassResponse(),
+      toast: buildToastify(data.message, ToastifyTypes.SUCCESS),
+    });
+
+    action.cbNavigation();
+  } catch (err) {
+    if (err.response.data && err.response.data.error) {
+      yield put({
+        ...UserActions.forgotPassResponse(),
         toast: buildToastify(err.response.data.error, ToastifyTypes.ERROR),
       });
     }
@@ -59,6 +80,7 @@ export default function* root() {
   yield takeLatest(UserTypes.VERIFY_AUTH, verifyAuth);
   yield takeLatest(UserTypes.SIGNIN_REQUEST, signin);
   yield takeLatest(UserTypes.SIGNUP_REQUEST, signup);
+  yield takeLatest(UserTypes.FORGOT_PASS_REQUEST, forgotPassRequest);
 
   yield put(UserActions.verifyAuth());
 }
