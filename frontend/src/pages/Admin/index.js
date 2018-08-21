@@ -4,19 +4,17 @@ import {
   Switch, Route, Redirect, Link,
 } from 'react-router-dom';
 
-import { withStyles } from '@material-ui/core/styles';
-import { Drawer, IconButton } from '@material-ui/core';
-import { MenuRounded, PeopleRounded } from '@material-ui/icons';
+import { Drawer } from '@material-ui/core';
 
 import {
-  Container, HeaderAdmin, DrawerOptionsContainer, MaterialUI,
+  Container, HeaderAdmin, DrawerOptionsContainer, MenuButton,
 } from './styles';
 
 import Home from './pages/Home';
+import Categories from './pages/Categories';
 
 class Admin extends Component {
   static propTypes = {
-    classes: PropTypes.shape().isRequired,
     match: PropTypes.shape({
       path: PropTypes.string,
     }).isRequired,
@@ -28,7 +26,14 @@ class Admin extends Component {
       {
         label: 'Relatório de usuários',
         path: '/admin/home',
+        icon: 'fa fa-users',
         key: 'userReport',
+      },
+      {
+        label: 'Painel de Categorias',
+        path: '/admin/categories',
+        icon: 'fa fa-list-alt',
+        key: 'categoriesPanel',
       },
     ],
   };
@@ -41,34 +46,36 @@ class Admin extends Component {
 
   renderDrawerOptions = () => (
     <DrawerOptionsContainer>
-      <dl>
+      <nav>
         {this.state.drawerOptions.map(option => (
-          <dt key={option.key}>
-            <PeopleRounded />
+          <button type="button" onClick={this.toggleDrawer(false)} key={option.key}>
+            <i className={option.icon} />
             <Link to={option.path}>{option.label}</Link>
-          </dt>
+          </button>
         ))}
-      </dl>
+      </nav>
     </DrawerOptionsContainer>
   );
 
   render() {
-    const { match, classes } = this.props;
+    const { match } = this.props;
     const { toggleDrawer } = this.state;
 
     return (
       <Container>
+        <MenuButton type="button" onClick={this.toggleDrawer(true)}>
+          <i className={!toggleDrawer ? 'fa fa-angle-double-down' : 'fa fa-angle-double-up'} />
+        </MenuButton>
         <HeaderAdmin>
-          <IconButton onClick={this.toggleDrawer(true)} className={classes.button}>
-            <MenuRounded />
-          </IconButton>
+          <i className="fa fa-cog fa-2x" />
           <p>Área de Administrador</p>
         </HeaderAdmin>
-        <Drawer anchor="left" open={toggleDrawer} onClose={this.toggleDrawer(false)}>
+        <Drawer anchor="top" open={toggleDrawer} onClose={this.toggleDrawer(false)}>
           {this.renderDrawerOptions()}
         </Drawer>
         <Switch>
-          <Route exact path={`${match.path}`} component={Home} />
+          <Route exact path={`${match.path}/home`} component={Home} />
+          <Route exact path={`${match.path}/categories`} component={Categories} />
           <Route render={() => <Redirect to={`${match.path}`} />} />
         </Switch>
       </Container>
@@ -76,4 +83,4 @@ class Admin extends Component {
   }
 }
 
-export default withStyles(MaterialUI)(Admin);
+export default Admin;

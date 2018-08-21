@@ -33,6 +33,15 @@ Router.post(
 Router.get('/users/me', controllers.UserController.me)
 
 /**
+ * Category
+ */
+Router.post(
+  '/admin/categories',
+  middlewares.Role('admin'),
+  controllers.CategoryController.create
+)
+
+/**
  * Error
  */
 Router.use(middlewares.Error)

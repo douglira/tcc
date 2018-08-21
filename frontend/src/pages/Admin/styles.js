@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { colors } from '~/styles';
 
 export const Container = styled.div`
   width: 100%;
@@ -7,7 +6,33 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+`;
+
+export const MenuButton = styled.button`
+  display: flex;
   justify-content: center;
+  align-items: center;
+  padding: 5px;
+  margin: 10px 0;
+  width: 100%;
+  border: 0;
+  background: ${props => props.theme.main.white.normal};
+  border-radius: 1px;
+  cursor: pointer;
+
+  &:hover {
+    background: ${props => props.theme.main.lighter.normal};
+
+    i {
+      color: ${props => props.theme.main.primary.normal};
+    }
+  }
+
+  i {
+    font-size: 32px;
+    color: ${props => props.theme.main.dark.normal};
+  }
 `;
 
 export const HeaderAdmin = styled.div`
@@ -27,46 +52,49 @@ export const HeaderAdmin = styled.div`
     color: ${props => props.theme.main.dark.normal};
     font-weight: 700;
   }
+
+  i {
+    font-size: 32px;
+    color: ${props => props.theme.main.dark.normal};
+  }
 `;
 
 export const DrawerOptionsContainer = styled.div`
-  width: 250px;
+  width: 100%;
 
-  dl {
+  nav {
     width: 100%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
 
-    dt {
+    button {
+      border: 0;
       display: flex;
+      width: 100%;
       justify-content: flex-start;
-      align-items: center;
+      /* align-items: center; */
       line-height: 24px;
-      padding: 10px 5px;
+      padding: 15px 5px;
+
+      &:hover {
+        color: ${props => props.theme.main.primary.normal};
+        background: ${props => props.theme.main.white.darken};
+      }
+
+      i {
+        font-size: 16px;
+        margin-left: 10px;
+      }
 
       a {
+        width: 100%;
         text-decoration: inherit;
         font-size: 16px;
-        margin-left: 5px;
+        margin-left: 10px;
         color: ${props => props.theme.main.dark.normal};
         font-weight: 500;
-
-        &:hover {
-          color: ${props => props.theme.main.primary.normal};
-        }
+        text-align: left;
       }
     }
   }
 `;
-
-export const MaterialUI = theme => ({
-  button: {
-    margin: theme.spacing.unit,
-    width: '28px',
-    height: '28px',
-    color: colors.main.dark.normal,
-  },
-  input: {
-    display: 'none',
-  },
-});
