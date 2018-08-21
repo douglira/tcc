@@ -78,9 +78,10 @@ module.exports = class User {
 
   isExpiredResetPassword () {
     const now = new Date()
+    const past = new Date(this.passwordExpiresIn)
     let isValid = false
 
-    if (now > this.passwordExpiresIn) {
+    if (now > past) {
       return isValid
     }
 

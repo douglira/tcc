@@ -105,7 +105,8 @@ module.exports = {
 
   async forgotPass (req, res, next) {
     try {
-      const { email } = req.body
+      const { email, formPathname } = req.body
+      const originPath = req.get('origin')
 
       if (!email) {
         return res.status(400).send({ error: 'Campo inválido' })
@@ -130,7 +131,7 @@ module.exports = {
         template: 'forgotPass',
         context: {
           displayName: user.displayName,
-          token: user.passwordResetToken
+          url: `${originPath}${formPathname}?t=${user.passwordResetToken}`
         }
       })
 

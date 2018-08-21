@@ -15,6 +15,9 @@ export const { Types, Creators } = createActions(
     forgotPassRequest: ['email', 'cbNavigation'],
     forgotPassResponse: [],
 
+    resetPassRequest: ['data', 'cbNavigation'],
+    resetPassResponse: [],
+
     signout: (logout = true) => ({ type: 'SIGNOUT', logout }),
   },
   { prefix: 'user/' },
@@ -84,6 +87,16 @@ const forgotPassResponse = (state = INITIAL_STATE) => ({
   loading: false,
 });
 
+const resetPassRequest = (state = INITIAL_STATE) => ({
+  ...state,
+  loading: true,
+});
+
+const resetPassResponse = (state = INITIAL_STATE) => ({
+  ...state,
+  loading: false,
+});
+
 export default createReducer(INITIAL_STATE, {
   [Types.VERIFY_AUTH]: verifyAuth,
 
@@ -97,4 +110,7 @@ export default createReducer(INITIAL_STATE, {
 
   [Types.FORGOT_PASS_REQUEST]: forgotPassRequest,
   [Types.FORGOT_PASS_RESPONSE]: forgotPassResponse,
+
+  [Types.RESET_PASS_REQUEST]: resetPassRequest,
+  [Types.RESET_PASS_RESPONSE]: resetPassResponse,
 });

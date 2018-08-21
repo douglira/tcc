@@ -5,6 +5,7 @@ import { Route, Switch, Redirect } from 'react-router-dom';
 import { Container, Content } from './styles';
 
 import FormForgotPass from './components/FormForgotPass';
+import FormResetPass from './components/FormResetPass';
 
 const RedefinePassword = ({ match }) => (
   <Container>
@@ -16,7 +17,7 @@ const RedefinePassword = ({ match }) => (
       <p>Siga os passos abaixo para redefinir sua senha</p>
       <Switch>
         <Route exact path={`${match.path}/form/forgot_pass`} component={FormForgotPass} />
-        {/* <Route exact path={`${match.path}/form/reset_pass`} component={FormLegalPerson} /> */}
+        <Route exact path={`${match.path}/form/reset_pass`} component={FormResetPass} />
         <Route render={() => <Redirect to={`${match.path}/form/forgot_pass`} />} />
       </Switch>
     </Content>

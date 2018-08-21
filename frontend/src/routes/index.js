@@ -19,8 +19,8 @@ const Routes = () => (
     <Route exact path="/signin" component={SignInPage} />
     <Route path="/signup" component={SignUpPage} />
     <Route path="/redefine" component={RedefinePassword} />
-    <PrivateRoute path="/home" component={UserPage} />
     <AdminRoute path="/admin/home" component={AdminPage} />
+    <PrivateRoute path="/home" component={UserPage} />
     <Route render={() => <Redirect to="/" />} />
   </Switch>
 );
