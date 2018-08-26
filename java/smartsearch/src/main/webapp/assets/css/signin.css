@@ -1,0 +1,23 @@
+.content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	margin-top: 40px;
+}
+
+.content > h1 {
+	text-transform: uppercase;
+}
+
+.content form, .div-error {
+	width: 100%;
+	max-width: 450px;
+	min-width: 320px;
+	padding: 10px;
+}
+
+.content form button {
+	width: 100%;
+	font-weight: 600;
+}

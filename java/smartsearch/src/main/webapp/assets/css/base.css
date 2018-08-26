@@ -1,0 +1,37 @@
+* {
+	margin: 0;
+	padding: 0;
+	outline: 0;
+	box-sizing: border-box;
+}
+
+html, body {
+	height: 100%;
+}
+
+body {
+	text-rendering: optimizeLegibility !important;
+	-webkit-font-smoothing: antialiased !important;
+	font-family: 'Montserrat', sans-serif !important;
+	background: #fff;
+}
+
+.app-color-primary {
+	color: #9ccc65 !important;
+}
+
+.app-color-secundary {
+	color: #6B84D9 !important;
+}
+
+.app-bg-primary {
+	background-color: #9ccc65 !important;
+}
+
+.app-bg-secundary {
+	background-color: #6B84D9 !important;
+}
+
+header {
+	margin-bottom: 20px;
+}

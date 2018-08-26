@@ -1,0 +1,22 @@
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link
+	href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,500,500i,600,700"
+	rel="stylesheet">
+<link rel="stylesheet" href="assets/libs/css/bootstrap.min.css">
+<link rel="stylesheet" href="assets/css/base.css">
+</head>
+<body>
+
+	<jsp:include page="header.jsp"/>
+
+	<div class="container"></div>
+
+	<script src="assets/libs/js/jquery-3.3.1.slim.min.js"></script>
+	<script src="assets/libs/js/popper-1.14.4.min.js"></script>
+	<script src="assets/libs/js/bootstrap.min.js"></script>
+</body>
+</html>
