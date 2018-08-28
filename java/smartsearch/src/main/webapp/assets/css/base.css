@@ -35,3 +35,14 @@ body {
 header {
 	margin-bottom: 20px;
 }
+
+.header-btn_dropdown {
+	background-color: inherit !important;
+	margin-right: 10px !important;
+	border: 0 !important;
+	padding-left: 0 !important;
+}
+
+header form input::placeholder {
+	font-size: 12.5px !important;
+}

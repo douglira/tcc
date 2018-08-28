@@ -6,9 +6,9 @@
 <link
 	href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,500,500i,600,700"
 	rel="stylesheet">
-<link rel="stylesheet" href="assets/libs/css/bootstrap.min.css">
-<link rel="stylesheet" href="assets/css/base.css">
-<link rel="stylesheet" href="assets/css/signin.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/css/bootstrap.min.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/base.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/signin.css">
 </head>
 <body>
 
@@ -38,12 +38,14 @@
 					<input class="form-control" type="password" id="passwordInput" name="password" placeholder="Sua senha" />
 				</div>
 				<button class="btn btn-primary" type="submit" value="signin" name="action" >Entrar</button>
+				<small>ou</small>
+				<p><a href="<%=request.getContextPath() %>/register" class="text-info">Não possui conta? Cadastrar</a></p>
 			</form>
 		</div>
 	</div>
 
-	<script src="assets/libs/js/jquery-3.3.1.slim.min.js"></script>
-	<script src="assets/libs/js/popper-1.14.4.min.js"></script>
-	<script src="assets/libs/js/bootstrap.min.js"></script>
+	<script src="<%=request.getContextPath()%>/assets/libs/js/jquery-3.3.1.slim.min.js"></script>
+	<script src="<%=request.getContextPath()%>/assets/libs/js/popper-1.14.4.min.js"></script>
+	<script src="<%=request.getContextPath()%>/assets/libs/js/bootstrap.min.js"></script>
 </body>
 </html>

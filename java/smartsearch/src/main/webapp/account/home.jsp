@@ -1,3 +1,6 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="utf-8">
@@ -11,9 +14,11 @@
 </head>
 <body>
 
-	<jsp:include page="header.jsp"/>
+	<jsp:include page="/header.jsp"/>
 
-	<div class="container"></div>
+	<div class="container">
+		<h1>Área do usuário</h1>
+	</div>
 
 	<script src="<%=request.getContextPath()%>/assets/libs/js/jquery-3.3.1.slim.min.js"></script>
 	<script src="<%=request.getContextPath()%>/assets/libs/js/popper-1.14.4.min.js"></script>
