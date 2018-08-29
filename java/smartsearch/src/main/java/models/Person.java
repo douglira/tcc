@@ -9,9 +9,10 @@ public class Person {
 	private long id;
 	private PersonType personType;
 	private String name;
-	private BigInteger tel;
+	private long tel;
 	private Timestamp createdAt;
 	private Timestamp updatedAt;
+	private User user;
 
 	public long getId() {
 		return id;
@@ -37,11 +38,11 @@ public class Person {
 		this.name = name;
 	}
 
-	public BigInteger getTel() {
+	public long getTel() {
 		return tel;
 	}
 
-	public void setTel(BigInteger tel) {
+	public void setTel(long tel) {
 		this.tel = tel;
 	}
 
@@ -59,5 +60,13 @@ public class Person {
 
 	public void setUpdatedAt(Timestamp updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 }

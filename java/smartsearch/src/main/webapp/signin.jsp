@@ -1,3 +1,4 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html lang="pt-br">
 <head>
 <meta charset="utf-8">
@@ -17,17 +18,12 @@
 	<div class="container">
 		<div class="content">
 			<h1>Login</h1>
-			
-			<%
-				String error = (String) request.getAttribute("error");
-				if (error != null) {
-			%>
+			<%String error = (String) request.getAttribute("error");%>
+			<c:if test="<%=error != null%>">
 				<div class="div-error">
 					<div class="alert alert-danger"><%= error %></div>
 				</div>
-			<%
-				}
-			%>
+			</c:if>
 			<form action="auth" method="POST">
 				<div class="form-group">
 					<label for="emailInput">Email</label>

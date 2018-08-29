@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import database.ConnectionFactory;
 import enums.Status;
@@ -11,16 +12,16 @@ import enums.UserRoles;
 import models.User;
 
 public class UserDAO {
-	public void create(User user) {
+	public User create(User user) {
 		Connection conn = null;
 		PreparedStatement stmt = null;
-		String sql = "INSERT INTO users (email, username, displayName, "
-		+ "password, role, status, createdAt) VALUES (?, ?, ?, "
+		String sql = "INSERT INTO users (email, username, \"displayName\", "
+		+ "password, role, status, \"createdAt\") VALUES (?, ?, ?, "
 		+ "?, CAST(? AS users_role), CAST(? AS users_status), NOW())";
 				
 		try {
 			conn = ConnectionFactory.getConnection();
-			stmt = conn.prepareStatement(sql);
+			stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, user.getEmail());
 			stmt.setString(2, user.getUsername());
 			stmt.setString(3, user.getDisplayName());
@@ -28,6 +29,12 @@ public class UserDAO {
 			stmt.setString(5, user.getRole().toString());
 			stmt.setString(6, user.getStatus().toString());
 			stmt.execute();
+			
+			ResultSet rs = stmt.getGeneratedKeys();
+			
+			if (rs.next()) {
+				user.setId(rs.getInt(1));
+			}
 			
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -40,6 +47,8 @@ public class UserDAO {
 				}
 			}
 		}
+		
+		return user;
 	}
 	
 	public User authenticate(User user) {

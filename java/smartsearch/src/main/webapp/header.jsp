@@ -3,7 +3,7 @@
 <% 
 	User user = (User) session.getAttribute("loggedUser"); 
 %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <header class="header">
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
 		<a class="navbar-brand" href="#">LOGOTIPO</a>
@@ -16,17 +16,18 @@
 
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav mr-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="#">Sobre nós</a>
+				</li>
 				<li class="nav-item active">
-					<a class="nav-link" href="#">Categorias</a>
+					<a class="nav-link" href="#">Pedidos de compra</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="#">Destaques</a>
+					<a class="nav-link" href="#">Recentes</a>
 				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#">Ofertas da semana</a>
-				</li>				
 				
 			</ul>
+			
 			
 			<div class="form-inline my-2 my-lg-0 dropdown">
 				<button 
@@ -37,35 +38,41 @@
 				aria-haspopup="true" 
 				aria-expanded="false"
 				>
-					<%
-						if (user == null) {
-					%>
+				<c:choose>
+					<c:when test="<%=user == null%>">
 						Minha conta
-					<% } else { %>
+					</c:when>
+					<c:otherwise>
 						Olá, <strong><%= user.getDisplayName() %></strong>
-					<% } %>
+					</c:otherwise>
+				</c:choose>
 				</button>
 				<div class="dropdown-menu" aria-labelledby="dropdownOptions">
-					<% if (user != null && user.getRole() == UserRoles.ADMIN) { %>
-					<a class="dropdown-item font-weight-bold" href="<%=request.getContextPath()%>/admin">(administrador)</a>
-					<div class="dropdown-divider"></div>
-					<a class="dropdown-item" href="<%=request.getContextPath()%>/admin">Lista de usuários</a> 
-					<a class="dropdown-item" href="#">Painel de categorias</a>
-					<% } else {  %>
-					<a class="dropdown-item" href="<%=request.getContextPath()%>/account">Pedidos de compra</a> 
-					<a class="dropdown-item" href="#">Orçamentos lançados</a>
-					<a class="dropdown-item" href="#">Meus dados</a>
-					<% } %>
+					<c:choose>
+						<c:when test="<%=user != null && user.getRole() == UserRoles.ADMIN%>">
+							<a class="dropdown-item font-weight-bold" href="<%=request.getContextPath()%>/admin">(administrador)</a>
+							<div class="dropdown-divider"></div>
+							<a class="dropdown-item" href="<%=request.getContextPath()%>/admin">Lista de usuários</a> 
+							<a class="dropdown-item" href="#">Painel de categorias</a>
+						</c:when>
+						<c:otherwise>
+							<a class="dropdown-item" href="<%=request.getContextPath()%>/account">Meus pedidos de compra</a> 
+							<a class="dropdown-item" href="#">Orçamentos lançados</a>
+							<a class="dropdown-item" href="#">Meus dados</a>
+						</c:otherwise>
+					</c:choose>
 					
 					<div class="dropdown-divider"></div>
 					
-					<%		
-						if (user == null) {
-					%>
-						<a class="dropdown-item" href="<%=request.getContextPath()%>/signin.jsp">Entrar</a>
-					<% } else { %>
-						<a class="dropdown-item" href="<%=request.getContextPath()%>/auth">Sair</a>
-					<% } %>
+					<c:choose>
+						<c:when test="<%=user == null%>">
+							<a class="dropdown-item" href="<%=request.getContextPath()%>/signin">Entrar</a>
+							<a class="dropdown-item text-info" href="<%=request.getContextPath()%>/register">Não possui conta?</a>
+						</c:when>
+						<c:otherwise>
+							<a class="dropdown-item" href="<%=request.getContextPath()%>/auth">Sair</a>
+						</c:otherwise>
+					</c:choose>
 				</div>
 			</div>
 			

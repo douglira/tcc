@@ -1,11 +1,9 @@
 package models;
 
-import java.math.BigInteger;
-
 public class LegalPerson extends Person {
 	private String corporateName;
-	private BigInteger stateRegistration;
-	private BigInteger cnpj;
+	private long stateRegistration;
+	private long cnpj;
 
 	public String getCorporateName() {
 		return corporateName;
@@ -15,19 +13,19 @@ public class LegalPerson extends Person {
 		this.corporateName = corporateName;
 	}
 
-	public BigInteger getStateRegistration() {
+	public long getStateRegistration() {
 		return stateRegistration;
 	}
 
-	public void setStateRegistration(BigInteger stateRegistration) {
+	public void setStateRegistration(long stateRegistration) {
 		this.stateRegistration = stateRegistration;
 	}
 
-	public BigInteger getCnpj() {
+	public long getCnpj() {
 		return cnpj;
 	}
 
-	public void setCnpj(BigInteger cnpj) {
+	public void setCnpj(long cnpj) {
 		this.cnpj = cnpj;
 	}
 }

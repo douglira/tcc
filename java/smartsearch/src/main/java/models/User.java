@@ -7,7 +7,7 @@ import enums.Status;
 import enums.UserRoles;
 
 public class User {
-	private BigInteger id;
+	private int id;
 	private String email;
 	private String username;
 	private String displayName;
@@ -29,11 +29,11 @@ public class User {
 		this.password = password;
 	}
 
-	public BigInteger getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(BigInteger id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
@@ -116,5 +116,24 @@ public class User {
 	public void setUpdatedAt(Timestamp updatedAt) {
 		this.updatedAt = updatedAt;
 	}
-
+	
+	public void generateDisplayName(Person person) {
+		String fullName = person.getName();
+		String[] fullNameParts = fullName.split(" ");
+		
+		if (fullNameParts.length == 1) {
+			this.displayName = fullNameParts[0];
+			return;
+		}
+		
+		if (fullNameParts.length == 2) {
+			this.displayName = fullName;
+			return;
+		}
+		
+		String firstName = fullNameParts[0];
+		String lastName = fullNameParts[fullNameParts.length - 1];
+		
+		this.displayName = firstName + " " + lastName;
+	}
 }
