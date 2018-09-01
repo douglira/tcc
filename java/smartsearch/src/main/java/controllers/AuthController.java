@@ -11,10 +11,9 @@ import javax.servlet.http.HttpSession;
 
 import dao.PersonDAO;
 import dao.UserDAO;
-import enums.PersonType;
 import enums.Status;
 import enums.UserRoles;
-import models.LegalPerson;
+import models.Person;
 import models.User;
 
 @WebServlet(urlPatterns = "/auth")
@@ -58,16 +57,15 @@ public class AuthController extends HttpServlet {
 			
 			HttpSession session = request.getSession();
 			session.setAttribute("loggedUser", loggedUser);
-			response.sendRedirect("/smartsearch");
+			response.sendRedirect(request.getContextPath());
 		} else if (action.equals("register")) {
 			
-			LegalPerson person = new LegalPerson();
-			person.setName(request.getParameter("name"));
+			Person person = new Person();
+			person.setAccountOwner(request.getParameter("accountOwner"));
 			person.setTel(Long.parseLong(request.getParameter("tel")));
 			person.setCnpj(Long.parseLong(request.getParameter("cnpj")));
 			person.setCorporateName(request.getParameter("corporateName"));
 			person.setStateRegistration(Long.parseLong(request.getParameter("stateRegistration")));
-			person.setPersonType(PersonType.LEGAL);
 			
 			User user = new User();
 			user.setEmail(request.getParameter("email"));
@@ -82,8 +80,7 @@ public class AuthController extends HttpServlet {
 			person.setUser(user);
 			
 			new PersonDAO().create(person);
-			
-			response.sendRedirect("/signin");
+			response.sendRedirect(request.getContextPath() + "/signin");
 		}
 	}
 

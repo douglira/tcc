@@ -1,18 +1,17 @@
 package models;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
-
-import enums.PersonType;
 
 public class Person {
 	private long id;
-	private PersonType personType;
-	private String name;
+	private String accountOwner;
 	private long tel;
+	private User user;
+	private String corporateName;
+	private long stateRegistration;
+	private long cnpj;
 	private Timestamp createdAt;
 	private Timestamp updatedAt;
-	private User user;
 
 	public long getId() {
 		return id;
@@ -22,20 +21,12 @@ public class Person {
 		this.id = id;
 	}
 
-	public PersonType getPersonType() {
-		return personType;
+	public String getAccountOwner() {
+		return accountOwner;
 	}
 
-	public void setPersonType(PersonType personType) {
-		this.personType = personType;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+	public void setAccountOwner(String accountOwner) {
+		this.accountOwner = accountOwner;
 	}
 
 	public long getTel() {
@@ -44,6 +35,38 @@ public class Person {
 
 	public void setTel(long tel) {
 		this.tel = tel;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public String getCorporateName() {
+		return corporateName;
+	}
+
+	public void setCorporateName(String corporateName) {
+		this.corporateName = corporateName;
+	}
+
+	public long getStateRegistration() {
+		return stateRegistration;
+	}
+
+	public void setStateRegistration(long stateRegistration) {
+		this.stateRegistration = stateRegistration;
+	}
+
+	public long getCnpj() {
+		return cnpj;
+	}
+
+	public void setCnpj(long cnpj) {
+		this.cnpj = cnpj;
 	}
 
 	public Timestamp getCreatedAt() {
@@ -60,13 +83,5 @@ public class Person {
 
 	public void setUpdatedAt(Timestamp updatedAt) {
 		this.updatedAt = updatedAt;
-	}
-
-	public User getUser() {
-		return user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 }

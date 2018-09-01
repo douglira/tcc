@@ -9,7 +9,7 @@
 <link
 	href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,500,500i,600,700"
 	rel="stylesheet">
-<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/css/bootstrap.min.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/base.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/register.css">
 </head>
@@ -36,8 +36,8 @@
 				</div>
 				<h2 class="text-muted">Dados jurídicos</h2>
 				<div class="form-group w-100">
-					<label for="name">Responsável</label>
-					<input class="form-control" type="text" id="name" name="name">
+					<label for="accountOwner">Responsável</label>
+					<input class="form-control" type="text" id="accountOwner" name="accountOwner">
 				</div>
 				<div class="form-group w-100">
 					<label for="tel">Telefone</label>
@@ -45,7 +45,7 @@
 				</div>
 				<div class="form-group w-100">
 					<label for="cnpj">CNPJ</label>
-					<input class="form-control" type="number" id="cnpj" name="cnpj">
+					<input class="form-control" type="text" id="cnpj" name="cnpj">
 				</div>
 				<div class="form-group w-100">
 					<label for="corporateName">Razão social</label>
@@ -57,7 +57,7 @@
 				</div>
 				<button class="btn btn-success btn-submit" type="submit" value="register" name="action">Finalizar cadastro</button>
 				<p class="text-muted p-link-signin">
-					Já tem um cadastro? 
+					Já tem um cadastro?	
 					<a class="text-info" href="<%=request.getContextPath()%>/signin">
 						Entrar
 					</a>
@@ -66,8 +66,10 @@
 		</div>
 	</div>
 
-	<script src="<%=request.getContextPath()%>/assets/libs/js/jquery-3.3.1.slim.min.js"></script>
-	<script src="<%=request.getContextPath()%>/assets/libs/js/popper-1.14.4.min.js"></script>
-	<script src="<%=request.getContextPath()%>/assets/libs/js/bootstrap.min.js"></script>
+	<script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
+	<script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/popper-1.14.4.min.js"></script>
+	<script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/bootstrap.min.js"></script>
+	<script src="<%=request.getContextPath()%>/assets/libs/inputmask/dist/jquery.inputmask.bundle.js"></script>
+	<script src="<%=request.getContextPath()%>/assets/js/register.js"></script>
 </body>
 </html>

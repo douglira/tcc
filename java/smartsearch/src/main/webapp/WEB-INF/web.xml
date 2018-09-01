@@ -72,14 +72,6 @@
 	
 
 	<!-- Admin -->
-	<servlet>
-		<servlet-name>adminHome</servlet-name>
-		<jsp-file>/admin/home.jsp</jsp-file>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>adminHome</servlet-name>
-		<url-pattern>/admin</url-pattern>
-	</servlet-mapping>
 	
 
 	<!-- User -->

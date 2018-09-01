@@ -50,9 +50,9 @@
 				<div class="dropdown-menu" aria-labelledby="dropdownOptions">
 					<c:choose>
 						<c:when test="<%=user != null && user.getRole() == UserRoles.ADMIN%>">
-							<a class="dropdown-item font-weight-bold" href="<%=request.getContextPath()%>/admin">(administrador)</a>
+							<a class="dropdown-item font-weight-bold" href="<%=request.getContextPath()%>/admin?page=1&perPage=15">(administrador)</a>
 							<div class="dropdown-divider"></div>
-							<a class="dropdown-item" href="<%=request.getContextPath()%>/admin">Lista de usuários</a> 
+							<a class="dropdown-item" href="<%=request.getContextPath()%>/admin?page=1&perPage=15">Lista de usuários</a> 
 							<a class="dropdown-item" href="#">Painel de categorias</a>
 						</c:when>
 						<c:otherwise>

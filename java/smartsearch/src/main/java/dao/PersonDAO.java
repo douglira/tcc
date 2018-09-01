@@ -5,25 +5,24 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import database.ConnectionFactory;
-import models.LegalPerson;
+import models.Person;
 
 public class PersonDAO {
-	public void create(LegalPerson person) {
+	public void create(Person person) {
 		Connection conn = null;
 		PreparedStatement stmt = null;
-		String sql = "INSERT INTO people (name, tel, cnpj, \"corporateName\", "
-				+ "\"stateRegistration\", persontype, \"userId\", \"createdAt\" )"
-				+ "VALUES (?, ?, ?, ?, ?, CAST(? AS people_type), ?, NOW())";
+		String sql = "INSERT INTO people (account_owner, tel, cnpj, corporate_name, "
+				+ "state_registration, user_id, created_at)"
+				+ "VALUES (?, ?, ?, ?, ?, ?, NOW())";
 		try {
 			conn = ConnectionFactory.getConnection();
 			stmt = conn.prepareStatement(sql);
-			stmt.setString(1, person.getName());
+			stmt.setString(1, person.getAccountOwner());
 			stmt.setLong(2, person.getTel());
 			stmt.setLong(3, person.getCnpj());
 			stmt.setString(4, person.getCorporateName());
 			stmt.setLong(5, person.getStateRegistration());
-			stmt.setString(6, person.getPersonType().toString());
-			stmt.setInt(7, person.getUser().getId());
+			stmt.setInt(6, person.getUser().getId());
 			stmt.execute();
 			
 		} catch (SQLException e) {

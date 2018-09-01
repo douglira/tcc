@@ -118,7 +118,7 @@ public class User {
 	}
 	
 	public void generateDisplayName(Person person) {
-		String fullName = person.getName();
+		String fullName = person.getAccountOwner();
 		String[] fullNameParts = fullName.split(" ");
 		
 		if (fullNameParts.length == 1) {
