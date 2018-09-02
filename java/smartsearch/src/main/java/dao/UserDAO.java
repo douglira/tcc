@@ -52,25 +52,25 @@ public class UserDAO {
 		return user;
 	}
 	
-	public User authenticate(User user) {
+	public User checkIfExists(User user) {
 		User loggedUser = null;
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT * FROM users WHERE users.email = ? AND password = ?";
+		String sql = "SELECT * FROM users WHERE users.email = ?";
 		
 		try {
 			
 			conn = ConnectionFactory.getConnection();
 			stmt = conn.prepareStatement(sql);
 			stmt.setString(1, user.getEmail());
-			stmt.setString(2, user.getPassword());
 			rs = stmt.executeQuery();
 			
 			if (rs.next()) {
 				loggedUser = new User();
 				loggedUser.setUsername(rs.getString("username"));
 				loggedUser.setEmail(rs.getString("email"));
+				loggedUser.setPassword(rs.getString("password"));
 				loggedUser.setDisplayName(rs.getString("display_name"));
 				loggedUser.setRole(UserRoles.valueOf(rs.getString("role")));
 				loggedUser.setStatus(Status.valueOf(rs.getString("status")));

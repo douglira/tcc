@@ -3,6 +3,8 @@ package models;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import enums.Status;
 import enums.UserRoles;
 
@@ -23,10 +25,9 @@ public class User {
 
 	}
 
-	public User(String email, String password) {
+	public User(String email) {
 		super();
 		this.email = email;
-		this.password = password;
 	}
 
 	public int getId() {
@@ -135,5 +136,24 @@ public class User {
 		String lastName = fullNameParts[fullNameParts.length - 1];
 		
 		this.displayName = firstName + " " + lastName;
+	}
+	
+	public void hashPassword() {
+		String password = this.password;
+		
+		String salt = BCrypt.gensalt(10);
+		this.password = BCrypt.hashpw(password, salt);
+	}
+	
+	public boolean checkPassword(String passwordPlainText) {
+		boolean isValid = false;
+		
+		if (this.password == null || passwordPlainText == null || !this.password.startsWith("$2a$")) {
+			return isValid;
+		}
+		
+		isValid = BCrypt.checkpw(passwordPlainText, this.password);
+		
+		return isValid;
 	}
 }
