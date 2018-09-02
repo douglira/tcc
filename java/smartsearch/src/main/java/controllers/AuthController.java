@@ -86,7 +86,7 @@ public class AuthController extends HttpServlet {
 			user.setRole(UserRoles.COMMON);
 			user.setStatus(Status.ACTIVE);
 
-			user.generateDisplayName(person);
+			user.generateDisplayName(person.getAccountOwner());
 			user.hashPassword();
 
 			user = new UserDAO().create(user);

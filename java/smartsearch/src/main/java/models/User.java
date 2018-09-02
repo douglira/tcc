@@ -1,7 +1,6 @@
 package models;
 
-import java.math.BigInteger;
-import java.sql.Timestamp;
+import java.util.Calendar;
 
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -15,11 +14,11 @@ public class User {
 	private String displayName;
 	private String password;
 	private String passwordResetToken;
-	private Timestamp passwordExpiresIn;
+	private Calendar passwordExpiresIn;
 	private UserRoles role = UserRoles.COMMON;
 	private Status status;
-	private Timestamp createdAt;
-	private Timestamp updatedAt;
+	private Calendar createdAt;
+	private Calendar updatedAt;
 
 	public User() {
 
@@ -78,11 +77,11 @@ public class User {
 		this.passwordResetToken = passwordResetToken;
 	}
 
-	public Timestamp getPasswordExpiresIn() {
+	public Calendar getPasswordExpiresIn() {
 		return passwordExpiresIn;
 	}
 
-	public void setPasswordExpiresIn(Timestamp passwordExpiresIn) {
+	public void setPasswordExpiresIn(Calendar passwordExpiresIn) {
 		this.passwordExpiresIn = passwordExpiresIn;
 	}
 
@@ -102,58 +101,63 @@ public class User {
 		this.status = status;
 	}
 
-	public Timestamp getCreatedAt() {
+	public Calendar getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(Timestamp createdAt) {
+	public void setCreatedAt(Calendar createdAt) {
 		this.createdAt = createdAt;
 	}
 
-	public Timestamp getUpdatedAt() {
+	public Calendar getUpdatedAt() {
 		return updatedAt;
 	}
 
-	public void setUpdatedAt(Timestamp updatedAt) {
+	public void setUpdatedAt(Calendar updatedAt) {
 		this.updatedAt = updatedAt;
 	}
-	
-	public void generateDisplayName(Person person) {
-		String fullName = person.getAccountOwner();
+
+	public void generateDisplayName(String fullName) {
 		String[] fullNameParts = fullName.split(" ");
-		
+
 		if (fullNameParts.length == 1) {
 			this.displayName = fullNameParts[0];
 			return;
 		}
-		
+
 		if (fullNameParts.length == 2) {
 			this.displayName = fullName;
 			return;
 		}
-		
+
+		if (fullNameParts[0].length() <= 3) {
+			this.displayName = fullNameParts[0] + " " + fullNameParts[1] + " "
+					+ fullNameParts[fullNameParts.length - 1];
+			return;
+		}
+
 		String firstName = fullNameParts[0];
 		String lastName = fullNameParts[fullNameParts.length - 1];
-		
+
 		this.displayName = firstName + " " + lastName;
 	}
-	
+
 	public void hashPassword() {
 		String password = this.password;
-		
+
 		String salt = BCrypt.gensalt(10);
 		this.password = BCrypt.hashpw(password, salt);
 	}
-	
+
 	public boolean checkPassword(String passwordPlainText) {
 		boolean isValid = false;
-		
+
 		if (this.password == null || passwordPlainText == null || !this.password.startsWith("$2a$")) {
 			return isValid;
 		}
-		
+
 		isValid = BCrypt.checkpw(passwordPlainText, this.password);
-		
+
 		return isValid;
 	}
 }

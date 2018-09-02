@@ -13,30 +13,27 @@
 </head>
 <body>
 
-	<jsp:include page="header.jsp"/>
+	<jsp:include page="/header.jsp"/>
 
 	<div class="container">
 		<div class="content">
-			<h1>Login</h1>
+			<h1 style="font-size: 28px; color: #666;">Redefinição de senha</h1>
 			<%String error = (String) request.getAttribute("error");%>
 			<c:if test="<%=error != null%>">
 				<div class="div-error">
 					<div class="alert alert-danger"><%= error %></div>
 				</div>
 			</c:if>
-			<form action="auth" method="POST">
+			<form action="<%=request.getContextPath()%>/password/redefine" method="POST">
+				<p class="text-secondary text-left" style="font-size: 13px">
+					Insira seu email de cadastro no campo abaixo e em alguns minutos enviaremos um e-mail
+					para que possa resetar sua senha.
+				</p>
 				<div class="form-group">
 					<label for="emailInput">Email</label>
-					<input class="form-control" type="email" id="emailInput" name="email" placeholder="Seu email de acesso" />
+					<input class="form-control" type="email" id="emailInput" name="email" placeholder="Email cadastrado" />
 				</div>
-				<div class="form-group">
-					<label for="passwordInput">Senha</label>
-					<input class="form-control" type="password" id="passwordInput" name="password" placeholder="Sua senha" />
-					<a class="link-forgot_pass" href="<%=request.getContextPath()%>/form/forgot_pass">Esqueceu sua senha?</a>
-				</div>
-				<button class="btn btn-primary" type="submit" value="signin" name="action" >Entrar</button>
-				<small>ou</small>
-				<p><a href="<%=request.getContextPath() %>/register" class="text-info">Não possui conta? Cadastrar</a></p>
+				<button class="btn btn-primary" type="submit" value="forgot_pass" name="action" >Enviar</button>
 			</form>
 		</div>
 	</div>
