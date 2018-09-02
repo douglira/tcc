@@ -25,15 +25,19 @@
 				</div>
 			</c:if>
 			<form action="<%=request.getContextPath()%>/password/redefine" method="POST">
+				<input type="hidden" name="token" value="<%=((String) request.getAttribute("token"))%>"/>
 				<p class="text-secondary text-left" style="font-size: 13px">
-					Insira seu email de cadastro no campo abaixo e em alguns minutos enviaremos um e-mail
-					para que possa resetar sua senha.
+					Preencha e confirme sua nova senha nos campos abaixo para redefini-la.
 				</p>
 				<div class="form-group">
-					<label for="emailInput">Email</label>
-					<input class="form-control" type="email" id="emailInput" name="email" placeholder="Email cadastrado" autofocus/>
+					<label for="passwordInput">Senha</label>
+					<input class="form-control" type="password" id="passwordInput" name="password" placeholder="Sua nova senha" autofocus/>
 				</div>
-				<button class="btn btn-primary" type="submit" value="forgot_pass" name="action" >Enviar</button>
+				<div class="form-group">
+					<label for="confirmPasswordInput">Confirmar senha</label>
+					<input class="form-control" type="password" id="confirmPasswordInput" name="confirmPassword" placeholder="Confirme sua senha" />
+				</div>
+				<button class="btn btn-primary" type="submit" value="reset_pass" name="action" >Pronto</button>
 			</form>
 		</div>
 	</div>

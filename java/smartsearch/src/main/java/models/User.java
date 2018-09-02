@@ -1,5 +1,7 @@
 package models;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.util.Calendar;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -159,5 +161,39 @@ public class User {
 		isValid = BCrypt.checkpw(passwordPlainText, this.password);
 
 		return isValid;
+	}
+	
+	public void processPassResetToken() {
+		MessageDigest messageDigest = null;
+
+		try {
+			messageDigest = MessageDigest.getInstance("MD5");
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e.toString());
+		}
+		String str = Calendar.getInstance().getTimeInMillis() + "_" + this.email;
+		messageDigest.update(str.getBytes(), 0, str.length());
+		this.passwordResetToken = ((String) new BigInteger(1, messageDigest.digest()).toString(16)).toUpperCase();
+
+		Calendar expiresIn = Calendar.getInstance();
+		expiresIn.add(Calendar.MINUTE, 10);
+
+		this.passwordExpiresIn = expiresIn;
+	}
+	
+	public boolean isExpiredResetPassword() {
+		boolean isExpired = true;
+		
+		Calendar cal = Calendar.getInstance();
+		long now = cal.getTimeInMillis();
+		long past = this.passwordExpiresIn.getTimeInMillis();
+		
+		if (now > past) {
+			return isExpired;
+		}
+		
+		isExpired = false;
+		return isExpired;
 	}
 }

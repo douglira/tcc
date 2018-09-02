@@ -117,7 +117,6 @@ public class UserDAO {
 
 				Calendar createdAt = Calendar.getInstance();
 				createdAt.setTime(rs.getTimestamp("created_at"));
-
 				user.setCreatedAt(createdAt);
 
 				users.add(user);
@@ -137,7 +136,7 @@ public class UserDAO {
 		return users;
 	}
 
-	public void forgotPassRequest(User user) {
+	public void setPasswordResetToken(User user) {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		String sql = "UPDATE users SET password_reset_token = ?, password_expires_in = ? WHERE email = ?";
@@ -148,6 +147,69 @@ public class UserDAO {
 			stmt.setString(1, user.getPasswordResetToken());
 			stmt.setTimestamp(2, new Timestamp(user.getPasswordExpiresIn().getTimeInMillis()));
 			stmt.setString(3, user.getEmail());
+			stmt.execute();
+
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException sqlException) {
+					throw new RuntimeException(sqlException);
+				}
+			}
+		}
+	}
+	
+	public User findByPassResetToken(User user) {
+		User userQuery = null;
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		String sql = "SELECT id, email, password_reset_token, password_expires_in FROM users WHERE password_reset_token = ?";
+		
+		try {
+			conn = ConnectionFactory.getConnection();
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, user.getPasswordResetToken());
+			rs = stmt.executeQuery();
+			
+			if (rs.next()) {
+				userQuery = new User();
+				userQuery.setId(rs.getInt("id"));
+				userQuery.setEmail(rs.getString("email"));
+				userQuery.setPasswordResetToken("password_reset_token");
+				
+				Calendar passwordExpiresIn = Calendar.getInstance();
+				passwordExpiresIn.setTime(rs.getTimestamp("password_expires_in"));
+				userQuery.setPasswordExpiresIn(passwordExpiresIn);
+			}
+		} catch(Exception e) {
+			throw new RuntimeException(e);
+		} finally {
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException sqlException) {
+					throw new RuntimeException(sqlException);
+				}
+			}
+		}
+		
+		return userQuery;
+	}
+	
+	public void updateResetPassword(User user) {
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		String sql = "UPDATE users SET password_reset_token = NULL, password_expires_in = NULL, password = ? WHERE id = ?";
+
+		try {
+			conn = ConnectionFactory.getConnection();
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, user.getPassword());
+			stmt.setInt(2, user.getId());
 			stmt.execute();
 
 		} catch (SQLException e) {

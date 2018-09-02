@@ -41,7 +41,7 @@
 			      <td>${ userRow.displayName }</td>
 			      <td>${ userRow.email }</td>
 			      <td style="text-align: end;">
-			      	<fmt:formatDate pattern="dd/MM/yyyy" value="${ userRow.createdAt }" />
+			      	<fmt:formatDate pattern="dd/MM/yyyy" value="${ userRow.createdAt.getTime() }" />
 			      </td>
 			    </tr>
 		  	</c:forEach>

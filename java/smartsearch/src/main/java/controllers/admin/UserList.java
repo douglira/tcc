@@ -1,4 +1,4 @@
-package controllers;
+package controllers.admin;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,10 +13,10 @@ import dao.UserDAO;
 import models.User;
 
 @WebServlet("/admin")
-public class AdminUserList extends HttpServlet {
+public class UserList extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
-    public AdminUserList() {
+    public UserList() {
         super();
     }
 

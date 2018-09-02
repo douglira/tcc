@@ -30,7 +30,7 @@ public class AuthController extends HttpServlet {
 
 		HttpSession session = request.getSession();
 		session.removeAttribute("loggedUser");
-		response.sendRedirect("/smartsearch");
+		response.sendRedirect("/");
 	}
 
 	@Override
@@ -63,7 +63,8 @@ public class AuthController extends HttpServlet {
 
 			HttpSession session = request.getSession();
 			session.setAttribute("loggedUser", loggedUser);
-			response.sendRedirect(request.getContextPath());
+
+			response.sendRedirect("/");
 		} else if (action.equals("register")) {
 
 			/**
