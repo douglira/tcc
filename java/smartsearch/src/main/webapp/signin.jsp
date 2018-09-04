@@ -27,7 +27,7 @@
 			<form action="auth" method="POST">
 				<div class="form-group">
 					<label for="emailInput">Email</label>
-					<input class="form-control" type="email" id="emailInput" name="email" placeholder="Seu email de acesso" />
+					<input class="form-control" type="email" id="emailInput" name="email" placeholder="Seu email de acesso" autofocus />
 				</div>
 				<div class="form-group">
 					<label for="passwordInput">Senha</label>

@@ -1,0 +1,15 @@
+.container-actions {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	width: 100%;
+}
+
+.container-actions_dropdown {
+	align-self: flex-end;
+}
+
+#dropdownCategoriesActions {
+	margin-right: 0 !important;
+	padding-right: 0 !important;
+}

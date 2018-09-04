@@ -110,7 +110,7 @@ public class UserDAO {
 			stmt.setInt(2, perPage);
 			rs = stmt.executeQuery();
 
-			if (rs.next()) {
+			while (rs.next()) {
 				user = new User();
 				user.setDisplayName(rs.getString("display_name"));
 				user.setEmail(rs.getString("email"));

@@ -13,10 +13,10 @@ import dao.CategoryDAO;
 import models.Category;
 
 @WebServlet(urlPatterns = { "/admin/categories" })
-public class CategoriesList extends HttpServlet {
+public class CategoryList extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public CategoriesList() {
+	public CategoryList() {
 		super();
 	}
 
