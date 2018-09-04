@@ -28,7 +28,7 @@ public class AuthenticateFilter implements Filter {
 		User user = (User) session.getAttribute("loggedUser");
 
 		if (user == null) {
-			((HttpServletResponse) response).sendRedirect("/smartsearch/signin");
+			((HttpServletResponse) response).sendRedirect("/signin");
 		} else {
 			chain.doFilter(request, response);
 		}

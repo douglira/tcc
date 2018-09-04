@@ -24,7 +24,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
-public class MailSMTPService implements MailerService {
+public class MailSMTPService implements IMailerService {
 	private static MailSMTPService mailServiceInstance = null;
 
 	private static final String HOST = "smtp.mailtrap.io";

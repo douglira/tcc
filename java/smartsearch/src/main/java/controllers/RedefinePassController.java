@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import dao.UserDAO;
 import mail.MailSMTPService;
-import mail.MailerService;
+import mail.IMailerService;
 import models.User;
 
 @WebServlet(urlPatterns = { "/password/redefine", "/form/reset_pass" })
@@ -70,7 +70,7 @@ public class RedefinePassController extends HttpServlet {
 
 			Runnable r = new Runnable() {
 				public void run() {
-					MailerService mail = MailSMTPService.getInstance();
+					IMailerService mail = MailSMTPService.getInstance();
 					mail.sendHTML(from, to, subject, templateName, context);
 
 					new UserDAO().setPasswordResetToken(user);

@@ -53,7 +53,7 @@
 							<a class="dropdown-item font-weight-bold" href="<%=request.getContextPath()%>/admin?page=1&perPage=15">(administrador)</a>
 							<div class="dropdown-divider"></div>
 							<a class="dropdown-item" href="<%=request.getContextPath()%>/admin?page=1&perPage=15">Lista de usuários</a> 
-							<a class="dropdown-item" href="#">Painel de categorias</a>
+							<a class="dropdown-item" href="<%=request.getContextPath()%>/admin/categories">Painel de categorias</a>
 						</c:when>
 						<c:otherwise>
 							<a class="dropdown-item" href="<%=request.getContextPath()%>/account">Meus pedidos de compra</a> 

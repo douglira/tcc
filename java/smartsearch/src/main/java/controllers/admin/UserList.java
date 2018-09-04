@@ -20,6 +20,7 @@ public class UserList extends HttpServlet {
         super();
     }
 
+    @Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		String page = request.getParameter("page");
@@ -36,6 +37,7 @@ public class UserList extends HttpServlet {
 		request.getRequestDispatcher("/admin/home.jsp").forward(request, response);
 	}
 
+//    @Override
 //	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 //		doGet(request, response);
 //	}

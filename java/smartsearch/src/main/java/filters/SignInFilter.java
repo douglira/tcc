@@ -30,7 +30,7 @@ public class SignInFilter implements Filter {
 		if (user == null) {
 			chain.doFilter(request, response);
 		} else {
-			((HttpServletResponse) response).sendRedirect("/smartsearch");
+			((HttpServletResponse) response).sendRedirect("/");
 		}
 	}
 

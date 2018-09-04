@@ -32,7 +32,7 @@ public class AdminFilter implements Filter {
 		if (user != null && user.getRole().equals(UserRoles.ADMIN)) {
 			chain.doFilter(request, response);
 		} else {
-			((HttpServletResponse) response).sendRedirect("/smartsearch");
+			((HttpServletResponse) response).sendRedirect("/");
 		}
 	}
 
