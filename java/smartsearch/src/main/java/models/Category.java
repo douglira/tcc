@@ -10,7 +10,7 @@ public class Category {
 	private String description;
 	private int layer;
 	private boolean isLastChild;
-	private Category subcategory;
+	private Category parent;
 	private Status status;
 	private Calendar createdAt;
 	private Calendar updatedAt;
@@ -55,12 +55,12 @@ public class Category {
 		this.isLastChild = isLastChild;
 	}
 
-	public Category getSubcategory() {
-		return subcategory;
+	public Category getParent() {
+		return parent;
 	}
 
-	public void setSubcategory(Category subcategory) {
-		this.subcategory = subcategory;
+	public void setParent(Category parent) {
+		this.parent = parent;
 	}
 
 	public Status getStatus() {

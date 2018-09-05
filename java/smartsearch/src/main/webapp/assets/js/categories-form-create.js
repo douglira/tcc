@@ -9,7 +9,7 @@ $(document).ready(function() {
 function loadCategories(params) {
 	$.get('/admin/categories/json', params, function(data) {
 		mountBreadcrumb();
-		mountTableCategories(JSON.parse(data))
+		mountTableCategories(JSON.parse(data));
 	});
 }
 
@@ -28,31 +28,47 @@ function mountTableRow(category) {
 	const row = $('<tr>');
 	const colId = $('<td>').text(category.id);
 	const colTitle = $('<td>').text(category.title);
+	const colBtnSubcategories = $('<td>');
+	const btnSubcategories = $('<button>');
 	
-	row.attr('style', 'cursor: pointer;')
-	row.click(function(e) {
-		const self = this;
-		setTimeout(function() {
-			const dblclick = parseInt($(self).data('double'), 10);
-			if (dblclick > 0) {
-				$(self).data('double', dblclick - 1);
-			} else {
-				setParentCategory.call(self, e);
-			}
-		}, 300);
-	});
-	row.dblclick(function(e) {
-		$(this).data('double', 2);
-		searchChildCategories.call(this, e);
-	});
+	btnSubcategories.attr('type', 'button');
+	btnSubcategories.addClass('btn btn-light btn-sm border border-light bg-light text-muted');
+	btnSubcategories.text('Ver subcategorias');
+	btnSubcategories.click(event => searchChildCategories.call(row, event));
+	
+	colBtnSubcategories.addClass('d-flex justify-content-end');
+	colBtnSubcategories.append(btnSubcategories);
+	
+	row.attr('style', 'cursor: pointer;');
+	row.click(event => setParentCategory.call(row, event));
+//	row.click(function(e) {
+//		const self = this;
+//		setTimeout(function() {
+//			const dblclick = parseInt($(self).data('double'), 10);
+//			if (dblclick > 0) {
+//				$(self).data('double', dblclick - 1);
+//			} else {
+//				setParentCategory.call(self, e);
+//			}
+//		}, 300);
+//	});
+//	row.dblclick(function(e) {
+//		$(this).data('double', 2);
+//		searchChildCategories.call(this, e);
+//	});
 	
 	row.append(colId);
 	row.append(colTitle);
+	row.append(colBtnSubcategories);
 	
 	return row
 }
 
 function setParentCategory(event) {
+	if (event.target.tagName === 'BUTTON'){
+		return null;
+	}
+	
 	const row = $(this);
 	row.parent().find('tr').removeClass('table-info');
 	row.addClass('table-info');
@@ -73,6 +89,7 @@ function searchChildCategories(event) {
 	const parentCategory = categoriesData.find(category => category.id === parseInt(parentId, 10));
 	
 	if (!parentCategory.isLastChild) {
+		removeSelectedCategory();
 		breadcrumbCategories.push({ id: parentCategory.id, title: parentCategory.title });
 		loadCategories({ parentId });
 		return;
@@ -92,7 +109,7 @@ function removeSelectedCategory() {
 }
 
 function showWarning(el, msg) {
-	el.text(msg)
+	el.text(msg);
 	el.show();
 }
 
@@ -139,6 +156,8 @@ function mountBreadcrumb() {
 function handleBreadcrumbClick(event) {
 	const link = $(event.target);
 	const categoryTitle = link.text();
+	
+	removeSelectedCategory();
 	
 	if (categoryTitle === 'Gerais') {
 		breadcrumbCategories = [{ id: null, title: categoryTitle }];

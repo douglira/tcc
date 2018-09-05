@@ -1,9 +1,9 @@
 <%@page import="models.Category"%>
 <%@page import="java.util.ArrayList"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -21,7 +21,7 @@
 
 	<jsp:include page="/header.jsp"/>
 
-	<div class="container">
+	<div class="container" style="margin-bottom: 20px;">
 		<h1 style="font-size: 28px;">Gestão de categorias e subcategorias</h1>
 		<hr>
 		<p class="text-secondary">
@@ -38,6 +38,7 @@
 		    <tr>
 		      <th scope="col">ID</th>
 		      <th scope="col">Título</th>
+		      <th scope="col"></th>
 		    </tr>
 		  </thead>
 		  <tbody id="tbody-categories">
@@ -65,7 +66,10 @@
 						name="category-title-selected"
 						readonly>
 					<div class="input-group-append">
-						<button class="btn btn-outline-secondary" type="button" id="btnRemoveSelectedCategory">Remover</button>
+						<button 
+							class="btn btn-light bg bg-light text-muted border" 
+							type="button" 
+							id="btnRemoveSelectedCategory">Remover</button>
 					</div>
 				</div>
 			</div>
