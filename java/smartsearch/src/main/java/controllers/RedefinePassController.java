@@ -65,7 +65,7 @@ public class RedefinePassController extends HttpServlet {
 
 			final Properties context = new Properties();
 			context.put("shortName", "SmartSearch LTDA");
-			context.put("urlRedirect", RedefinePassController.getUrlRedirect(request, user.getPasswordResetToken()));
+			context.put("urlRedirect", getUrlRedirect(request, user.getPasswordResetToken()));
 			context.put("displayName", user.getDisplayName());
 
 			Runnable r = new Runnable() {
@@ -134,7 +134,7 @@ public class RedefinePassController extends HttpServlet {
 		return scheme + serverName + serverPort + contextPath;
 	}
 
-	public static String getUrlRedirect(HttpServletRequest request, String token) {
+	private String getUrlRedirect(HttpServletRequest request, String token) {
 		return RedefinePassController.getBaseUrl(request) + "/form/reset_pass?t=" + token;
 	}
 }

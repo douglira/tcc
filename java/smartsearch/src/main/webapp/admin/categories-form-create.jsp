@@ -23,7 +23,7 @@
 
 	<div class="container">
 		<h1 style="font-size: 28px;">Gestão de categorias e subcategorias</h1>
-		<div class="dropdown-divider"></div>
+		<hr>
 		<p class="text-secondary">
 			Para criar uma subcategoria selecione na lista abaixo o grupo na qual ela irá pertencer. 
 			Caso contrário, cadastre uma nova categoria geral.
@@ -31,7 +31,9 @@
 		
 		<div class="alert alert-warning" style="display: none;" role="alert"></div>
 		
-		<table class="table table-hover" style="margin-top: 50px;">
+		<div id="breadcrumb-categories" style="margin-top: 50px;"></div>
+		
+		<table class="table table-hover">
 		  <thead>
 		    <tr>
 		      <th scope="col">ID</th>
@@ -70,7 +72,7 @@
 			<input type="hidden" id="category-id-selected" name="category-id-selected" />
 			<input type="hidden" id="category-layer-selected" name="category-layer-selected" />
 			<input type="hidden" id="category-is_last_child-selected" name="category-is_last_child-selected" />
-			
+			<hr>
 			<button type="submit" class="btn btn-primary btn-lg btn-block">Cadastrar</button>
 		</form>
 		

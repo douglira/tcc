@@ -1,3 +1,5 @@
+let breadcrumbCategories = [{ id: null, title: 'Gerais' }];
+
 $(document).ready(function() {
 	let categoriesData = [];
 	loadCategories();
@@ -6,6 +8,7 @@ $(document).ready(function() {
 
 function loadCategories(params) {
 	$.get('/admin/categories/json', params, function(data) {
+		mountBreadcrumb();
 		mountTableCategories(JSON.parse(data))
 	});
 }
@@ -19,12 +22,6 @@ function mountTableCategories(categories) {
 		const tableRow = mountTableRow(category);
 		tbody.prepend(tableRow);
 	});
-	
-	if (categories[0] && categories[0].layer !== 1) {
-		console.log(categories)
-		console.log('entrou aqui')
-		mountBackButton();
-	}
 }
 
 function mountTableRow(category) {
@@ -76,6 +73,7 @@ function searchChildCategories(event) {
 	const parentCategory = categoriesData.find(category => category.id === parseInt(parentId, 10));
 	
 	if (!parentCategory.isLastChild) {
+		breadcrumbCategories.push({ id: parentCategory.id, title: parentCategory.title });
 		loadCategories({ parentId });
 		return;
 	}
@@ -100,22 +98,57 @@ function showWarning(el, msg) {
 
 function hideWarning(el, time = 3000) {
 	setTimeout(function() {
-		el.text(null);
-		el.hide();
+		el.fadeOut();
 	}, time);
 }
 
-function mountBackButton() {
-	const tbody = $('#tbody-categories');
-	const row = $('<tr>');
-	const btn = $('<button>');
+function mountBreadcrumb() {
+	const container = $('#breadcrumb-categories');
+	container.empty();
+	const nav = $('<nav>');
+	const ol = $('<ol>');
 	
-	btn.addClass("btn btn-light text-secondary");
-	btn.text('Voltar');
-	btn.click(() => loadCategories())
+	nav.attr('aria-label', 'breadcrumb');
+	ol.addClass('breadcrumb');
 	
-	row.attr('colspan', '2');
-	row.append(btn);
+	const lastIndex = breadcrumbCategories.length - 1;
 	
-	tbody.append(row);
+	breadcrumbCategories.forEach((category, index) => {
+		const li = $('<li>');
+		if (lastIndex === index) {
+			li.addClass('breadcrumb-item active');
+			li.attr('aria-current', 'page');
+			li.text(category.title);
+			ol.append(li);
+			return;
+		}
+		
+		const link = $('<a>');
+		link.text(category.title);
+		link.attr('href', 'javascript:void(0)');
+		link.click(handleBreadcrumbClick);
+		li.addClass('breadcrumb-item');
+		li.append(link);
+		ol.append(li);
+	});
+	
+	nav.append(ol);
+	container.append(nav);
+}
+
+function handleBreadcrumbClick(event) {
+	const link = $(event.target);
+	const categoryTitle = link.text();
+	
+	if (categoryTitle === 'Gerais') {
+		breadcrumbCategories = [{ id: null, title: categoryTitle }];
+		loadCategories();
+		return;
+	}
+	
+	const category = breadcrumbCategories.find(cat => cat.title === categoryTitle)
+	const endIndex = breadcrumbCategories.indexOf(category) + 1;
+	
+	breadcrumbCategories = [...breadcrumbCategories.slice(0, endIndex)];
+	loadCategories({ parentId: category.id });
 }

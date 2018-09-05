@@ -31,7 +31,6 @@ public class CategoryJson extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		
 		String parentId = request.getParameter("parentId");
-		String layer = request.getParameter("layer");
 		
 		Gson gJson = new Gson();
 
@@ -44,13 +43,6 @@ public class CategoryJson extends HttpServlet {
 			return;
 		}
 		
-		if (layer != null && layer.length() != 0) {
-			categories = new CategoryDAO().subcategoriesByLayer(Integer.parseInt(layer));
-			out.print(gJson.toJson(categories));
-			out.close();
-			return;
-		}
-
 		categories = new CategoryDAO().generals();
 		out.print(gJson.toJson(categories));
 		out.close();

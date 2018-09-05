@@ -41,7 +41,7 @@
 				aria-expanded="false">
 					Ações
 				</button>
-				<div class="dropdown-menu" aria-labelledby="dropdownCategoriesActions">
+				<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownCategoriesActions">
 					<a class="dropdown-item" style="cursor: pointer;" href="<%=request.getContextPath()%>/admin/categories/new" >Nova categoria</a>
 				</div>
 			</div>
