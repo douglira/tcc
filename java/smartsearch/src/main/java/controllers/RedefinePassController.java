@@ -10,8 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.UserDAO;
-import mail.MailSMTPService;
 import mail.IMailerService;
+import mail.MailSMTPService;
+import mail.MailerService;
 import models.User;
 
 @WebServlet(urlPatterns = { "/password/redefine", "/form/reset_pass" })
@@ -58,21 +59,12 @@ public class RedefinePassController extends HttpServlet {
 				return;
 			}
 
-			String from = "noreply@smartsearch.com.br";
-			String to = user.getEmail();
-			String subject = "SmartSearch | Redefinição de senha";
-			String templateName = "mailResetPass";
-
-			final Properties context = new Properties();
-			context.put("shortName", "SmartSearch LTDA");
-			context.put("urlRedirect", getUrlRedirect(request, user.getPasswordResetToken()));
-			context.put("displayName", user.getDisplayName());
+			MailerService mailer = new MailerService(MailSMTPService.getInstance());
+			mailer.setTo(user.getEmail());
 
 			Runnable r = new Runnable() {
 				public void run() {
-					IMailerService mail = MailSMTPService.getInstance();
-					mail.sendHTML(from, to, subject, templateName, context);
-
+					mailer.sendResetPass(user.getDisplayName(), getUrlRedirect(request, user.getPasswordResetToken()));
 					new UserDAO(true).setPasswordResetToken(user);
 				}
 			};

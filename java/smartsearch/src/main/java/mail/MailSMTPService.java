@@ -24,7 +24,7 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
-public class MailSMTPService implements IMailerService {
+public class MailSMTPService extends Mailer {
 	private static MailSMTPService mailServiceInstance = null;
 
 	private static final String HOST = "smtp.mailtrap.io";
@@ -35,7 +35,7 @@ public class MailSMTPService implements IMailerService {
 	private Properties propsConfig;
 	private VelocityEngine ve;
 
-	public MailSMTPService() {
+	protected MailSMTPService() {
 		this.propsConfig = new Properties();
 		this.propsConfig.put("mail.smtp.auth", "true");
 		this.propsConfig.put("mail.smtp.starttls.enable", "true");
@@ -56,7 +56,8 @@ public class MailSMTPService implements IMailerService {
 		return mailServiceInstance;
 	}
 
-	public void sendHTML(String from, String to, String subject, String templateName, Properties context) {
+	@Override
+	protected void sendHTML(String from, String to, String subject, String templateName, Properties context) {
 		Session session = Session.getInstance(this.propsConfig, new Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(USER, PASS);
