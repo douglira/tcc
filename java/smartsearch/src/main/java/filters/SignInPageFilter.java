@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 
 import models.User;
 
-public class SignInFilter implements Filter {
+public class SignInPageFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {

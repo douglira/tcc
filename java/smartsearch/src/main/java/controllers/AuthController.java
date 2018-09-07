@@ -61,6 +61,7 @@ public class AuthController extends HttpServlet {
 				return;
 			}
 
+			loggedUser.setPassword(null);
 			HttpSession session = request.getSession();
 			session.setAttribute("loggedUser", loggedUser);
 

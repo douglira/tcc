@@ -37,13 +37,13 @@ public class CategoryJson extends HttpServlet {
 		ArrayList<Category> categories = null;
 		
 		if (parentId != null && parentId.length() != 0) {
-			categories = new CategoryDAO().subcategoriesByParent(Integer.parseInt(parentId));
+			categories = new CategoryDAO(true).subcategoriesByParent(Integer.parseInt(parentId));
 			out.print(gJson.toJson(categories));
 			out.close();
 			return;
 		}
 		
-		categories = new CategoryDAO().generals();
+		categories = new CategoryDAO(true).generals();
 		out.print(gJson.toJson(categories));
 		out.close();
 	}

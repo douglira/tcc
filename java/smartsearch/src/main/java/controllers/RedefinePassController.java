@@ -22,6 +22,18 @@ public class RedefinePassController extends HttpServlet {
 	public RedefinePassController() {
 		super();
 	}
+	
+	private String getBaseUrl(HttpServletRequest request) {
+		String scheme = request.getScheme() + "://";
+		String serverName = request.getServerName();
+		String serverPort = (request.getServerPort() == 80) ? "" : ":" + request.getServerPort();
+		String contextPath = request.getContextPath();
+		return scheme + serverName + serverPort + contextPath;
+	}
+
+	private String getUrlRedirect(HttpServletRequest request, String token) {
+		return this.getBaseUrl(request) + "/form/reset_pass?t=" + token;
+	}
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -59,12 +71,14 @@ public class RedefinePassController extends HttpServlet {
 				return;
 			}
 
-			MailerService mailer = new MailerService(MailSMTPService.getInstance());
+			final MailerService mailer = new MailerService(MailSMTPService.getInstance());
 			mailer.setTo(user.getEmail());
+			String displayName = user.getDisplayName();
+			String urlRedirect = this.getUrlRedirect(request, user.getPasswordResetToken());
 
 			Runnable r = new Runnable() {
 				public void run() {
-					mailer.sendResetPass(user.getDisplayName(), getUrlRedirect(request, user.getPasswordResetToken()));
+					mailer.sendResetPass(displayName, urlRedirect);
 					new UserDAO(true).setPasswordResetToken(user);
 				}
 			};
@@ -116,17 +130,5 @@ public class RedefinePassController extends HttpServlet {
 
 			response.sendRedirect(request.getContextPath() + "/signin");
 		}
-	}
-
-	public static String getBaseUrl(HttpServletRequest request) {
-		String scheme = request.getScheme() + "://";
-		String serverName = request.getServerName();
-		String serverPort = (request.getServerPort() == 80) ? "" : ":" + request.getServerPort();
-		String contextPath = request.getContextPath();
-		return scheme + serverName + serverPort + contextPath;
-	}
-
-	private String getUrlRedirect(HttpServletRequest request, String token) {
-		return RedefinePassController.getBaseUrl(request) + "/form/reset_pass?t=" + token;
 	}
 }

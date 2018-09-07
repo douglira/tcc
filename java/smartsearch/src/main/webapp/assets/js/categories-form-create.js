@@ -28,38 +28,39 @@ function mountTableRow(category) {
 	const row = $('<tr>');
 	const colId = $('<td>').text(category.id);
 	const colTitle = $('<td>').text(category.title);
-	const colBtnSubcategories = $('<td>');
+	const colBtnGroup = $('<td>');
+	const divBtnGroup = $('<div>');
 	const btnSubcategories = $('<button>');
+	const linkBtnEdit = $('<a>');
+	
+	const btnClasses = 'btn btn-light btn-sm border border-light bg-light text-muted';
+	
+	linkBtnEdit.attr('role', 'button');
+	linkBtnEdit.attr('aria-pressed', 'true');
+	linkBtnEdit.attr('href', `/admin/categories/edit?title=${category.title}`);
+	linkBtnEdit.addClass(btnClasses);
+	linkBtnEdit.text('Editar');
 	
 	btnSubcategories.attr('type', 'button');
-	btnSubcategories.addClass('btn btn-light btn-sm border border-light bg-light text-muted');
+	btnSubcategories.addClass(btnClasses);
 	btnSubcategories.text('Ver subcategorias');
 	btnSubcategories.click(event => searchChildCategories.call(row, event));
 	
-	colBtnSubcategories.addClass('d-flex justify-content-end');
-	colBtnSubcategories.append(btnSubcategories);
+	divBtnGroup.attr('role', 'button');
+	divBtnGroup.attr('aria-label', 'Ações');
+	divBtnGroup.addClass('btn-group');
+	divBtnGroup.append(linkBtnEdit);
+	divBtnGroup.append(btnSubcategories);
+	
+	colBtnGroup.addClass('d-flex justify-content-end');
+	colBtnGroup.append(divBtnGroup);
 	
 	row.attr('style', 'cursor: pointer;');
 	row.click(event => setParentCategory.call(row, event));
-//	row.click(function(e) {
-//		const self = this;
-//		setTimeout(function() {
-//			const dblclick = parseInt($(self).data('double'), 10);
-//			if (dblclick > 0) {
-//				$(self).data('double', dblclick - 1);
-//			} else {
-//				setParentCategory.call(self, e);
-//			}
-//		}, 300);
-//	});
-//	row.dblclick(function(e) {
-//		$(this).data('double', 2);
-//		searchChildCategories.call(this, e);
-//	});
 	
 	row.append(colId);
 	row.append(colTitle);
-	row.append(colBtnSubcategories);
+	row.append(colBtnGroup);
 	
 	return row
 }

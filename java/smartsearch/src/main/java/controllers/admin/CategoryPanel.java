@@ -13,17 +13,17 @@ import dao.CategoryDAO;
 import models.Category;
 
 @WebServlet(urlPatterns = { "/admin/categories" })
-public class CategoryList extends HttpServlet {
+public class CategoryPanel extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public CategoryList() {
+	public CategoryPanel() {
 		super();
 	}
 
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		ArrayList<Category> categories = new CategoryDAO().generals();
+		ArrayList<Category> categories = new CategoryDAO(true).generals();
 
 		request.setAttribute("categories", categories);
 

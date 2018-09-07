@@ -28,7 +28,7 @@
 	<div class="container">
 		<h1>Painel de categorias</h1>
 		<p class="text-secondary">
-			Abaixo estão listadas as categorias gerais do sistema. Clique sobre uma categoria para gerenciá-la.			
+			Abaixo estão listadas as categorias gerais do sistema. Clique sobre uma categoria para visualizar suas subcategorias.		
 		</p>
 		<div class="container-actions">
 			<div class="dropdown">
@@ -42,7 +42,7 @@
 					Ações
 				</button>
 				<div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownCategoriesActions">
-					<a class="dropdown-item" style="cursor: pointer;" href="<%=request.getContextPath()%>/admin/categories/new" >Nova categoria</a>
+					<a class="dropdown-item" style="cursor: pointer;" href="<%=request.getContextPath()%>/admin/categories/new" >Gerenciar</a>
 				</div>
 			</div>
 		</div>

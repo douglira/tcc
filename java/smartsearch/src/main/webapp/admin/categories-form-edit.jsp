@@ -20,32 +20,33 @@
 <body>
 
 	<jsp:include page="/header.jsp"/>
+	
+	<%
+		Category category = (Category) request.getAttribute("category");
+	%>
 
 	<div class="container" style="margin-bottom: 20px;">
-		<h1 style="font-size: 28px;">Gestão de categorias e subcategorias</h1>
+		<h1 style="font-size: 28px;">Categoria:&nbsp;<i><%=category.getTitle()%></i></h1>
 		<hr>
 		<p class="text-secondary">
-			Para criar uma subcategoria selecione na lista abaixo o grupo na qual ela irá pertencer. 
-			Caso contrário, cadastre uma nova categoria geral.
+			Edite abaixo o título e descrição da categoria.
 		</p>
 		
-		<div class="alert alert-warning" style="display: none;" role="alert"></div>
-		
-		<div id="breadcrumb-categories" style="margin-top: 50px;"></div>
-		
-		<table class="table table-hover">
-		  <thead>
-		    <tr>
-		      <th scope="col">ID</th>
-		      <th scope="col">Título</th>
-		      <th scope="col"></th>
-		    </tr>
-		  </thead>
-		  <tbody id="tbody-categories">
-		  </tbody>		  
-		</table>
-		
-		<form action="/admin/categories/new" method="POST">
+		<form action="/admin/categories/edit" method="POST">
+			<div class="input-group mb-3 w-25">
+				<div class="input-group-prepend">
+			    	<span class="input-group-text">
+						<strong>ID</strong>
+			    	</span>
+			  	</div>
+				<input 
+					class="form-control font-italic" 
+					type="text" 
+					value="<%=category.getId()%>"
+					id="category-id" 
+					name="category-id"
+					readonly>
+			</div>
 			<div class="form-group w-100">
 				<label for="category-title">Título</label>
 				<input class="form-control" type="text" id="category-title" name="category-title">
@@ -54,32 +55,9 @@
 				<label for="category-description">Descrição</label>
 				<textarea class="form-control" id="category-description" rows="3"></textarea>
 			</div>
-			<div class="form-group">
-				<label>Grupo selecionado</label>
-				<div class="input-group mb-3">
-					<input 
-						class="form-control" 
-						type="text" 
-						placeholder="Nenhum grupo de categoria selecionada"
-						aria-label="Nenhum grupo de categoria selecionada"
-						id="category-title-selected" 
-						name="category-title-selected"
-						readonly>
-					<div class="input-group-append">
-						<button 
-							class="btn btn-light bg bg-light text-muted border" 
-							type="button" 
-							id="btnRemoveSelectedCategory">Remover</button>
-					</div>
-				</div>
-			</div>
-			<input type="hidden" id="category-id-selected" name="category-id-selected" />
-			<input type="hidden" id="category-layer-selected" name="category-layer-selected" />
-			<input type="hidden" id="category-is_last_child-selected" name="category-is_last_child-selected" />
 			<hr>
-			<button type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="new">Cadastrar</button>
+			<button type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="edit">Salvar</button>
 		</form>
-		
 	</div>
 
 	<script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
