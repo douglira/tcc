@@ -8,15 +8,44 @@ import database.ConnectionFactory;
 import models.Person;
 
 public class PersonDAO {
+	private Connection conn;
+
+	public PersonDAO(boolean getConnection) {
+		if (getConnection) {
+			this.conn = ConnectionFactory.getConnection();
+		}
+	}
+
+	public PersonDAO(Connection conn, boolean setTransaction) {
+		this.conn = conn;
+
+		if (setTransaction) {
+			this.setTransaction();			
+		}
+	}
+
+	public void setConnection(Connection conn) {
+		this.conn = conn;
+	}
+
+	public Connection getConnection() {
+		return this.conn;
+	}
+
+	public void setTransaction() {
+		try {
+			this.conn.setAutoCommit(false);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void create(Person person) {
-		Connection conn = null;
 		PreparedStatement stmt = null;
 		String sql = "INSERT INTO people (account_owner, tel, cnpj, corporate_name, "
-				+ "state_registration, user_id, created_at)"
-				+ "VALUES (?, ?, ?, ?, ?, ?, NOW())";
+				+ "state_registration, user_id, created_at)" + "VALUES (?, ?, ?, ?, ?, ?, NOW())";
 		try {
-			conn = ConnectionFactory.getConnection();
-			stmt = conn.prepareStatement(sql);
+			stmt = this.conn.prepareStatement(sql);
 			stmt.setString(1, person.getAccountOwner());
 			stmt.setLong(2, person.getTel());
 			stmt.setLong(3, person.getCnpj());
@@ -24,13 +53,19 @@ public class PersonDAO {
 			stmt.setLong(5, person.getStateRegistration());
 			stmt.setInt(6, person.getUser().getId());
 			stmt.execute();
-			
+			this.conn.commit();
+
 		} catch (SQLException e) {
+			try {
+				this.conn.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 			throw new RuntimeException(e);
 		} finally {
-			if (conn != null) {
+			if (this.conn != null) {
 				try {
-					conn.close();
+					this.conn.close();
 				} catch (SQLException sqlException) {
 					throw new RuntimeException(sqlException);
 				}

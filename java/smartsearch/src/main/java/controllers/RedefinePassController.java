@@ -41,7 +41,7 @@ public class RedefinePassController extends HttpServlet {
 		String action = request.getParameter("action");
 
 		if (action.equals("forgot_pass")) {
-			final User user = new UserDAO().checkIfExists(new User(request.getParameter("email")));
+			final User user = new UserDAO(true).checkIfExists(new User(request.getParameter("email")));
 
 			if (user == null) {
 				request.setAttribute("error", "E-mail inválido");
@@ -73,7 +73,7 @@ public class RedefinePassController extends HttpServlet {
 					IMailerService mail = MailSMTPService.getInstance();
 					mail.sendHTML(from, to, subject, templateName, context);
 
-					new UserDAO().setPasswordResetToken(user);
+					new UserDAO(true).setPasswordResetToken(user);
 				}
 			};
 
@@ -103,7 +103,7 @@ public class RedefinePassController extends HttpServlet {
 			User user = new User();
 			user.setPasswordResetToken(token);
 
-			User userData = new UserDAO().findByPassResetToken(user);
+			User userData = new UserDAO(true).findByPassResetToken(user);
 
 			if (userData == null) {
 				System.out.println("Token invalido");
@@ -120,7 +120,7 @@ public class RedefinePassController extends HttpServlet {
 			userData.setPassword(password);
 			userData.hashPassword();
 
-			new UserDAO().updateResetPassword(userData);
+			new UserDAO(true).updateResetPassword(userData);
 
 			response.sendRedirect(request.getContextPath() + "/signin");
 		}

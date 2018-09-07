@@ -29,7 +29,7 @@ public class UserList extends HttpServlet {
 		page = page != null ? page : "1";
 		perPage = perPage != null? perPage : "15";
 		
-		ArrayList<User> users = new UserDAO().report(Integer.parseInt(page), Integer.parseInt(perPage));
+		ArrayList<User> users = new UserDAO(true).report(Integer.parseInt(page), Integer.parseInt(perPage));
 		
 		
 		request.setAttribute("users", users);

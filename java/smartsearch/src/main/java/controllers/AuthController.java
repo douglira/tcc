@@ -41,7 +41,7 @@ public class AuthController extends HttpServlet {
 
 		if (action.equals("signin")) {
 			User user = new User(request.getParameter("email"));
-			User loggedUser = new UserDAO().checkIfExists(user);
+			User loggedUser = new UserDAO(true).checkIfExists(user);
 
 			if (loggedUser == null) {
 				request.setAttribute("error", "Email ou senha inválida");
@@ -90,10 +90,15 @@ public class AuthController extends HttpServlet {
 			user.generateDisplayName(person.getAccountOwner());
 			user.hashPassword();
 
-			user = new UserDAO().create(user);
+			UserDAO userDao = new UserDAO(true);
+			userDao.setTransaction();
+			user = userDao.create(user);
+			
 			person.setUser(user);
-
-			new PersonDAO().create(person);
+			
+			PersonDAO personDao = new PersonDAO(userDao.getConnection(), false);
+			personDao.create(person);
+			
 			response.sendRedirect(request.getContextPath() + "/signin");
 		}
 	}

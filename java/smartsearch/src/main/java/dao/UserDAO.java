@@ -15,16 +15,46 @@ import enums.UserRoles;
 import models.User;
 
 public class UserDAO {
+	private Connection conn;
+
+	public UserDAO(boolean getConnection) {
+		if (getConnection) {
+			this.conn = ConnectionFactory.getConnection();
+		}
+	}
+
+	public UserDAO(Connection conn, boolean setTransaction) {
+		this.conn = conn;
+
+		if (setTransaction) {
+			this.setTransaction();			
+		}
+	}
+
+	public void setConnection(Connection conn) {
+		this.conn = conn;
+	}
+
+	public Connection getConnection() {
+		return this.conn;
+	}
+
+	public void setTransaction() {
+		try {
+			this.conn.setAutoCommit(false);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public User create(User user) {
-		Connection conn = null;
 		PreparedStatement stmt = null;
 		String sql = "INSERT INTO users (email, username, display_name, "
 				+ "password, role, status, created_at) VALUES (?, ?, ?, "
 				+ "?, CAST(? AS users_role), CAST(? AS status_entity), NOW())";
 
 		try {
-			conn = ConnectionFactory.getConnection();
-			stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, user.getEmail());
 			stmt.setString(2, user.getUsername());
 			stmt.setString(3, user.getDisplayName());
@@ -41,14 +71,6 @@ public class UserDAO {
 
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
-		} finally {
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (SQLException sqlException) {
-					throw new RuntimeException(sqlException);
-				}
-			}
 		}
 
 		return user;
@@ -56,15 +78,13 @@ public class UserDAO {
 
 	public User checkIfExists(User user) {
 		User loggedUser = null;
-		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		String sql = "SELECT * FROM users WHERE users.email = ?";
 
 		try {
 
-			conn = ConnectionFactory.getConnection();
-			stmt = conn.prepareStatement(sql);
+			stmt = this.conn.prepareStatement(sql);
 			stmt.setString(1, user.getEmail());
 			rs = stmt.executeQuery();
 
@@ -81,9 +101,9 @@ public class UserDAO {
 		} catch (SQLException sqlException) {
 			throw new RuntimeException(sqlException);
 		} finally {
-			if (conn != null) {
+			if (this.conn != null) {
 				try {
-					conn.close();
+					this.conn.close();
 				} catch (SQLException errClose) {
 					throw new RuntimeException(errClose);
 				}
@@ -96,7 +116,6 @@ public class UserDAO {
 	public ArrayList<User> report(int page, int perPage) {
 		User user;
 		ArrayList<User> users = new ArrayList<User>();
-		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		String sql = "SELECT display_name, email, created_at FROM users OFFSET ? LIMIT ?";
@@ -104,8 +123,7 @@ public class UserDAO {
 		int offset = (page - 1) * perPage;
 		try {
 
-			conn = ConnectionFactory.getConnection();
-			stmt = conn.prepareStatement(sql);
+			stmt = this.conn.prepareStatement(sql);
 			stmt.setInt(1, offset);
 			stmt.setInt(2, perPage);
 			rs = stmt.executeQuery();
@@ -124,9 +142,9 @@ public class UserDAO {
 		} catch (SQLException sqlException) {
 			throw new RuntimeException(sqlException);
 		} finally {
-			if (conn != null) {
+			if (this.conn != null) {
 				try {
-					conn.close();
+					this.conn.close();
 				} catch (SQLException errClose) {
 					throw new RuntimeException(errClose);
 				}
@@ -137,13 +155,11 @@ public class UserDAO {
 	}
 
 	public void setPasswordResetToken(User user) {
-		Connection conn = null;
 		PreparedStatement stmt = null;
 		String sql = "UPDATE users SET password_reset_token = ?, password_expires_in = ? WHERE email = ?";
 
 		try {
-			conn = ConnectionFactory.getConnection();
-			stmt = conn.prepareStatement(sql);
+			stmt = this.conn.prepareStatement(sql);
 			stmt.setString(1, user.getPasswordResetToken());
 			stmt.setTimestamp(2, new Timestamp(user.getPasswordExpiresIn().getTimeInMillis()));
 			stmt.setString(3, user.getEmail());
@@ -152,61 +168,57 @@ public class UserDAO {
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		} finally {
-			if (conn != null) {
+			if (this.conn != null) {
 				try {
-					conn.close();
+					this.conn.close();
 				} catch (SQLException sqlException) {
 					throw new RuntimeException(sqlException);
 				}
 			}
 		}
 	}
-	
+
 	public User findByPassResetToken(User user) {
 		User userQuery = null;
-		Connection conn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		String sql = "SELECT id, email, password_reset_token, password_expires_in FROM users WHERE password_reset_token = ?";
-		
+
 		try {
-			conn = ConnectionFactory.getConnection();
-			stmt = conn.prepareStatement(sql);
+			stmt = this.conn.prepareStatement(sql);
 			stmt.setString(1, user.getPasswordResetToken());
 			rs = stmt.executeQuery();
-			
+
 			if (rs.next()) {
 				userQuery = new User();
 				userQuery.setId(rs.getInt("id"));
 				userQuery.setEmail(rs.getString("email"));
 				userQuery.setPasswordResetToken("password_reset_token");
-				
+
 				Calendar passwordExpiresIn = Calendar.getInstance();
 				passwordExpiresIn.setTime(rs.getTimestamp("password_expires_in"));
 				userQuery.setPasswordExpiresIn(passwordExpiresIn);
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
-			if (conn != null) {
+			if (this.conn != null) {
 				try {
-					conn.close();
+					this.conn.close();
 				} catch (SQLException sqlException) {
 					throw new RuntimeException(sqlException);
 				}
 			}
 		}
-		
+
 		return userQuery;
 	}
-	
+
 	public void updateResetPassword(User user) {
-		Connection conn = null;
 		PreparedStatement stmt = null;
 		String sql = "UPDATE users SET password_reset_token = NULL, password_expires_in = NULL, password = ? WHERE id = ?";
 
 		try {
-			conn = ConnectionFactory.getConnection();
 			stmt = conn.prepareStatement(sql);
 			stmt.setString(1, user.getPassword());
 			stmt.setInt(2, user.getId());
@@ -215,9 +227,9 @@ public class UserDAO {
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		} finally {
-			if (conn != null) {
+			if (this.conn != null) {
 				try {
-					conn.close();
+					this.conn.close();
 				} catch (SQLException sqlException) {
 					throw new RuntimeException(sqlException);
 				}
