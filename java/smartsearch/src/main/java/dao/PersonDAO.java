@@ -8,6 +8,8 @@ import database.ConnectionFactory;
 import models.Person;
 
 public class PersonDAO {
+	private static final String TABLE_NAME = "people";
+	
 	private Connection conn;
 
 	public PersonDAO(boolean getConnection) {
@@ -42,7 +44,7 @@ public class PersonDAO {
 
 	public void create(Person person) {
 		PreparedStatement stmt = null;
-		String sql = "INSERT INTO people (account_owner, tel, cnpj, corporate_name, "
+		String sql = "INSERT INTO " + TABLE_NAME + " (account_owner, tel, cnpj, corporate_name, "
 				+ "state_registration, user_id, created_at)" + "VALUES (?, ?, ?, ?, ?, ?, NOW())";
 		try {
 			stmt = this.conn.prepareStatement(sql);

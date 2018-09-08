@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.CategoryDAO;
+import enums.Status;
 import models.Category;
 
 @WebServlet(urlPatterns = {"/admin/categories/new", "/admin/categories/edit"})
@@ -75,7 +76,19 @@ public class CategoryController extends HttpServlet {
     		category.setDescription(request.getParameter("category-description"));
     		
     		new CategoryDAO(true).saveDetails(category);
-    	}    	
+    	} else if (action.equals("toggleStatus")) {
+    		Category category = new Category();
+    		category.setId(Integer.parseInt(request.getParameter("category-id")));
+    		category.setStatus(Status.valueOf(request.getParameter("category-status")));
+    		category.toggleStatus();
+    		
+    		new CategoryDAO(true).updateStatus(category);
+    	} else if (action.equals("delete")) {
+    		Category category = new Category();
+    		category.setId(Integer.parseInt(request.getParameter("category-id")));
+    		
+    		new CategoryDAO(true).destroy(category);
+    	}
     	response.sendRedirect("/admin/categories/new");
 	}
 

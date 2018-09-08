@@ -1,3 +1,4 @@
+<%@page import="enums.Status"%>
 <%@page import="models.Category"%>
 <%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -58,11 +59,18 @@
 		  	
 		  	<c:forEach items="${ categories }" var="categoryRow">		  		
 			    <tr style="cursor: pointer;">
-			      <td>${ categoryRow.id }</td>
-			      <td>${ categoryRow.title }</td>
-			      <td style="text-align: end;">
-			      	<fmt:formatDate pattern="dd/MM/yyyy HH:mm:ss" value="${ categoryRow.createdAt.getTime() }" />
-			      </td>
+			      	<td>${ categoryRow.id }</td>
+			    	<c:choose>
+						<c:when test="${ categoryRow.status == 'ACTIVE' }">
+					      	<td>${ categoryRow.title }</td>
+						</c:when>
+						<c:otherwise>
+					      	<td class="text-danger">${ categoryRow.title }</td>
+						</c:otherwise>
+					</c:choose>
+			      	<td style="text-align: end;">
+			      		<fmt:formatDate pattern="dd/MM/yyyy HH:mm:ss" value="${ categoryRow.createdAt.getTime() }" />
+			      	</td>
 			    </tr>
 		  	</c:forEach>
 		  </tbody>

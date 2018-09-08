@@ -33,6 +33,10 @@ function mountTableRow(category) {
 	const btnSubcategories = $('<button>');
 	const linkBtnEdit = $('<a>');
 	
+	if (category.status === 'INACTIVE') {
+		colTitle.addClass('text-danger');
+	}
+	
 	const btnClasses = 'btn btn-light btn-sm border border-light bg-light text-muted';
 	
 	linkBtnEdit.attr('role', 'button');
@@ -49,8 +53,8 @@ function mountTableRow(category) {
 	divBtnGroup.attr('role', 'button');
 	divBtnGroup.attr('aria-label', 'Ações');
 	divBtnGroup.addClass('btn-group');
-	divBtnGroup.append(linkBtnEdit);
 	divBtnGroup.append(btnSubcategories);
+	divBtnGroup.append(linkBtnEdit);
 	
 	colBtnGroup.addClass('d-flex justify-content-end');
 	colBtnGroup.append(divBtnGroup);
@@ -66,7 +70,7 @@ function mountTableRow(category) {
 }
 
 function setParentCategory(event) {
-	if (event.target.tagName === 'BUTTON'){
+	if (event.target.tagName !== 'TD'){
 		return null;
 	}
 	

@@ -15,6 +15,8 @@ import enums.UserRoles;
 import models.User;
 
 public class UserDAO {
+	private static final String TABLE_NAME = "users";
+
 	private Connection conn;
 
 	public UserDAO(boolean getConnection) {
@@ -27,7 +29,7 @@ public class UserDAO {
 		this.conn = conn;
 
 		if (setTransaction) {
-			this.setTransaction();			
+			this.setTransaction();
 		}
 	}
 
@@ -49,7 +51,7 @@ public class UserDAO {
 
 	public User create(User user) {
 		PreparedStatement stmt = null;
-		String sql = "INSERT INTO users (email, username, display_name, "
+		String sql = "INSERT INTO " + TABLE_NAME + " (email, username, display_name, "
 				+ "password, role, status, created_at) VALUES (?, ?, ?, "
 				+ "?, CAST(? AS users_role), CAST(? AS status_entity), NOW())";
 
@@ -80,7 +82,7 @@ public class UserDAO {
 		User loggedUser = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT * FROM users WHERE users.email = ?";
+		String sql = "SELECT * FROM " + TABLE_NAME + " WHERE users.email = ?";
 
 		try {
 
@@ -118,7 +120,7 @@ public class UserDAO {
 		ArrayList<User> users = new ArrayList<User>();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT display_name, email, created_at FROM users OFFSET ? LIMIT ?";
+		String sql = "SELECT display_name, email, created_at FROM " + TABLE_NAME + " OFFSET ? LIMIT ?";
 
 		int offset = (page - 1) * perPage;
 		try {
@@ -156,7 +158,7 @@ public class UserDAO {
 
 	public void setPasswordResetToken(User user) {
 		PreparedStatement stmt = null;
-		String sql = "UPDATE users SET password_reset_token = ?, password_expires_in = ? WHERE email = ?";
+		String sql = "UPDATE " + TABLE_NAME + " SET password_reset_token = ?, password_expires_in = ? WHERE email = ?";
 
 		try {
 			stmt = this.conn.prepareStatement(sql);
@@ -182,7 +184,8 @@ public class UserDAO {
 		User userQuery = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT id, email, password_reset_token, password_expires_in FROM users WHERE password_reset_token = ?";
+		String sql = "SELECT id, email, password_reset_token, password_expires_in FROM " + TABLE_NAME
+				+ " WHERE password_reset_token = ?";
 
 		try {
 			stmt = this.conn.prepareStatement(sql);
@@ -216,7 +219,8 @@ public class UserDAO {
 
 	public void updateResetPassword(User user) {
 		PreparedStatement stmt = null;
-		String sql = "UPDATE users SET password_reset_token = NULL, password_expires_in = NULL, password = ? WHERE id = ?";
+		String sql = "UPDATE " + TABLE_NAME
+				+ " SET password_reset_token = NULL, password_expires_in = NULL, password = ? WHERE id = ?";
 
 		try {
 			stmt = conn.prepareStatement(sql);

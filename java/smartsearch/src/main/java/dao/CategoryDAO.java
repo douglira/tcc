@@ -12,6 +12,8 @@ import enums.Status;
 import models.Category;
 
 public class CategoryDAO {
+	private static final String TABLE_NAME = "categories";
+
 	private Connection conn;
 
 	public CategoryDAO(boolean getConnection) {
@@ -84,7 +86,7 @@ public class CategoryDAO {
 		ArrayList<Category> categories = new ArrayList<Category>();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT * FROM categories WHERE layer = 1";
+		String sql = "SELECT * FROM " + TABLE_NAME + " WHERE layer = 1";
 
 		try {
 			stmt = this.conn.prepareStatement(sql);
@@ -123,7 +125,7 @@ public class CategoryDAO {
 	public Category findByTitle(Category category) {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT * FROM categories WHERE title = ?";
+		String sql = "SELECT * FROM " + TABLE_NAME + " WHERE title = ?";
 
 		try {
 			stmt = this.conn.prepareStatement(sql);
@@ -157,14 +159,14 @@ public class CategoryDAO {
 				}
 			}
 		}
-		
+
 		return category;
 	}
-	
+
 	public void saveDetails(Category category) {
 		PreparedStatement stmt = null;
-		String sql = "UPDATE categories SET title = ?, description = ? WHERE id = ?";
-		
+		String sql = "UPDATE " + TABLE_NAME + " SET title = ?, description = ? WHERE id = ?";
+
 		try {
 			stmt = this.conn.prepareStatement(sql);
 			stmt.setString(1, category.getTitle());
@@ -188,7 +190,7 @@ public class CategoryDAO {
 		ArrayList<Category> subcategories = new ArrayList<Category>();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT * FROM categories WHERE parent_id = ?";
+		String sql = "SELECT * FROM " + TABLE_NAME + " WHERE parent_id = ?";
 
 		try {
 			stmt = this.conn.prepareStatement(sql);
@@ -224,5 +226,48 @@ public class CategoryDAO {
 		}
 
 		return subcategories;
+	}
+
+	public void updateStatus(Category category) {
+		PreparedStatement stmt = null;
+		String sql = "SELECT * FROM func_toggle_status_categories(?, ?::status_entity)";
+
+		try {
+			stmt = this.conn.prepareStatement(sql);
+			stmt.setInt(1, category.getId());
+			stmt.setString(2, category.getStatus().toString());
+			stmt.execute();
+		} catch (Exception sqlException) {
+			throw new RuntimeException(sqlException);
+		} finally {
+			if (this.conn != null) {
+				try {
+					this.conn.close();
+				} catch (SQLException errClose) {
+					throw new RuntimeException(errClose);
+				}
+			}
+		}
+	}
+
+	public void destroy(Category category) {
+		PreparedStatement stmt = null;
+		String sql = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
+
+		try {
+			stmt = this.conn.prepareStatement(sql);
+			stmt.setInt(1, category.getId());
+			stmt.execute();
+		} catch (Exception sqlException) {
+			throw new RuntimeException(sqlException);
+		} finally {
+			if (this.conn != null) {
+				try {
+					this.conn.close();
+				} catch (SQLException errClose) {
+					throw new RuntimeException(errClose);
+				}
+			}
+		}
 	}
 }

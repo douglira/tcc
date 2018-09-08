@@ -86,4 +86,12 @@ public class Category {
 	public void setUpdatedAt(Calendar updatedAt) {
 		this.updatedAt = updatedAt;
 	}
+	
+	public void toggleStatus() {
+		if (this.status == Status.ACTIVE) {
+			this.status = Status.INACTIVE;
+		} else {
+			this.status = Status.ACTIVE;
+		}
+	}
 }
