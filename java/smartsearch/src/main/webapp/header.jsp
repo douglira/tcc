@@ -91,7 +91,6 @@
 	</nav>
 	<c:if test="<%=user != null && user.getRole() == UserRoles.COMMON%>">
 		<input type="hidden" id="inputHeaderUsername" value="<%= user.getUsername() %>"/>
-		<script src="<%=request.getContextPath() %>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
 		<script src="<%=request.getContextPath() %>/assets/libs/socket/socket.io.js"></script>
 		<script src="<%=request.getContextPath() %>/assets/js/header-websocket.js"></script>
 	</c:if>

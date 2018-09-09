@@ -5,8 +5,10 @@
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link
-	href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,500,500i,600,700"
-	rel="stylesheet">
+	href="<%=request.getContextPath() %>/assets/fonts/montserrat.css"
+	rel="stylesheet"
+	type="text/css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/fontawesome/css/all.css" >
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/base.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/signin.css">
@@ -42,6 +44,7 @@
 		</div>
 	</div>
 
+	<script src="<%=request.getContextPath()%>/assets/libs/fontawesome/js/all.js"></script>
 	<script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
 	<script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/popper-1.14.4.min.js"></script>
 	<script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/bootstrap.min.js"></script>
