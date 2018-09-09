@@ -13,10 +13,10 @@ import dao.UserDAO;
 import models.User;
 
 @WebServlet("/admin")
-public class UserList extends HttpServlet {
+public class UserListController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     
-    public UserList() {
+    public UserListController() {
         super();
     }
 
