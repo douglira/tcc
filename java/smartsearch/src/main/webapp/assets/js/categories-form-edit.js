@@ -48,7 +48,7 @@ function toggleStatus() {
 	$.post(
 		'/admin/categories/edit', 
 		{
-			action: 'toggleStatus',
+			action: 'ToggleStatus',
 			['category-id']: category.id,
 			['category-status']: category.status,
 		},
@@ -66,7 +66,7 @@ function deleteCategory() {
 	$.post(
 		'/admin/categories/edit', 
 		{
-			action: 'delete',
+			action: 'Delete',
 			['category-id']: category.id,
 		},
 		function() {

@@ -116,7 +116,7 @@
 			</div>
 			<input type="hidden" id="category-status" value="${category.status}"/>
 			<hr>
-			<button type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="edit">Salvar</button>
+			<button type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="Edit">Salvar</button>
 		</form>
 	</div>
 

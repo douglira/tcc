@@ -46,3 +46,21 @@ header {
 header form input::placeholder {
 	font-size: 12.5px !important;
 }
+
+.btn-notification {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: inherit;
+	padding: 10px;
+	border: 0;
+	font-size: 24px;
+	cursor: pointer;
+	margin: 10px;
+	color: #999;
+	border-radius: 50%;
+}
+
+.btn-notification:hover {
+	background-color: #f1f1f1;
+}

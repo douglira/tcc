@@ -4,7 +4,7 @@
 	User user = (User) session.getAttribute("loggedUser");
 %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<header class="header">
+<header id="appHeader" class="header">
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
 		<a class="navbar-brand" href="#">LOGOTIPO</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -40,6 +40,16 @@
 						</c:otherwise>
 					</c:choose>
 				</button>
+				
+				
+				<template v-if="username">
+					<button class="btn-notification">
+						<i class="far fa-bell"></i>
+					</button>
+				</template>
+				
+				
+				
 				<div class="dropdown-menu" aria-labelledby="dropdownOptions">
 					<c:choose>
 						<c:when
@@ -89,9 +99,9 @@
 			</form>
 		</div>
 	</nav>
-	<c:if test="<%=user != null && user.getRole() == UserRoles.COMMON%>">
-		<input type="hidden" id="inputHeaderUsername" value="<%= user.getUsername() %>"/>
-		<script src="<%=request.getContextPath() %>/assets/libs/socket/socket.io.js"></script>
-		<script src="<%=request.getContextPath() %>/assets/js/header-websocket.js"></script>
-	</c:if>
 </header>
+<c:if test="<%=user != null && user.getRole() == UserRoles.COMMON%>">
+	<input type="hidden" id="inputHeaderUsername" value="<%= user.getUsername() %>"/>
+	<script src="<%=request.getContextPath() %>/assets/libs/vuejs/vue-dist.js"></script>
+	<script src="<%=request.getContextPath() %>/assets/js/header-websocket.js"></script>
+</c:if>
