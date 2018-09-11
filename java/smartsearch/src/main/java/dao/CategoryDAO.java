@@ -162,6 +162,47 @@ public class CategoryDAO {
 
 		return category;
 	}
+	
+	public Category findParentByChildId(Category category) {
+		Category parentCategory = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		String sql = "SELECT * FROM categories WHERE id = (SELECT parent_id FROM categories WHERE id = ?)";
+		
+		try {
+			stmt = this.conn.prepareStatement(sql);
+			stmt.setInt(1, category.getId());
+			rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				parentCategory = new Category();
+				
+				parentCategory.setId(rs.getInt("id"));
+				parentCategory.setTitle(rs.getString("title"));
+				parentCategory.setDescription(rs.getString("description"));
+				parentCategory.setLayer(rs.getInt("layer"));
+				parentCategory.setLastChild(rs.getBoolean("is_last_child"));
+				parentCategory.setStatus(Status.valueOf(rs.getString("status")));
+
+				Calendar createdAt = Calendar.getInstance();
+				createdAt.setTime(rs.getTimestamp("created_at"));
+				parentCategory.setCreatedAt(createdAt);
+			}
+
+		} catch (Exception sqlException) {
+			throw new RuntimeException(sqlException);
+		} finally {
+			if (this.conn != null) {
+				try {
+					this.conn.close();
+				} catch (SQLException errClose) {
+					throw new RuntimeException(errClose);
+				}
+			}
+		}
+
+		return parentCategory;
+	}
 
 	public void saveDetails(Category category) {
 		PreparedStatement stmt = null;

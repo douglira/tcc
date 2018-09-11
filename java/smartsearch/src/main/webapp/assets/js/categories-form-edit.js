@@ -1,12 +1,12 @@
 let modalActions = {
 		toggleStatus: {
 			textTitle: status => `${status} categoria`,
-			textBody: 'Tem certeza que deseja inativar esta categoria? Todas as subcategorias também serão afetadas',
+			textBody: status => `Tem certeza que deseja ${status.toLowerCase()} esta categoria? Todas as subcategorias também serão afetadas`,
 			action: toggleStatus,
 		},
 		deleteCategory: {
 			textTitle: () => 'Excluir categoria',
-			textBody: 'Tem certeza que deseja excluir esta categoria? Esta operação é irreversível e todas as subcategorias serão excluídas',
+			textBody: () => 'Tem certeza que deseja excluir esta categoria? Esta operação é irreversível e todas as subcategorias serão excluídas',
 			action: deleteCategory,
 		},
 }
@@ -24,8 +24,10 @@ function openModal() {
 		
 		let modal = $(this);
 		
-		modal.find('.modal-title').text(modalActions[action].textTitle($('#btnToggleStatus').text()));
-		modal.find('.modal-body').text(modalActions[action].textBody);
+		const status = $('#btnToggleStatus').text();
+		
+		modal.find('.modal-title').text(modalActions[action].textTitle(status));
+		modal.find('.modal-body').text(modalActions[action].textBody(status));
 		$('#btnModalOk').data('action', modalActions[action].action);
 	})
 }
@@ -41,8 +43,8 @@ function onModalConfirm(event) {
 
 function toggleStatus() {
 	const category = {
-			id: $('#category-id').val(),
-			status: $('#category-status').val(),
+		id: $('#category-id').val(),
+		status: $('#category-status').val(),
 	}
 	
 	$.post(
@@ -52,15 +54,27 @@ function toggleStatus() {
 			['category-id']: category.id,
 			['category-status']: category.status,
 		},
-		function() {
-			window.location.replace('/admin/categories/new')
+		function(response) {
+			response = JSON.parse(response);
+			
+			if (!response.error && response.error === null) {
+				window.location.replace('/admin/categories/new');				
+				return;
+			}
+			
+			const divError = $('#divError');
+			
+			divError.text(response.error);
+			divError.show();
+			
+			setTimeout(() => divError.hide(), 3200);
 		}
 	);
 }
 
 function deleteCategory() {
 	const category = {
-			id: $('#category-id').val(),
+		id: $('#category-id').val(),
 	}
 	
 	$.post(

@@ -30,6 +30,11 @@ public class NewCategory implements ICategoryCommand {
 		}
 
 		new CategoryDAO(true).create(category);
+		try {
+			response.sendRedirect("/admin/categories/new");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

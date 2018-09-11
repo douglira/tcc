@@ -58,7 +58,6 @@ public class CategoryController extends HttpServlet {
 			ICategoryCommand command = (ICategoryCommand) classCommand.newInstance();
 
 			command.execute(request, response);
-			response.sendRedirect("/admin/categories/new");
 		} catch (Exception e) {
 			System.out.println("ERROR_COMMAND_CATEGORY: " + e);
 			response.sendRedirect("/admin/categories/new");

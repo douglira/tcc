@@ -48,11 +48,20 @@
 	</div>
 
 	<div class="container" style="margin-bottom: 20px;">
+		
+			<div id="divError" class="alert alert-warning" style="display: none;" role="alert"></div>
+	
 		<h1 style="font-size: 28px;">Categoria:&nbsp;<i><%=category.getTitle()%></i></h1>
 		<hr>
-		<p class="text-secondary">
-			Edite abaixo o título e descrição da categoria.
-		</p>
+		<div class="d-inline-flex justify-content-between w-100">
+			<p class="text-secondary">
+				Edite abaixo o título e descrição da categoria.
+			</p>
+			
+			<a href="<%=request.getContextPath() %>/admin/categories/new" aria-pressed="true">
+				Voltar
+			</a>
+		</div>
 		
 		<form action="/admin/categories/edit" method="POST">
 			<div class="d-inline-flex justify-content-between w-100">

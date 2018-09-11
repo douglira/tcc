@@ -14,6 +14,11 @@ public class DeleteCategory implements ICategoryCommand {
 		category.setId(Integer.parseInt(request.getParameter("category-id")));
 
 		new CategoryDAO(true).destroy(category);
+		try {
+			response.sendRedirect("/admin/categories/new");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }
