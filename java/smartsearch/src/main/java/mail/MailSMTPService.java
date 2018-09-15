@@ -35,7 +35,7 @@ public class MailSMTPService extends Mailer {
 	private Properties propsConfig;
 	private VelocityEngine ve;
 
-	protected MailSMTPService() {
+	private MailSMTPService() {
 		this.propsConfig = new Properties();
 		this.propsConfig.put("mail.smtp.auth", "true");
 		this.propsConfig.put("mail.smtp.starttls.enable", "true");

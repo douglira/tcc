@@ -36,9 +36,9 @@ public class NotificationSocket {
 
 	@OnMessage
 	public void onMessage(Session session, Notification notification) throws IOException {
-		notification.setFrom(users.get(session.getId()));
-		System.out.println("Socket onMessage[Notification]: " + notification);
-		sendNotification(notification);
+//		notification.setFrom(users.get(session.getId()));
+//		System.out.println("Socket onMessage[Notification]: " + notification);
+//		sendNotification(notification);
 	}
 
 	@OnClose
@@ -58,9 +58,9 @@ public class NotificationSocket {
 			synchronized (endpoint) {
 				String username = NotificationSocket.users.get(endpoint.session.getId());
 
-				if (username.equals(notification.getTo())) {
+				if (username.equals(notification.getTo().getUsername())) {
 					try {
-						System.out.println("Sending notification from " + notification.getFrom() + " to " + notification.getTo());
+						System.out.println("Sending notification from " + notification.getFrom().getUsername() + " to " + notification.getTo().getUsername());
 						endpoint.session.getBasicRemote().
 						sendObject(notification);
 					} catch (IOException | EncodeException e) {

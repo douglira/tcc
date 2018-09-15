@@ -1,28 +1,29 @@
 package models.socket;
 
 import enums.NotificationStatus;
+import models.User;
 
 public class Notification {
-	private String from;
-	private String to;
+	private User from = new User() ;
+	private User to = new User();
 	private String topic;
 	private String action;
 	private String content;
 	private NotificationStatus status;
 
-	public String getFrom() {
+	public User getFrom() {
 		return from;
 	}
 
-	public void setFrom(String from) {
+	public void setFrom(User from) {
 		this.from = from;
 	}
 
-	public String getTo() {
+	public User getTo() {
 		return to;
 	}
 
-	public void setTo(String to) {
+	public void setTo(User to) {
 		this.to = to;
 	}
 
