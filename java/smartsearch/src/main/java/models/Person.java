@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 public class Person {
 	private long id;
+	private Address address;
 	private String accountOwner;
 	private long tel;
 	private User user;
@@ -19,6 +20,14 @@ public class Person {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
 	}
 
 	public String getAccountOwner() {

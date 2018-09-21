@@ -1,7 +1,6 @@
 package controllers;
 
 import java.io.IOException;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,9 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.UserDAO;
-import mail.IMailerService;
 import mail.MailSMTPService;
 import mail.MailerService;
+import mail.ResetPassword;
 import models.User;
 
 @WebServlet(urlPatterns = { "/password/redefine", "/form/reset_pass" })
@@ -22,7 +21,7 @@ public class RedefinePassController extends HttpServlet {
 	public RedefinePassController() {
 		super();
 	}
-	
+
 	private String getBaseUrl(HttpServletRequest request) {
 		String scheme = request.getScheme() + "://";
 		String serverName = request.getServerName();
@@ -71,14 +70,14 @@ public class RedefinePassController extends HttpServlet {
 				return;
 			}
 
-			final MailerService mailer = new MailerService(MailSMTPService.getInstance());
+			final MailerService mailer = new ResetPassword(user.getDisplayName(),
+					this.getUrlRedirect(request, user.getPasswordResetToken()));
+			mailer.setMail(MailSMTPService.getInstance());
 			mailer.setTo(user.getEmail());
-			String displayName = user.getDisplayName();
-			String urlRedirect = this.getUrlRedirect(request, user.getPasswordResetToken());
 
 			Runnable r = new Runnable() {
 				public void run() {
-					mailer.sendResetPass(displayName, urlRedirect);
+					mailer.send();
 					new UserDAO(true).setPasswordResetToken(user);
 				}
 			};

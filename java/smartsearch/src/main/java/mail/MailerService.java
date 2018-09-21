@@ -2,23 +2,17 @@ package mail;
 
 import java.util.Properties;
 
-public class MailerService implements IMailerService {
+public abstract class MailerService {
 
-	private String from;
-	private String to;
-	private String subject;
+	protected String from;
+	protected String to;
+	protected String subject;
+	protected String template;
+	protected Properties context;
+	protected Mailer mail;
 	
-	private Mailer mail;
-	
-	public MailerService(Mailer mail) {
-		this.mail = mail;
-	}
-	
-	public MailerService(Mailer mail, String from, String to, String subject) {
-		this.mail = mail;
-		this.from = from;
-		this.to = to;
-		this.subject = subject;
+	public MailerService() {
+		this.context = new Properties();
 	}
 
 	public String getFrom() {
@@ -45,22 +39,29 @@ public class MailerService implements IMailerService {
 		this.subject = subject;
 	}
 	
-	private void sendMailHTML(String template, Properties context) {
-		this.mail.sendHTML(this.from, this.to, this.subject, template, context);
+	public String getTemplate() {
+		return template;
 	}
 
-	@Override
-	public void sendResetPass(String displayName, String urlRedirect) {		
-		this.from = "noreply@smartsearch.com.br";
-		this.subject = "SmartSearch | Redefinição de senha";
-		
-		String template = "mailResetPass";
-		
-		final Properties context = new Properties();
-		context.put("shortName", "SmartSearch");
-		context.put("urlRedirect", urlRedirect);
-		context.put("displayName", displayName);
-		
-		this.sendMailHTML(template, context);
+	public void setTemplate(String template) {
+		this.template = template;
 	}
+
+	public Properties getContext() {
+		return context;
+	}
+
+	public void setContext(Properties context) {
+		this.context = context;
+	}
+
+	public Mailer getMail() {
+		return mail;
+	}
+
+	public void setMail(Mailer mail) {
+		this.mail = mail;
+	}
+
+	public abstract void send();
 }

@@ -16,11 +16,11 @@ import dao.CategoryDAO;
 import models.Category;
 
 @WebServlet(urlPatterns = "/admin/categories/json")
-public class CategoryJson extends HttpServlet {
+public class CategoryAjax extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	public CategoryJson() {
+	public CategoryAjax() {
 		super();
 	}
 
