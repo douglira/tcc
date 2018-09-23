@@ -63,7 +63,6 @@ public class PersonDataController extends HttpServlet {
 		long stateRegistration = Long.parseLong(request.getParameter("stateRegistration"));
 
 		int addressId = 0;
-		System.out.println("addressId??? -> " + request.getParameter("addressId"));
 		if (request.getParameter("addressId").length() != 0 && request.getParameter("addressId") != null) {
 			addressId = Integer.parseInt(request.getParameter("addressId"));
 		}
@@ -97,10 +96,8 @@ public class PersonDataController extends HttpServlet {
 		new PersonDAO(true).update(person);
 
 		if (addressId == 0) {
-			System.out.println("Criando endereço");
 			address = new AddressDAO(true).create(address);
 		} else {
-			System.out.println("Atualizando endereço");
 			new AddressDAO(true).update(address);
 		}
 		
@@ -111,7 +108,7 @@ public class PersonDataController extends HttpServlet {
 		person.setAddress(address);
 		address.setPerson(null);
 
-		out.print("{\"msg\": \"Dados alterados com sucesso!\", \"person\": " + gJson.toJson(person) + "}");
+		out.print(gJson.toJson(person));
 		out.close();
 	}
 

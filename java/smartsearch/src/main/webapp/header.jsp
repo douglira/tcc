@@ -69,7 +69,7 @@
 								href="<%=request.getContextPath()%>/account">Meus pedidos de
 								compra</a>
 							<a class="dropdown-item" href="#">Orçamentos lançados</a>
-							<a class="dropdown-item" href="#">Meu estoque</a>
+							<a class="dropdown-item" href="<%=request.getContextPath()%>/account/inventory">Estoque</a>
 							<a class="dropdown-item" href="<%=request.getContextPath()%>/account/me">Meus dados</a>
 						</c:otherwise>
 					</c:choose>

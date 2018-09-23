@@ -82,8 +82,8 @@ new Vue({
 				(data, status) => {
 					data = JSON.parse(data);
 					if (status === 'success') {
-						this.person = data.person
-						this.showMessage(data.msg);		
+						this.person = data;
+						this.showMessage('Dados alterados com sucesso');		
 						return;
 					}
 					

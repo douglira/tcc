@@ -1,5 +1,6 @@
 package models;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import enums.Status;
@@ -93,5 +94,17 @@ public class Category {
 		} else {
 			this.status = Status.ACTIVE;
 		}
+	}
+	
+	public ArrayList<Category> filterActiveCategories(ArrayList<Category> categories) {
+		ArrayList<Category> filteredCategories = new ArrayList<Category>();
+		
+		for (Category category : categories) {
+			if (category.getStatus() == Status.ACTIVE) {
+				filteredCategories.add(category);
+			}
+		}
+		
+		return filteredCategories;
 	}
 }

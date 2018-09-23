@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/fontawesome/css/all.css" >
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/base.css">
-<link href="/assets/libs/toast/toastr.css" rel="stylesheet"/>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/toast/toastr.css"/>
 </head>
 <body>
 

@@ -88,4 +88,20 @@
     <servlet-name>userData</servlet-name>
     <url-pattern>/account/me</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>userInventory</servlet-name>
+    <jsp-file>/user/inventory.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>userInventory</servlet-name>
+    <url-pattern>/account/inventory</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>userProductNew</servlet-name>
+    <jsp-file>/user/product-form-create.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>userProductNew</servlet-name>
+    <url-pattern>/account/product/new</url-pattern>
+  </servlet-mapping>
 </web-app>

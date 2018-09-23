@@ -66,7 +66,7 @@ small::after {
 	justify-content: flex-end; 
 	text-decoration: none;
 	font-size: 13px;
-	color: #ccc;
+	color: #999;
 	width: 100%;
 	margin: 3px 0 10px 0;
 }
