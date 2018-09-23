@@ -3,26 +3,35 @@ package models;
 import java.util.Calendar;
 
 public class Address {
-	private Integer id;
+	private int id;
+	private Person person;
 	private String postalCode;
 	private String street;
 	private String district;
 	private String city;
 	private String provinceCode;
-	private String countryName;
+	private String countryName = "Brasil";
 	private int buildingNumber;
 	private String additionalData;
 	private Calendar createdAt;
 	private Calendar updatedAt;
 
-	public Integer getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 
+	public Person getPerson() {
+		return person;
+	}
+
+	public void setPerson(Person person) {
+		this.person = person;
+	}
+	
 	public String getPostalCode() {
 		return postalCode;
 	}

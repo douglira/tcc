@@ -11,39 +11,15 @@ import database.ConnectionFactory;
 import enums.Status;
 import models.Category;
 
-public class CategoryDAO {
+public class CategoryDAO extends GenericDAO {
 	private static final String TABLE_NAME = "categories";
 
-	private Connection conn;
-
 	public CategoryDAO(boolean getConnection) {
-		if (getConnection) {
-			this.conn = ConnectionFactory.getConnection();
-		}
+		super(getConnection);
 	}
 
 	public CategoryDAO(Connection conn, boolean setTransaction) {
-		this.conn = conn;
-
-		if (setTransaction) {
-			this.setTransaction();
-		}
-	}
-
-	public void setConnection(Connection conn) {
-		this.conn = conn;
-	}
-
-	public Connection getConnection() {
-		return this.conn;
-	}
-
-	public void setTransaction() {
-		try {
-			this.conn.setAutoCommit(false);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		super(conn, setTransaction);
 	}
 
 	public void create(Category category) {

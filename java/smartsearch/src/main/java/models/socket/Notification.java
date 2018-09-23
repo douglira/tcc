@@ -1,12 +1,13 @@
 package models.socket;
 
 import enums.NotificationStatus;
+import enums.NotificationTopic;
 import models.User;
 
 public class Notification {
 	private User from = new User() ;
 	private User to = new User();
-	private String topic;
+	private NotificationTopic topic;
 	private String action;
 	private String content;
 	private NotificationStatus status;
@@ -27,11 +28,11 @@ public class Notification {
 		this.to = to;
 	}
 
-	public String getTopic() {
+	public NotificationTopic getTopic() {
 		return topic;
 	}
 
-	public void setTopic(String topic) {
+	public void setTopic(NotificationTopic topic) {
 		this.topic = topic;
 	}
 

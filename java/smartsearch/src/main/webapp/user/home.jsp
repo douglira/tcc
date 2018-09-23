@@ -19,7 +19,7 @@
 	<jsp:include page="/header.jsp"/>
 
 	<div class="container">
-		<h1>Área do usuário</h1>
+		<h1>Pedidos de compra</h1>
 	</div>
 
 	<script src="<%=request.getContextPath()%>/assets/libs/fontawesome/js/all.js"></script>

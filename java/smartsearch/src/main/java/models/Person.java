@@ -3,7 +3,7 @@ package models;
 import java.sql.Timestamp;
 
 public class Person {
-	private long id;
+	private int id;
 	private Address address;
 	private String accountOwner;
 	private long tel;
@@ -13,12 +13,20 @@ public class Person {
 	private long cnpj;
 	private Timestamp createdAt;
 	private Timestamp updatedAt;
+	
+	public Person() {
+		
+	}
+	
+	public Person(User user) {
+		this.user = user;
+	}
 
-	public long getId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 

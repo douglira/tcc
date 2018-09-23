@@ -14,39 +14,15 @@ import enums.Status;
 import enums.UserRoles;
 import models.User;
 
-public class UserDAO {
+public class UserDAO extends GenericDAO {
 	private static final String TABLE_NAME = "users";
 
-	private Connection conn;
-
 	public UserDAO(boolean getConnection) {
-		if (getConnection) {
-			this.conn = ConnectionFactory.getConnection();
-		}
+		super(getConnection);
 	}
 
 	public UserDAO(Connection conn, boolean setTransaction) {
-		this.conn = conn;
-
-		if (setTransaction) {
-			this.setTransaction();
-		}
-	}
-
-	public void setConnection(Connection conn) {
-		this.conn = conn;
-	}
-
-	public Connection getConnection() {
-		return this.conn;
-	}
-
-	public void setTransaction() {
-		try {
-			this.conn.setAutoCommit(false);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		super(conn, setTransaction);
 	}
 
 	public User create(User user) {
@@ -92,6 +68,7 @@ public class UserDAO {
 
 			if (rs.next()) {
 				loggedUser = new User();
+				loggedUser.setId(rs.getInt("id"));
 				loggedUser.setUsername(rs.getString("username"));
 				loggedUser.setEmail(rs.getString("email"));
 				loggedUser.setPassword(rs.getString("password"));

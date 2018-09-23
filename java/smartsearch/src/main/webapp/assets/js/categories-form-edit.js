@@ -58,7 +58,7 @@ function toggleStatus() {
 			response = JSON.parse(response);
 			
 			if (!response.error && response.error === null) {
-				window.location.replace('/admin/categories/new');				
+				window.location.replace('/admin/categories/new');
 				return;
 			}
 			

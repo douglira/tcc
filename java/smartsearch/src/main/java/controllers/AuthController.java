@@ -92,7 +92,7 @@ public class AuthController extends HttpServlet {
 			user.hashPassword();
 
 			UserDAO userDao = new UserDAO(true);
-			userDao.setTransaction();
+			userDao.initTransaction();
 			user = userDao.create(user);
 			
 			person.setUser(user);
