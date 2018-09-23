@@ -104,6 +104,10 @@ public class PersonDataController extends HttpServlet {
 			new AddressDAO(true).update(address);
 		}
 		
+		HttpSession session = ((HttpServletRequest) request).getSession();
+		User user = (User) session.getAttribute("loggedUser");
+		
+		person.setUser(user);
 		person.setAddress(address);
 		address.setPerson(null);
 
