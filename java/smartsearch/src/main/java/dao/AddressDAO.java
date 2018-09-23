@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import models.Address;
 
@@ -18,13 +19,14 @@ public class AddressDAO extends GenericDAO {
 		super(conn, setTransaction);
 	}
 
-	public void create(Address address) {
+	public Address create(Address address) {
 		PreparedStatement stmt = null;
+		ResultSet rs = null;
 		String sql = "INSERT INTO " + TABLE_NAME + " (postal_code, street, district, city, "
 				+ "province_code, country_name, building_number, additional_data, person_id, created_at)"
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
 		try {
-			stmt = this.conn.prepareStatement(sql);
+			stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, address.getPostalCode());
 			stmt.setString(2, address.getStreet());
 			stmt.setString(3, address.getDistrict());
@@ -36,6 +38,12 @@ public class AddressDAO extends GenericDAO {
 			stmt.setInt(9, address.getPerson().getId());
 			stmt.execute();
 
+			rs = stmt.getGeneratedKeys();
+			
+			if (rs.next()) {
+				address.setId(rs.getInt("id"));
+			}
+			
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		} finally {
@@ -47,6 +55,7 @@ public class AddressDAO extends GenericDAO {
 				}
 			}
 		}
+		return address;
 	}
 
 	public void update(Address address) {

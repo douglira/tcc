@@ -37,7 +37,7 @@ new Vue({
 				address.city = data.localidade;
 				address.provinceCode = data.uf;
 				
-				this.person.address = { ...address };
+				this.person.address = { ...this.person.address, ...address };
 			} catch (err) {
 				this.showMessage('Não foi possível carregar os dados pelo CEP. Por favor preencha manualmente', 'error');
 			}
@@ -82,6 +82,7 @@ new Vue({
 				(data, status) => {
 					data = JSON.parse(data);
 					if (status === 'success') {
+						this.person = data.person
 						this.showMessage(data.msg);		
 						return;
 					}
