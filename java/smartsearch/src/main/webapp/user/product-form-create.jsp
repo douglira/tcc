@@ -26,13 +26,13 @@
 	<div id="productNew" class="container mb-sm-5 mb-md-5">
 		<div class="card mb-sm-3 mb-md-3">
 			<div class="card-body">
-				<h1 class="card-title text-muted">Novo produto</h1>
+				<h1 class="card-title text-muted text-uppercase">Novo produto</h1>
 			</div>
 		</div>
 		<form autocomplete="off" @submit.prevent="save">
 			<div class="card mb-3 mb-sm-3 mb-md-3">
 				<div class="card-body">				
-					<h2 class="text-muted">Categoria: <i>{{ product.category && product.category.id && product.category.title }}</i></h2>
+					<h2 class="text-muted">Categoria: <i class="text-primary">{{ product.category && product.category.id && product.category.title }}</i></h2>
 					<p class="text-muted">Escolha abaixo a categoria na qual este produto irá pertencer</p>
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
@@ -49,10 +49,6 @@
 								<option :value="category.id">{{ category.title }}</option>
 							</template>
 						</select>
-					</div>
-					<div class="d-flex justify-content-between">
-						<a role="button" class="btn btn-link px-md-5 py-md-2 font-weight-bold" href="<%=request.getContextPath() %>/account/inventory" >Voltar</a>
-						<button class="btn btn-success btn-submit px-md-5 py-md-2 font-weight-bold" type="submit" value="edit" name="action">Salvar</button>
 					</div>
 				</div>
 			</div>
@@ -76,17 +72,47 @@
 								type="text" 
 								:value="product.title" 
 								@keyup="onKeyupProductTitle"
-								@blur="productsPredict = []">
+								@blur="clearPredictProducts">
 							<div class="list-group autocomplete-list" v-if="productsPredict && productsPredict.length">
-								<template v-for="(suggestedProduct, index) in productsPredict">
-									<a href="javascript:void(0)" class="list-group-item list-group-item-action" @click="onClickSuggestedProduct(suggestedProduct)">
-										{{ suggestedProduct.title }}
+								<template v-for="(predictProduct, index) in productsPredict">
+									<a 
+										@click="onClickPredictProduct(predictProduct)"
+										href="javascript:void(0)" 
+										class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+										{{ predictProduct.title }}
+										<span class="badge badge-pill badge-light text-info">{{ predictProduct.relevance }}</span>
 									</a>
 								</template>
 							</div>
 						</div>
 					</div>
+					
+					<div class="form-row">
+						<div class="form-group col-md-6">
+							<label for="price">Preço</label>
+							<div class="input-group mb-3">
+								<div class="input-group-prepend">
+									<span class="input-group-text">R$</span>
+								</div>								
+								<input class="form-control" type="number" id="price" name="price" v-model="product.price">
+							</div>
+						</div>
+						<div class="form-group col-md-6">
+							<label for="availableQuantity">Quantidade disponível</label>
+							<input class="form-control" type="number" id="availableQuantity" name="availableQuantity" v-model="product.availableQuantity">
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label for="description">Especificações</label>
+						<textarea class="form-control" id="description" name="description" rows="3" style="white-space: pre-wrap">{{ product.description }}</textarea>
+					</div>
 				</div>
+			</div>
+			
+			<div class="d-flex justify-content-between">
+				<a role="button" class="btn btn-link px-md-5 py-md-2 font-weight-bold" href="<%=request.getContextPath() %>/account/inventory" >Voltar</a>
+				<button class="btn btn-success btn-submit px-md-5 py-md-2 font-weight-bold" type="submit" value="edit" name="action">Salvar</button>
 			</div>
 		</form>
 	</div>

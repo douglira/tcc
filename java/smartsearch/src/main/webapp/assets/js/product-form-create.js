@@ -4,6 +4,9 @@ new Vue({
 		return {
 			product: {
 				title: '',
+				price: null,
+				availableQuantity: null,
+				description: '',
 				category: {},
 			},
 			productsPredict: [],
@@ -19,9 +22,7 @@ new Vue({
 			const categoryId = Number(event.target.value);
 			const category = this.categories.find(cat => cat.id === categoryId);
 
-			console.log(category.isLastChild);
 			if (category.isLastChild) {
-				console.log('selecionada', category);
 				this.product.category = { ...category };
 				return;
 			}
@@ -46,25 +47,29 @@ new Vue({
 				this.product.category = null;
 			}
 		},
-		onKeyupProductTitle: _.debounce(function(event) {
+		onClickPredictProduct(predictProduct) {
+			this.product.title = predictProduct.title;
+			this.productsPredict = [];
+		},
+		onKeyupProductTitle: _.debounce(async function(event) {
 			const productTitle = event.target.value.trim();
 			
 			this.product.title = productTitle;
-			if (!productTitle) {
+			if (!productTitle || productTitle.length <= 1) {
 				this.productsPredict = [];
 				return;
 			}
 			
 			// buscar no elasticsearch
-			// this.productsPredict = [{ id: 1, title: 'Notebook Gamer', relevance: '450' }, { id: 2, title: 'Computador de escritório', relevance: '1245' }];
+			const { data } = await axios.get(`/products/search?productPredictTitle=${productTitle}`);
+			this.productsPredict = data;
 		}, 300),
-		onClickSuggestedProduct(suggestedProduct) {
-			this.product.title = suggestedProduct.title;
-			this.productsPredict = [];
-		},
 		save() {
 			console.log('Salvando novo produto');
 		},
+		clearPredictProducts: _.debounce(function() {
+			this.productsPredict = [];
+		}, 300),
 		async getCategories(categoryId) {
 			let data;
 			
