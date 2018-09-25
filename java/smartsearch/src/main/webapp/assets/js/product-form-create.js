@@ -68,7 +68,7 @@ new Vue({
 		},
 		getPredictProducts: _.debounce(async function(productTitle) {
 			productTitle.trim();
-			// buscar no elasticsearch
+			// predict at elasticsearch
 			const { data } = await axios.get(`/products/search?productPredictTitle=${productTitle}`);
 			this.productsPredict = data;
 		}, 450),

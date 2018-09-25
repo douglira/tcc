@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
-import facades.ElasticsearchFacade;
+import database.elasticsearch.ElasticsearchFacade;
 import models.ProductItem;
 
 @WebServlet(urlPatterns = "/products/search")

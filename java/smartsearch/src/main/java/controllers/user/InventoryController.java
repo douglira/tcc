@@ -15,9 +15,9 @@ import com.google.gson.Gson;
 import dao.PersonDAO;
 import dao.ProductDAO;
 import dao.ProductItemDAO;
+import database.elasticsearch.ElasticsearchFacade;
 import enums.MessengerType;
 import enums.Status;
-import facades.ElasticsearchFacade;
 import models.Category;
 import models.Messenger;
 import models.Person;
@@ -43,7 +43,7 @@ public class InventoryController extends HttpServlet {
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		Gson gJson = new Gson();
-		
+
 		HttpSession session = request.getSession();
 		User user = (User) session.getAttribute("loggedUser");
 
@@ -58,48 +58,50 @@ public class InventoryController extends HttpServlet {
 		}
 
 		Product product = gJson.fromJson(productJson, Product.class);
-		
+
 		ProductItem productItem = new ProductItem();
 		productItem.setTitle(product.getTitle());
-		
+
 		if (productItemId == null || productItemId.length() == 0) {
 			Person person = new Person();
 			person.setUser(user);
-			
+
 			PersonDAO personDao = new PersonDAO(true);
 			person = personDao.findByUser(person);
 			Seller seller = new Seller();
 			seller.setId(person.getId());
-			
+
 			productItem.setMarketPrice(product.getPrice());
 			productItem.setMaxPrice(product.getPrice());
 			productItem.setMinPrice(product.getPrice());
-			
+
 			ProductItemDAO productItemDao = new ProductItemDAO(true);
 			productItemDao.initTransaction();
 			productItem = productItemDao.create(productItem);
-			
+
 			Category category = new Category();
 			category.setId(Integer.parseInt(categoryId));
-			
+
 			product.setCategory(category);
 			product.setSeller(seller);
 			product.setProductItem(productItem);
 			product.setStatus(Status.ACTIVE);
-			
+
 			new ProductDAO(productItemDao.getConnection(), false).create(product);
-			
+
 			ElasticsearchFacade elasticsearch = ElasticsearchFacade.getInstance();
 			elasticsearch.indexProductItem(productItem);
-			
-			Messenger msg = new Messenger("Seu novo produto foi cadastrado com sucesso em nosso sistema.", MessengerType.SUCCESS);
+
+			Messenger msg = new Messenger("Seu novo produto foi cadastrado com sucesso em nosso sistema.",
+					MessengerType.SUCCESS);
 			out.print(gJson.toJson(msg));
 		} else {
-			
-			Messenger msg = new Messenger("Seu novo produto foi vinculado a um anúncio já cadastrado com sucesso.", MessengerType.SUCCESS);
-			out.print(gJson.toJson(msg));			
+
+			Messenger msg = new Messenger("Seu novo produto foi vinculado a um anúncio já cadastrado com sucesso.",
+					MessengerType.SUCCESS);
+			out.print(gJson.toJson(msg));
 		}
-		
+
 		out.close();
 	}
 }

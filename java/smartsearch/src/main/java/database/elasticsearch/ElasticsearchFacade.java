@@ -1,4 +1,4 @@
-package facades;
+package database.elasticsearch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,7 +15,6 @@ import org.elasticsearch.search.sort.SortOrder;
 
 import com.google.gson.Gson;
 
-import database.elasticsearch.ClientTransport;
 import models.ProductItem;
 
 public class ElasticsearchFacade {
@@ -26,10 +25,10 @@ public class ElasticsearchFacade {
 
 	private ElasticsearchFacade() {
 		if (this.client == null) {
-			this.client = ClientTransport.getTransport();			
+			this.client = ClientTransport.getTransport();
 		}
 	}
-	
+
 	public static ElasticsearchFacade getInstance() {
 		if (esFacade == null) {
 			esFacade = new ElasticsearchFacade();
@@ -37,18 +36,17 @@ public class ElasticsearchFacade {
 		}
 		return esFacade;
 	}
-	
+
 	public void indexProductItem(ProductItem productItem) {
 		if (productItem == null) {
 			return;
 		}
-		
+
 		Gson gJson = new Gson();
 		String productItemJson = gJson.toJson(productItem);
-		
+
 		IndexResponse response = client.prepareIndex("product_items", "_doc", productItem.getId().toString())
-			.setSource(productItemJson, XContentType.JSON)
-			.get();
+				.setSource(productItemJson, XContentType.JSON).get();
 	}
 
 	public List<ProductItem> getProductsPredict(String productItemTitle) {
@@ -63,10 +61,10 @@ public class ElasticsearchFacade {
 		List<SearchHit> searchHits = Arrays.asList(esResponse.getHits().getHits());
 		List<ProductItem> products = new ArrayList<ProductItem>();
 		searchHits.forEach(hit -> {
-			synchronized(hit) {
+			synchronized (hit) {
 				ProductItem productItem = this.gJson.fromJson(hit.getSourceAsString(), ProductItem.class);
 				productItem.setId(Integer.parseInt(hit.getId()));
-				products.add(productItem);				
+				products.add(productItem);
 			}
 		});
 
