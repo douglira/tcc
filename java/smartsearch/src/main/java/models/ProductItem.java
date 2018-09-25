@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class ProductItem {
 
+	private int id;
 	private ArrayList<Product> basedProducts;
 	private String title;
 	private double thumbnailPath;
@@ -13,4 +14,84 @@ public class ProductItem {
 	private double minPrice;
 	private int viewsCount;
 	private int relevance;
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	
+	public Integer getId() {
+		return id;
+	}
+	
+	public ArrayList<Product> getBasedProducts() {
+		return basedProducts;
+	}
+
+	public void setBasedProducts(ArrayList<Product> basedProducts) {
+		this.basedProducts = basedProducts;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public double getThumbnailPath() {
+		return thumbnailPath;
+	}
+
+	public void setThumbnailPath(double thumbnailPath) {
+		this.thumbnailPath = thumbnailPath;
+	}
+
+	public ArrayList<String> getPictures() {
+		return pictures;
+	}
+
+	public void setPictures(ArrayList<String> pictures) {
+		this.pictures = pictures;
+	}
+
+	public double getMarketPrice() {
+		return marketPrice;
+	}
+
+	public void setMarketPrice(double marketPrice) {
+		this.marketPrice = marketPrice;
+	}
+
+	public double getMaxPrice() {
+		return maxPrice;
+	}
+
+	public void setMaxPrice(double maxPrice) {
+		this.maxPrice = maxPrice;
+	}
+
+	public double getMinPrice() {
+		return minPrice;
+	}
+
+	public void setMinPrice(double minPrice) {
+		this.minPrice = minPrice;
+	}
+
+	public int getViewsCount() {
+		return viewsCount;
+	}
+
+	public void setViewsCount(int viewsCount) {
+		this.viewsCount = viewsCount;
+	}
+
+	public int getRelevance() {
+		return relevance;
+	}
+
+	public void setRelevance(int relevance) {
+		this.relevance = relevance;
+	}
 }

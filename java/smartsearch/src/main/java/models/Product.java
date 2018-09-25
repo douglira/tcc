@@ -8,6 +8,7 @@ import enums.Status;
 public class Product {
 	private int id;
 	private Seller seller;
+	private ProductItem productItem;
 	private Category category;
 	private String title;
 	private String description;
@@ -33,6 +34,14 @@ public class Product {
 
 	public void setSeller(Seller seller) {
 		this.seller = seller;
+	}
+
+	public ProductItem getProductItem() {
+		return productItem;
+	}
+
+	public void setProductItem(ProductItem productItem) {
+		this.productItem = productItem;
 	}
 
 	public Category getCategory() {

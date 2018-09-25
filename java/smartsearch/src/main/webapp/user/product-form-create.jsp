@@ -33,7 +33,7 @@
 			<div class="card mb-3 mb-sm-3 mb-md-3">
 				<div class="card-body">				
 					<h2 class="text-muted">Categoria: <i class="text-primary">{{ product.category && product.category.id && product.category.title }}</i></h2>
-					<p class="text-muted">Escolha abaixo a categoria na qual este produto irá pertencer</p>
+					<p class="text-muted">Escolha abaixo a categoria na qual este produto irá pertencer.</p>
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<template v-for="(subcategory, index) in breadcrumbCategories">
@@ -42,9 +42,9 @@
 							</template>
 						</ol>
 					</nav>
-					<div class="form-group col-md-5 col-sm-4 col-lg-4">
-						<label for="category">Categorias</label>
-						<select id="category" name="category" class="custom-select" @change="onChangeCategory">
+					<div class="form-group col-md-5 col-sm-8 col-lg-8 col-12">
+						<label for="categoryId">Categorias</label>
+						<select id="categoryId" name="categoryId" class="custom-select" @change="onChangeCategorySelection">
 							<template v-for="(category, index) in categories">
 								<option :value="category.id">{{ category.title }}</option>
 							</template>
@@ -62,11 +62,11 @@
 						Para mais informações&nbsp;<a href="javascript:void(0)">clique aqui.</a>
 					</p>
 					<div class="form-group">
-						<label for="productTitle">Título</label>
+						<label for="title">Título</label>
 						<div class="autocomplete">
 							<input 
-								id="productTitle" 
-								name="productTitle" 
+								id="title" 
+								name="title" 
 								class="form-control form-control-lg" 
 								placeholder="Busque por um produto ou registre um novo" 
 								type="text" 
@@ -94,12 +94,12 @@
 								<div class="input-group-prepend">
 									<span class="input-group-text">R$</span>
 								</div>								
-								<input class="form-control" type="number" id="price" name="price" v-model="product.price">
+								<input class="form-control" type="number" id="price" name="price" step="0.01" min="0.01" v-model="product.price">
 							</div>
 						</div>
 						<div class="form-group col-md-6">
 							<label for="availableQuantity">Quantidade disponível</label>
-							<input class="form-control" type="number" id="availableQuantity" name="availableQuantity" v-model="product.availableQuantity">
+							<input class="form-control" type="number" id="availableQuantity" name="availableQuantity" min="0" v-model="product.availableQuantity">
 						</div>
 					</div>
 					

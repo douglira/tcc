@@ -7,7 +7,10 @@ new Vue({
 				price: null,
 				availableQuantity: null,
 				description: '',
-				category: {},
+				productItemId: null,
+				category: {
+					id: null,
+				},
 			},
 			productsPredict: [],
 			categories: [],
@@ -18,7 +21,7 @@ new Vue({
 		this.loadData();
 	},
 	methods: {
-		async onChangeCategory(event) {
+		async onChangeCategorySelection(event) {
 			const categoryId = Number(event.target.value);
 			const category = this.categories.find(cat => cat.id === categoryId);
 
@@ -49,23 +52,75 @@ new Vue({
 		},
 		onClickPredictProduct(predictProduct) {
 			this.product.title = predictProduct.title;
+			this.product.productItemId = predictProduct.id;
 			this.productsPredict = [];
 		},
-		onKeyupProductTitle: _.debounce(async function(event) {
-			const productTitle = event.target.value.trim();
+		onKeyupProductTitle(event) {
+			const productTitle = event.target.value;
 			
 			this.product.title = productTitle;
+			this.product.productItemId = null;
 			if (!productTitle || productTitle.length <= 1) {
 				this.productsPredict = [];
 				return;
 			}
-			
+			this.getPredictProducts(productTitle);
+		},
+		getPredictProducts: _.debounce(async function(productTitle) {
+			productTitle.trim();
 			// buscar no elasticsearch
 			const { data } = await axios.get(`/products/search?productPredictTitle=${productTitle}`);
 			this.productsPredict = data;
-		}, 300),
+		}, 450),
 		save() {
-			console.log('Salvando novo produto');
+			let isValid = true;
+			
+			const categoryId = this.product.category.id;
+			const productItemId = this.product.productItemId;
+			const payload = {
+				categoryId,
+				productItemId,
+				product: {
+					title: this.product.title.trim(),
+					price: this.product.price,
+					availableQuantity: this.product.availableQuantity,
+					description: this.product.description,
+				}
+			};
+			
+			const toValidate = { ...payload.product, categoryId };
+			
+			Object.keys(toValidate).forEach((key) => {
+				if (!toValidate[key] && key !== 'description') {
+					isValid = false;
+					$(`#${key}`).addClass('border-danger');
+					return;
+				}
+				
+				$(`#${key}`).hasClass('border-danger') && $(`#${key}`).removeClass('border-danger');
+			})
+			
+			if (!isValid) {
+				return null;
+			}
+			
+			$.post(
+				'/account/me/inventory',
+				{
+					...payload,
+					product: JSON.stringify(payload.product),
+				},
+				(data, status) => {
+					const msg = data && JSON.parse(data);
+					if (status === 'success') {
+						this.showToast(msg.content, msg.type);		
+						this.resetData();
+						return;
+					}
+					
+					this.showToast(msg.content, msg.type);
+				}
+			);
 		},
 		clearPredictProducts: _.debounce(function() {
 			this.productsPredict = [];
@@ -92,8 +147,25 @@ new Vue({
 		async loadData() {
 			this.categories = await this.getCategories();
 		},
-		showToast(msg, topic) {
+		showToast(msg, topic = 'success') {
+			topic = topic.toLowerCase();
+			
 			toastr[topic](msg);
+		},
+		resetData() {
+			this.product = {
+				title: '',
+				price: null,
+				availableQuantity: null,
+				description: '',
+				productItemId: null,
+				category: {
+					id: null,
+				},
+			};
+			this.productsPredict = [];
+			this.categories = await this.getCategories();
+			this.breadcrumbCategories = [{ id: 0, title: 'Geral' }];
 		}
 	},
 })
