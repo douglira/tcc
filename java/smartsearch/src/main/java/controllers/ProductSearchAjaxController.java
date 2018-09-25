@@ -32,7 +32,8 @@ public class ProductSearchAjaxController extends HttpServlet {
 
 		String productItemTitle = request.getParameter("productPredictTitle");
 
-		List<ProductItem> products = new ElasticsearchFacade().getProductsPredict(productItemTitle);
+		ElasticsearchFacade elasticsearch = ElasticsearchFacade.getInstance();
+		List<ProductItem> products = elasticsearch.getProductsPredict(productItemTitle);
 
 		out.print(gJson.toJson(products));
 		out.close();

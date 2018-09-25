@@ -89,7 +89,8 @@ public class InventoryController extends HttpServlet {
 			
 			new ProductDAO(productItemDao.getConnection(), false).create(product);
 			
-			new ElasticsearchFacade().indexProductItem(productItem);
+			ElasticsearchFacade elasticsearch = ElasticsearchFacade.getInstance();
+			elasticsearch.indexProductItem(productItem);
 			
 			Messenger msg = new Messenger("Seu novo produto foi cadastrado com sucesso em nosso sistema.", MessengerType.SUCCESS);
 			out.print(gJson.toJson(msg));

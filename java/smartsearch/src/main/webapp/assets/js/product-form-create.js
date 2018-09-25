@@ -152,7 +152,7 @@ new Vue({
 			
 			toastr[topic](msg);
 		},
-		resetData() {
+		async resetData() {
 			this.product = {
 				title: '',
 				price: null,

@@ -10,7 +10,7 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 public class ClientTransport {
 	private static final Settings SETTINGS_CONNECTION = Settings.builder()
-//			.put("client.transport.sniff", true)
+			.put("client.transport.sniff", true)
 			.put("cluster.name", "docker-cluster")
 			.build();
 	

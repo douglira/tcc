@@ -20,15 +20,22 @@ import models.ProductItem;
 
 public class ElasticsearchFacade {
 
-	private final Client client;
+	private Client client;
+	private static ElasticsearchFacade esFacade;
 	private final Gson gJson = new Gson();
 
-	public ElasticsearchFacade() {
-		this.client = ClientTransport.getTransport();
-
+	private ElasticsearchFacade() {
 		if (this.client == null) {
-			System.out.println("Error at get elasticsearch client transport.");
+			this.client = ClientTransport.getTransport();			
 		}
+	}
+	
+	public static ElasticsearchFacade getInstance() {
+		if (esFacade == null) {
+			esFacade = new ElasticsearchFacade();
+			return esFacade;
+		}
+		return esFacade;
 	}
 	
 	public void indexProductItem(ProductItem productItem) {
@@ -42,7 +49,6 @@ public class ElasticsearchFacade {
 		IndexResponse response = client.prepareIndex("product_items", "_doc", productItem.getId().toString())
 			.setSource(productItemJson, XContentType.JSON)
 			.get();
-		System.out.println(response.getVersion());
 	}
 
 	public List<ProductItem> getProductsPredict(String productItemTitle) {
@@ -64,7 +70,6 @@ public class ElasticsearchFacade {
 			}
 		});
 
-		this.client.close();
 		return products;
 	}
 }
