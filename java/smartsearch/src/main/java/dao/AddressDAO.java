@@ -15,8 +15,8 @@ public class AddressDAO extends GenericDAO {
 		super(getConnection);
 	}
 
-	public AddressDAO(Connection conn, boolean setTransaction) {
-		super(conn, setTransaction);
+	public AddressDAO(Connection conn) {
+		super(conn);
 	}
 
 	public Address create(Address address) {

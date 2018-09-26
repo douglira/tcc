@@ -18,8 +18,8 @@ public class CategoryDAO extends GenericDAO {
 		super(getConnection);
 	}
 
-	public CategoryDAO(Connection conn, boolean setTransaction) {
-		super(conn, setTransaction);
+	public CategoryDAO(Connection conn) {
+		super(conn);
 	}
 
 	public void create(Category category) {

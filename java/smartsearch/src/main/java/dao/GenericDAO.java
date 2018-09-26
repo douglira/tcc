@@ -14,12 +14,8 @@ public abstract class GenericDAO {
 		}
 	}
 
-	protected GenericDAO(Connection conn, boolean setTransaction) {
+	protected GenericDAO(Connection conn) {
 		this.conn = conn;
-
-		if (setTransaction) {
-			this.initTransaction();
-		}
 	}
 
 	public void setConnection(Connection conn) {
@@ -33,14 +29,6 @@ public abstract class GenericDAO {
 	public void initTransaction() {
 		try {
 			this.conn.setAutoCommit(false);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void closeTransaction() {
-		try {
-			this.conn.setAutoCommit(true);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

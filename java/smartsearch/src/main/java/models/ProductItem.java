@@ -7,7 +7,7 @@ public class ProductItem {
 	private int id;
 	private ArrayList<Product> basedProducts;
 	private String title;
-	private double thumbnailPath;
+	private String thumbnailPath;
 	private ArrayList<String> pictures;
 	private double marketPrice;
 	private double maxPrice;
@@ -39,11 +39,11 @@ public class ProductItem {
 		this.title = title;
 	}
 
-	public double getThumbnailPath() {
+	public String getThumbnailPath() {
 		return thumbnailPath;
 	}
 
-	public void setThumbnailPath(double thumbnailPath) {
+	public void setThumbnailPath(String thumbnailPath) {
 		this.thumbnailPath = thumbnailPath;
 	}
 
@@ -93,5 +93,20 @@ public class ProductItem {
 
 	public void setRelevance(int relevance) {
 		this.relevance = relevance;
+	}
+
+	public void updatePrices() {		
+		this.marketPrice = this.basedProducts.stream()
+				.mapToDouble(Product::getPrice)
+				.average()
+				.getAsDouble();
+		this.maxPrice = this.basedProducts.stream()
+				.mapToDouble(Product::getPrice)
+				.max()
+				.getAsDouble();
+		this.minPrice = this.basedProducts.stream()
+				.mapToDouble(Product::getPrice)
+				.min()
+				.getAsDouble();
 	}
 }

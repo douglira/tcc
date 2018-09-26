@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import database.ConnectionFactory;
 import models.Person;
@@ -15,16 +16,18 @@ public class PersonDAO extends GenericDAO {
 		super(getConnection);
 	}
 
-	public PersonDAO(Connection conn, boolean setTransaction) {
-		super(conn, setTransaction);
+	public PersonDAO(Connection conn) {
+		super(conn);
 	}
 
-	public void create(Person person) {
+	public Person create(Person person) {
 		PreparedStatement stmt = null;
+		ResultSet rs = null;
 		String sql = "INSERT INTO " + TABLE_NAME + " (account_owner, tel, cnpj, corporate_name, "
 				+ "state_registration, user_id, created_at)" + "VALUES (?, ?, ?, ?, ?, ?, NOW())";
+		
 		try {
-			stmt = this.conn.prepareStatement(sql);
+			stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, person.getAccountOwner());
 			stmt.setLong(2, person.getTel());
 			stmt.setLong(3, person.getCnpj());
@@ -32,8 +35,13 @@ public class PersonDAO extends GenericDAO {
 			stmt.setLong(5, person.getStateRegistration());
 			stmt.setInt(6, person.getUser().getId());
 			stmt.execute();
-			this.conn.commit();
+			
+			rs = stmt.getGeneratedKeys();
 
+			if (rs.next()) {
+				person.setId(rs.getInt("id"));
+			}
+			
 		} catch (SQLException e) {
 			try {
 				this.conn.rollback();
@@ -41,15 +49,9 @@ public class PersonDAO extends GenericDAO {
 				e1.printStackTrace();
 			}
 			throw new RuntimeException(e);
-		} finally {
-			if (this.conn != null) {
-				try {
-					this.conn.close();
-				} catch (SQLException sqlException) {
-					throw new RuntimeException(sqlException);
-				}
-			}
 		}
+		
+		return person;
 	}
 
 	public void update(Person person) {

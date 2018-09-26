@@ -42,6 +42,7 @@ public class InventoryController extends HttpServlet {
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
+		Messenger msg;
 		Gson gJson = new Gson();
 
 		HttpSession session = request.getSession();
@@ -52,7 +53,7 @@ public class InventoryController extends HttpServlet {
 		String productJson = request.getParameter("product");
 
 		if (categoryId == null || categoryId.length() == 0 || productJson == null || productJson.length() == 0) {
-			Messenger msg = new Messenger("Operação inválida.", MessengerType.ERROR);
+			msg = new Messenger("Operação inválida.", MessengerType.ERROR);
 			out.print(gJson.toJson(msg));
 			return;
 		}
@@ -62,46 +63,58 @@ public class InventoryController extends HttpServlet {
 		ProductItem productItem = new ProductItem();
 		productItem.setTitle(product.getTitle());
 
+		Person person = new Person();
+		person.setUser(user);
+		
+		PersonDAO personDao = new PersonDAO(true);
+		person = personDao.findByUser(person);
+		
+		Seller seller = new Seller();
+		seller.setId(person.getId());
+		
+		Category category = new Category();
+		category.setId(Integer.parseInt(categoryId));
+		
+		product.setCategory(category);
+		product.setSeller(seller);
+		product.setStatus(Status.ACTIVE);
+		
+		ProductItemDAO productItemDao = new ProductItemDAO(true);
+		
 		if (productItemId == null || productItemId.length() == 0) {
-			Person person = new Person();
-			person.setUser(user);
-
-			PersonDAO personDao = new PersonDAO(true);
-			person = personDao.findByUser(person);
-			Seller seller = new Seller();
-			seller.setId(person.getId());
 
 			productItem.setMarketPrice(product.getPrice());
 			productItem.setMaxPrice(product.getPrice());
 			productItem.setMinPrice(product.getPrice());
 
-			ProductItemDAO productItemDao = new ProductItemDAO(true);
 			productItemDao.initTransaction();
 			productItem = productItemDao.create(productItem);
 
-			Category category = new Category();
-			category.setId(Integer.parseInt(categoryId));
 
-			product.setCategory(category);
-			product.setSeller(seller);
-			product.setProductItem(productItem);
-			product.setStatus(Status.ACTIVE);
-
-			new ProductDAO(productItemDao.getConnection(), false).create(product);
-
-			ElasticsearchFacade elasticsearch = ElasticsearchFacade.getInstance();
-			elasticsearch.indexProductItem(productItem);
-
-			Messenger msg = new Messenger("Seu novo produto foi cadastrado com sucesso em nosso sistema.",
+			msg = new Messenger("Seu novo produto foi cadastrado com sucesso em nosso sistema.",
 					MessengerType.SUCCESS);
-			out.print(gJson.toJson(msg));
 		} else {
+			productItem.setId(Integer.parseInt(productItemId));
+			
+			productItem = productItemDao.findById(productItem);
+			productItem.setRelevance(productItem.getRelevance() + 1);
+			productItem.setBasedProducts(new ProductDAO(true).findProductsByProductItem(productItem.getId()));
+			
+			productItem.updatePrices();
+			
+			productItemDao = new ProductItemDAO(true);
+			productItemDao.initTransaction();
+			productItemDao.updatePricesAndRelevance(productItem);
 
-			Messenger msg = new Messenger("Seu novo produto foi vinculado a um anúncio já cadastrado com sucesso.",
+			msg = new Messenger("Seu novo produto foi vinculado a um anúncio já cadastrado com sucesso.",
 					MessengerType.SUCCESS);
-			out.print(gJson.toJson(msg));
 		}
 
+		product.setProductItem(productItem);
+		new ProductDAO(productItemDao.getConnection()).create(product);
+		
+		new ElasticsearchFacade().indexProductItem(productItem);
+		out.print(gJson.toJson(msg));
 		out.close();
 	}
 }

@@ -21,8 +21,8 @@ public class UserDAO extends GenericDAO {
 		super(getConnection);
 	}
 
-	public UserDAO(Connection conn, boolean setTransaction) {
-		super(conn, setTransaction);
+	public UserDAO(Connection conn) {
+		super(conn);
 	}
 
 	public User create(User user) {

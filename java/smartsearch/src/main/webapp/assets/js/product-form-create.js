@@ -18,7 +18,7 @@ new Vue({
 		};
 	},
 	created() {
-		this.loadData();
+		 this.loadData();
 	},
 	methods: {
 		async onChangeCategorySelection(event) {

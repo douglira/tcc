@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -19,22 +19,13 @@ import models.ProductItem;
 
 public class ElasticsearchFacade {
 
-	private Client client;
-	private static ElasticsearchFacade esFacade;
+	private TransportClient client;
 	private final Gson gJson = new Gson();
 
-	private ElasticsearchFacade() {
+	public ElasticsearchFacade() {
 		if (this.client == null) {
-			this.client = ClientTransport.getTransport();
+			this.client = ElasticsearchClient.getTransport();
 		}
-	}
-
-	public static ElasticsearchFacade getInstance() {
-		if (esFacade == null) {
-			esFacade = new ElasticsearchFacade();
-			return esFacade;
-		}
-		return esFacade;
 	}
 
 	public void indexProductItem(ProductItem productItem) {
@@ -42,11 +33,23 @@ public class ElasticsearchFacade {
 			return;
 		}
 
-		Gson gJson = new Gson();
-		String productItemJson = gJson.toJson(productItem);
+		ProductItem productIndex = new ProductItem();
+		productIndex.setTitle(productItem.getTitle());
+		productIndex.setId(productItem.getId());
+		productIndex.setMarketPrice(productItem.getMarketPrice());
+		productIndex.setMaxPrice(productItem.getMaxPrice());
+		productIndex.setMinPrice(productItem.getMinPrice());
+		productIndex.setRelevance(productItem.getRelevance());
+		productIndex.setViewsCount(productItem.getViewsCount());
+		productIndex.setThumbnailPath(productItem.getThumbnailPath());
+		productIndex.setPictures(productItem.getPictures());
 
-		IndexResponse response = client.prepareIndex("product_items", "_doc", productItem.getId().toString())
+		Gson gJson = new Gson();
+		String productItemJson = gJson.toJson(productIndex);
+
+		this.client.prepareIndex("product_items", "_doc", productItem.getId().toString())
 				.setSource(productItemJson, XContentType.JSON).get();
+		this.client.close();
 	}
 
 	public List<ProductItem> getProductsPredict(String productItemTitle) {
@@ -57,7 +60,7 @@ public class ElasticsearchFacade {
 		QueryBuilder qb = QueryBuilders.matchQuery("title", productItemTitle);
 
 		SearchResponse esResponse = this.client.prepareSearch("product_items").setQuery(qb)
-				.addSort("relevance", SortOrder.DESC).execute().actionGet();
+				.setMinScore(Float.parseFloat("0.85")).addSort("relevance", SortOrder.DESC).execute().actionGet();
 		List<SearchHit> searchHits = Arrays.asList(esResponse.getHits().getHits());
 		List<ProductItem> products = new ArrayList<ProductItem>();
 		searchHits.forEach(hit -> {
@@ -68,6 +71,7 @@ public class ElasticsearchFacade {
 			}
 		});
 
+		this.client.close();
 		return products;
 	}
 }

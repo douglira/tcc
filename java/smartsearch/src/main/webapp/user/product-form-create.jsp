@@ -80,7 +80,7 @@
 										href="javascript:void(0)" 
 										class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
 										{{ predictProduct.title }}
-										<span class="badge badge-pill badge-light text-info">{{ predictProduct.relevance }}</span>
+										<span class="badge badge-pill badge-info text-light">{{ predictProduct.relevance }}</span>
 									</a>
 								</template>
 							</div>
