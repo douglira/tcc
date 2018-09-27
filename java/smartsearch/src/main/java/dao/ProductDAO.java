@@ -13,15 +13,15 @@ import models.Seller;
 
 public class ProductDAO extends GenericDAO {
 	private static final String TABLE_NAME = "products";
-	
+
 	public ProductDAO(boolean getConnection) {
 		super(getConnection);
 	}
-	
+
 	public ProductDAO(Connection conn) {
 		super(conn);
 	}
-	
+
 	public void create(Product product) {
 		PreparedStatement stmt = null;
 		String sql = "INSERT INTO " + TABLE_NAME + " (seller_id, product_item_id, category_id, title, description, "
@@ -57,29 +57,31 @@ public class ProductDAO extends GenericDAO {
 			}
 		}
 	}
-	
+
 	public ArrayList<Product> findProductsByProductItem(int productItemId) {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
-		String sql = "SELECT * FROM " + TABLE_NAME + " WHERE product_item_id = ? AND status = CAST( ? AS status_entity )";
+		String sql = "SELECT * FROM " + TABLE_NAME
+				+ " WHERE product_item_id = ? AND status = CAST( ? AS status_entity )";
 		ArrayList<Product> products = new ArrayList<Product>();
-		
+
 		try {
+			System.out.println("ProductItemId -> " + productItemId);
 			stmt = this.conn.prepareStatement(sql);
 			stmt.setInt(1, productItemId);
 			stmt.setString(2, Status.ACTIVE.toString());
 			rs = stmt.executeQuery();
 
-			while(rs.next()) {
+			while (rs.next()) {
 				Seller seller = new Seller();
 				seller.setId(rs.getInt("seller_id"));
-				
+
 				Category category = new Category();
 				category.setId(rs.getInt("category_id"));
-				
+
 				Product product = new Product();
 				product.setId(rs.getInt("id"));
-				
+
 				product.setSeller(seller);
 				product.setCategory(category);
 				product.setTitle(rs.getString("title"));
@@ -88,7 +90,7 @@ public class ProductDAO extends GenericDAO {
 				product.setSoldQuantity(rs.getInt("sold_quantity"));
 				product.setAvailableQuantity(rs.getInt("available_quantity"));
 				product.setStatus(Status.ACTIVE);
-				
+
 				products.add(product);
 			}
 		} catch (SQLException e) {
@@ -103,7 +105,7 @@ public class ProductDAO extends GenericDAO {
 				}
 			}
 		}
-		
+
 		return products;
 	}
 }

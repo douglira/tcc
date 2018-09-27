@@ -30,6 +30,10 @@ public class ProductItem {
 	public void setBasedProducts(ArrayList<Product> basedProducts) {
 		this.basedProducts = basedProducts;
 	}
+	
+	public void addBasedProduct(Product product) {
+		this.basedProducts.add(product);
+	}
 
 	public String getTitle() {
 		return title;
@@ -96,17 +100,26 @@ public class ProductItem {
 	}
 
 	public void updatePrices() {		
-		this.marketPrice = this.basedProducts.stream()
-				.mapToDouble(Product::getPrice)
-				.average()
-				.getAsDouble();
-		this.maxPrice = this.basedProducts.stream()
-				.mapToDouble(Product::getPrice)
-				.max()
-				.getAsDouble();
-		this.minPrice = this.basedProducts.stream()
-				.mapToDouble(Product::getPrice)
-				.min()
-				.getAsDouble();
+		
+		double maxPrice = 0;
+		double minPrice = Integer.MAX_VALUE;
+		double sum = 0;
+		
+		for (Product product: this.basedProducts) {
+			
+			if (product.getPrice() > maxPrice) {
+				maxPrice = product.getPrice();
+			}
+			
+			if (product.getPrice() < minPrice ) {
+				minPrice = product.getPrice();
+			}
+			
+			sum += product.getPrice();
+		}
+		
+		this.marketPrice = sum / this.basedProducts.size();
+		this.maxPrice = maxPrice;
+		this.minPrice = minPrice;
 	}
 }

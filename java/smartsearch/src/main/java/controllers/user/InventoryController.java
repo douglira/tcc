@@ -40,6 +40,7 @@ public class InventoryController extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		Messenger msg;
@@ -65,22 +66,22 @@ public class InventoryController extends HttpServlet {
 
 		Person person = new Person();
 		person.setUser(user);
-		
+
 		PersonDAO personDao = new PersonDAO(true);
 		person = personDao.findByUser(person);
-		
+
 		Seller seller = new Seller();
 		seller.setId(person.getId());
-		
+
 		Category category = new Category();
 		category.setId(Integer.parseInt(categoryId));
-		
+
 		product.setCategory(category);
 		product.setSeller(seller);
 		product.setStatus(Status.ACTIVE);
-		
+
 		ProductItemDAO productItemDao = new ProductItemDAO(true);
-		
+
 		if (productItemId == null || productItemId.length() == 0) {
 
 			productItem.setMarketPrice(product.getPrice());
@@ -90,18 +91,17 @@ public class InventoryController extends HttpServlet {
 			productItemDao.initTransaction();
 			productItem = productItemDao.create(productItem);
 
-
-			msg = new Messenger("Seu novo produto foi cadastrado com sucesso em nosso sistema.",
-					MessengerType.SUCCESS);
+			msg = new Messenger("Seu novo produto foi cadastrado com sucesso em nosso sistema.", MessengerType.SUCCESS);
 		} else {
 			productItem.setId(Integer.parseInt(productItemId));
-			
+
 			productItem = productItemDao.findById(productItem);
 			productItem.setRelevance(productItem.getRelevance() + 1);
 			productItem.setBasedProducts(new ProductDAO(true).findProductsByProductItem(productItem.getId()));
-			
+			productItem.addBasedProduct(product);
+
 			productItem.updatePrices();
-			
+
 			productItemDao = new ProductItemDAO(true);
 			productItemDao.initTransaction();
 			productItemDao.updatePricesAndRelevance(productItem);
@@ -112,7 +112,7 @@ public class InventoryController extends HttpServlet {
 
 		product.setProductItem(productItem);
 		new ProductDAO(productItemDao.getConnection()).create(product);
-		
+
 		new ElasticsearchFacade().indexProductItem(productItem);
 		out.print(gJson.toJson(msg));
 		out.close();

@@ -58,7 +58,7 @@
 					<h2 class="text-muted">Produto</i></h2>
 					<p class="text-muted">
 						Insira o título do produto no campo abaixo, ao inserir um título que não 
-						conste na nossa base de dados você estará criando um novo produto em nosso sistema. 
+						conste na nossa base de dados você estará criando um novo anúncio em nosso sistema. 
 						Para mais informações&nbsp;<a href="javascript:void(0)">clique aqui.</a>
 					</p>
 					<div class="form-group">
