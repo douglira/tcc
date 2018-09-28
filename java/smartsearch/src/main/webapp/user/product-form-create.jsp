@@ -17,6 +17,7 @@
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/bootstrap/css/bootstrap.min.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/base.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/toast/toastr.css"/>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/dropzone/dropzone.css"/>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/product-form-create.css"/>
 </head>
 <body>
@@ -107,11 +108,16 @@
 						<label for="description">Especificações</label>
 						<textarea class="form-control" id="description" name="description" rows="3" style="white-space: pre-wrap">{{ product.description }}</textarea>
 					</div>
+					
+					
+					<div class="dropzone"></div>
+						
+						
 				</div>
 			</div>
 			
 			<div class="d-flex justify-content-between">
-				<a role="button" class="btn btn-link px-md-5 py-md-2 font-weight-bold" href="<%=request.getContextPath() %>/account/inventory" >Voltar</a>
+				<a role="button" class="btn btn-link bg-white px-md-5 py-md-2 font-weight-bold" href="<%=request.getContextPath() %>/account/inventory" >Voltar</a>
 				<button class="btn btn-success btn-submit px-md-5 py-md-2 font-weight-bold" type="submit" value="edit" name="action">Salvar</button>
 			</div>
 		</form>
@@ -124,6 +130,8 @@
 	<script src="<%=request.getContextPath()%>/assets/libs/axios/axios-dist.min.js"></script>
 	<script src="<%=request.getContextPath()%>/assets/libs/vuejs/vue-dist.js"></script>
 	<script src="<%=request.getContextPath()%>/assets/libs/lodash/lodash-dist.js"></script>
+	<script src="<%=request.getContextPath()%>/assets/libs/dropzone/dropzone.js"></script>
+	<script>Dropzone.autoDiscover = false;</script>
 	<script src="<%=request.getContextPath()%>/assets/js/product-form-create.js"></script>
 </body>
 </html>

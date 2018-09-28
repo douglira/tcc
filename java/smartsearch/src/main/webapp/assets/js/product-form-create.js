@@ -8,6 +8,7 @@ new Vue({
 				availableQuantity: null,
 				description: '',
 				productItemId: null,
+				picturesPath: [],
 				category: {
 					id: null,
 				},
@@ -19,6 +20,33 @@ new Vue({
 	},
 	created() {
 		 this.loadData();
+	},
+	mounted() {
+		this.picturesDropzone = new Dropzone('div.dropzone', {
+			url: '/products/pictures/upload',
+			acceptedFiles: 'image/jpg,image/jpeg',
+			maxFiles: 4,
+//			createThumbnails: false,
+			parallelUploads: 10,
+			uploadMultiple: true,
+			maxFileSize: 3,
+			thumbnailWidth: 320,
+//			dpreviewTemplate: null,
+			autoProcessQueue: false,
+			addRemoveLinks: true,
+			dictDefaultMessage: 'Arraste para cá ou clique para carregar',
+			dictFallbackMessage: 'Arquivo não suportado',
+			dictFallbackMessage: null,
+			dictInvalidFileType: 'Tipo do arquivo inválido',
+			dictFileTooBig: 'Arquivo muito grande',
+			dictResponseError: 'Algo deu errado, tente novamente',
+			dictRemoveFile: 'Remover',
+			dictMaxFilesExceeded: 'Número de arquivos excedidos',
+//			previewTemplate: null,
+//			successmultiple: (files, response) => {
+//				this.product.picturesPath = JSON.parse(response);
+//			}
+		});
 	},
 	methods: {
 		async onChangeCategorySelection(event) {
@@ -71,7 +99,17 @@ new Vue({
 			const { data } = await axios.get(`/products/search?productPredictTitle=${productTitle}`);
 			this.productsPredict = data;
 		}, 450),
-		save() {
+		async save() {
+			this.picturesDropzone.processQueue();
+			
+			const picturesPath = await new Promise(resolve => {
+				this.picturesDropzone.on('successmultiple', (files, response) => {
+					resolve(JSON.parse(response));
+				});
+			});
+			
+			
+			
 			let isValid = true;
 			
 			const categoryId = this.product.category.id;
@@ -102,6 +140,10 @@ new Vue({
 			if (!isValid) {
 				return null;
 			}
+			
+			payload.product.picturesPath = picturesPath;
+			
+			console.log(JSON.stringify(payload.product));
 			
 			$.post(
 				'/account/me/inventory',

@@ -61,6 +61,8 @@ public class InventoryController extends HttpServlet {
 
 		Product product = gJson.fromJson(productJson, Product.class);
 
+		product = validatePicturesPath(product);
+		
 		ProductItem productItem = new ProductItem();
 		productItem.setTitle(product.getTitle());
 
@@ -116,5 +118,14 @@ public class InventoryController extends HttpServlet {
 		new ElasticsearchFacade().indexProductItem(productItem);
 		out.print(gJson.toJson(msg));
 		out.close();
+	}
+
+	private Product validatePicturesPath(Product product) {
+		if (product.getPicturesPath() == null || product.getPicturesPath().size() == 0) {
+			return product;
+		}
+		
+		product.setTitle(product.getPicturesPath().get(0));
+		return product;
 	}
 }

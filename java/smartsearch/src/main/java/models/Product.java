@@ -2,6 +2,7 @@ package models;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import enums.Status;
 
@@ -15,7 +16,7 @@ public class Product {
 	private double price;
 	private int soldQuantity;
 	private int availableQuantity;
-	private ArrayList<String> picturesPath;
+	private List<String> picturesPath;
 	private Status status;
 	private Calendar createdAt;
 	private Calendar updatedAt;
@@ -92,11 +93,11 @@ public class Product {
 		this.availableQuantity = availableQuantity;
 	}
 
-	public ArrayList<String> getPicturesPath() {
+	public List<String> getPicturesPath() {
 		return picturesPath;
 	}
 
-	public void setPicturesPath(ArrayList<String> picturesPath) {
+	public void setPicturesPath(List<String> picturesPath) {
 		this.picturesPath = picturesPath;
 	}
 
