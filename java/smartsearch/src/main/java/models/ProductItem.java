@@ -7,8 +7,8 @@ public class ProductItem {
 	private int id;
 	private ArrayList<Product> basedProducts;
 	private String title;
-	private String thumbnailPath;
-	private ArrayList<String> pictures;
+	private ProductPicture thumbnail;
+	private ArrayList<ProductPicture> pictures;
 	private double marketPrice;
 	private double maxPrice;
 	private double minPrice;
@@ -43,19 +43,19 @@ public class ProductItem {
 		this.title = title;
 	}
 
-	public String getThumbnailPath() {
-		return thumbnailPath;
+	public ProductPicture getThumbnail() {
+		return thumbnail;
 	}
 
-	public void setThumbnailPath(String thumbnailPath) {
-		this.thumbnailPath = thumbnailPath;
+	public void setThumbnail(ProductPicture thumbnail) {
+		this.thumbnail= thumbnail;
 	}
 
-	public ArrayList<String> getPictures() {
+	public ArrayList<ProductPicture> getPictures() {
 		return pictures;
 	}
 
-	public void setPictures(ArrayList<String> pictures) {
+	public void setPictures(ArrayList<ProductPicture> pictures) {
 		this.pictures = pictures;
 	}
 

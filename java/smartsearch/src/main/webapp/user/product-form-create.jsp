@@ -109,9 +109,10 @@
 						<textarea class="form-control" id="description" name="description" rows="3" style="white-space: pre-wrap">{{ product.description }}</textarea>
 					</div>
 					
-					
-					<div class="dropzone"></div>
-						
+					<div class="form-group">
+						<label>Imagens</label>
+						<div class="dropzone"></div>
+					</div>
 						
 				</div>
 			</div>

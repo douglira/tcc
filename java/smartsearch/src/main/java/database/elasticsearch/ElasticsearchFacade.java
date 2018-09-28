@@ -43,7 +43,7 @@ public class ElasticsearchFacade {
 		productIndex.setMinPrice(productItem.getMinPrice());
 		productIndex.setRelevance(productItem.getRelevance());
 		productIndex.setViewsCount(productItem.getViewsCount());
-		productIndex.setThumbnailPath(productItem.getThumbnailPath());
+		productIndex.setThumbnail(productItem.getThumbnail());
 		productIndex.setPictures(productItem.getPictures());
 
 		Gson gJson = new Gson();

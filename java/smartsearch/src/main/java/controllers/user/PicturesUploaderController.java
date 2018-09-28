@@ -15,8 +15,11 @@ import javax.servlet.http.Part;
 
 import com.google.gson.Gson;
 
+import models.ProductPicture;
+
 @WebServlet("/products/pictures/upload")
-@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5 * 5)
+@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5
+		* 5)
 public class PicturesUploaderController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String UPLOAD_DIRECTORY = "pictures";
@@ -34,26 +37,33 @@ public class PicturesUploaderController extends HttpServlet {
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		Gson gJson = new Gson();
-		
+
 		String uploadPath = request.getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;
 		File uploadDir = new File(uploadPath);
-		
-		if (!uploadDir.exists()) uploadDir.mkdir();
-		
+
+		if (!uploadDir.exists())
+			uploadDir.mkdir();
+
 		String baseUrl = getBaseUrl(request);
-		
-		ArrayList<String> pictures = new ArrayList<String>();
-		
+
+		ArrayList<ProductPicture> pictures = new ArrayList<ProductPicture>();
+
 		for (Part part : request.getParts()) {
 			String filename = String.valueOf(System.currentTimeMillis()) + "_" + part.getSubmittedFileName();
 			String filenamePath = uploadPath + File.separator + filename;
-			
-			String picturePath = baseUrl + File.separator + UPLOAD_DIRECTORY + File.separator + filename;
-			pictures.add(picturePath);
-			
+			String urlPath = baseUrl + File.separator + UPLOAD_DIRECTORY + File.separator + filename;
 			part.write(filenamePath);
+
+			ProductPicture picture = new ProductPicture();
+			picture.setName(part.getSubmittedFileName());
+			picture.setFilename(filenamePath);
+			picture.setUrlPath(urlPath);
+			picture.setSize(part.getSize());
+			picture.setType(part.getContentType().toString());
+
+			pictures.add(picture);
 		}
-		
+
 		out.println(gJson.toJson(pictures));
 		out.close();
 	}

@@ -2,6 +2,7 @@ package controllers.user;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -15,6 +16,7 @@ import com.google.gson.Gson;
 import dao.PersonDAO;
 import dao.ProductDAO;
 import dao.ProductItemDAO;
+import dao.ProductPictureDAO;
 import database.elasticsearch.ElasticsearchFacade;
 import enums.MessengerType;
 import enums.Status;
@@ -23,6 +25,7 @@ import models.Messenger;
 import models.Person;
 import models.Product;
 import models.ProductItem;
+import models.ProductPicture;
 import models.Seller;
 import models.User;
 
@@ -61,10 +64,10 @@ public class InventoryController extends HttpServlet {
 
 		Product product = gJson.fromJson(productJson, Product.class);
 
-		product = validatePicturesPath(product);
+		product = validatePictures(product);
 		
 		ProductItem productItem = new ProductItem();
-		productItem.setTitle(product.getTitle());
+		productItem.setTitle(product.getTitle().trim());
 
 		Person person = new Person();
 		person.setUser(user);
@@ -92,6 +95,19 @@ public class InventoryController extends HttpServlet {
 
 			productItemDao.initTransaction();
 			productItem = productItemDao.create(productItem);
+			
+			ProductPictureDAO pictureDao = new ProductPictureDAO(productItemDao.getConnection());
+			ArrayList<ProductPicture> pictures = new ArrayList<ProductPicture>();
+			
+			for (ProductPicture picture : product.getPictures()) {
+				picture.setProductItem(productItem);
+				picture = pictureDao.create(picture);
+				picture.setProductItem(null);
+				pictures.add(picture);
+			}
+			
+			productItem.setThumbnail(pictures.get(0));
+			productItem.setPictures(pictures);
 
 			msg = new Messenger("Seu novo produto foi cadastrado com sucesso em nosso sistema.", MessengerType.SUCCESS);
 		} else {
@@ -120,12 +136,12 @@ public class InventoryController extends HttpServlet {
 		out.close();
 	}
 
-	private Product validatePicturesPath(Product product) {
-		if (product.getPicturesPath() == null || product.getPicturesPath().size() == 0) {
+	private Product validatePictures(Product product) {
+		if (product.getPictures() == null || product.getPictures().size() == 0) {
 			return product;
 		}
 		
-		product.setTitle(product.getPicturesPath().get(0));
+		product.setThumbnail(product.getPictures().get(0));
 		return product;
 	}
 }

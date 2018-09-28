@@ -99,17 +99,17 @@ new Vue({
 			const { data } = await axios.get(`/products/search?productPredictTitle=${productTitle}`);
 			this.productsPredict = data;
 		}, 450),
-		async save() {
+		async savePictures() {
 			this.picturesDropzone.processQueue();
 			
-			const picturesPath = await new Promise(resolve => {
+			return new Promise(resolve => {
 				this.picturesDropzone.on('successmultiple', (files, response) => {
+					console.log(files)
 					resolve(JSON.parse(response));
 				});
 			});
-			
-			
-			
+		},
+		async save() {
 			let isValid = true;
 			
 			const categoryId = this.product.category.id;
@@ -118,7 +118,7 @@ new Vue({
 				categoryId,
 				productItemId,
 				product: {
-					title: this.product.title.trim(),
+					title: this.product.title,
 					price: this.product.price,
 					availableQuantity: this.product.availableQuantity,
 					description: this.product.description,
@@ -141,7 +141,9 @@ new Vue({
 				return null;
 			}
 			
-			payload.product.picturesPath = picturesPath;
+			const pictures = await this.savePictures();
+			
+			payload.product.pictures= pictures;
 			
 			console.log(JSON.stringify(payload.product));
 			
@@ -207,6 +209,7 @@ new Vue({
 			this.productsPredict = [];
 			this.categories = await this.getCategories();
 			this.breadcrumbCategories = [{ id: 0, title: 'Geral' }];
+			this.picturesDropzone.removeAllFiles(true);
 		}
 	},
 })

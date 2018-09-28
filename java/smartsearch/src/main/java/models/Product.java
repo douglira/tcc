@@ -16,7 +16,8 @@ public class Product {
 	private double price;
 	private int soldQuantity;
 	private int availableQuantity;
-	private List<String> picturesPath;
+	private ProductPicture thumbnail;
+	private List<ProductPicture> pictures;
 	private Status status;
 	private Calendar createdAt;
 	private Calendar updatedAt;
@@ -92,13 +93,21 @@ public class Product {
 	public void setAvailableQuantity(int availableQuantity) {
 		this.availableQuantity = availableQuantity;
 	}
-
-	public List<String> getPicturesPath() {
-		return picturesPath;
+	
+	public ProductPicture getThumbnail() {
+		return thumbnail;
+	}
+	
+	public void setThumbnail(ProductPicture thumbnail) {
+		this.thumbnail = thumbnail;
 	}
 
-	public void setPicturesPath(List<String> picturesPath) {
-		this.picturesPath = picturesPath;
+	public List<ProductPicture> getPictures() {
+		return pictures;
+	}
+
+	public void setPictures(List<ProductPicture> pictures) {
+		this.pictures = pictures;
 	}
 
 	public Status getStatus() {

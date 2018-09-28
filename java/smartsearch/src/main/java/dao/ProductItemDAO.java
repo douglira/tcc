@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import models.ProductItem;
+import models.ProductPicture;
 
 public class ProductItemDAO extends GenericDAO {
 	private static final String TABLE_NAME = "product_items";
@@ -59,12 +60,16 @@ public class ProductItemDAO extends GenericDAO {
 			
 			if (rs.next()) {
 				productItem.setTitle(rs.getString("title"));
-				productItem.setThumbnailPath(rs.getString("thumbnail_path"));
 				productItem.setViewsCount(rs.getInt("views_count"));
 				productItem.setRelevance(rs.getInt("relevance"));
 				productItem.setMarketPrice(rs.getDouble("market_price"));
 				productItem.setMaxPrice(rs.getDouble("max_price"));
 				productItem.setMinPrice(rs.getDouble("min_price"));
+				
+				ProductPicture picture = new ProductPicture();
+				picture.setUrlPath(rs.getString("thumbnail_path"));
+				
+				productItem.setThumbnail(picture);
 			}
 		} catch (SQLException sqlError) {
 			System.out.println("ProductItem.findById" + sqlError);
