@@ -1,9 +1,9 @@
 package models;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import enums.ProductSituation;
 import enums.Status;
 
 public class Product {
@@ -18,6 +18,7 @@ public class Product {
 	private int availableQuantity;
 	private ProductPicture thumbnail;
 	private List<ProductPicture> pictures;
+	private ProductSituation situation;
 	private Status status;
 	private Calendar createdAt;
 	private Calendar updatedAt;
@@ -108,6 +109,14 @@ public class Product {
 
 	public void setPictures(List<ProductPicture> pictures) {
 		this.pictures = pictures;
+	}
+	
+	public ProductSituation getSituation() {
+		return situation;
+	}
+	
+	public void setSituation(ProductSituation situation) {
+		this.situation = situation;
 	}
 
 	public Status getStatus() {

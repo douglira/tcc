@@ -2,6 +2,8 @@ package models;
 
 import java.util.ArrayList;
 
+import com.google.gson.annotations.Expose;
+
 public class ProductItem {
 
 	private int id;
@@ -14,6 +16,9 @@ public class ProductItem {
 	private double minPrice;
 	private int viewsCount;
 	private int relevance;
+	
+	@Expose(deserialize = false, serialize = false)
+	public static final int MAX_PICTURES = 15;
 
 	public void setId(Integer id) {
 		this.id = id;

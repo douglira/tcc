@@ -2,6 +2,7 @@ new Vue({
 	el: '#productNew',
 	data() {
 		return {
+			productItem: null,
 			product: {
 				title: '',
 				price: null,
@@ -81,9 +82,13 @@ new Vue({
 		onClickPredictProduct(predictProduct) {
 			this.product.title = predictProduct.title;
 			this.product.productItemId = predictProduct.id;
+			
+			this.productItem = predictProduct;
+			
 			this.productsPredict = [];
 		},
 		onKeyupProductTitle(event) {
+			this.productItem = null;
 			const productTitle = event.target.value;
 			
 			this.product.title = productTitle;
@@ -93,6 +98,12 @@ new Vue({
 				return;
 			}
 			this.getPredictProducts(productTitle);
+		},
+		onClickRemoveProductItem() {
+			this.product.title = '';
+			this.product.productItemId = null;
+			
+			this.productItem = null;
 		},
 		getPredictProducts: _.debounce(async function(productTitle) {
 			// predict at elasticsearch
@@ -104,7 +115,6 @@ new Vue({
 			
 			return new Promise(resolve => {
 				this.picturesDropzone.on('successmultiple', (files, response) => {
-					console.log(files)
 					resolve(JSON.parse(response));
 				});
 			});
@@ -144,8 +154,6 @@ new Vue({
 			const pictures = await this.savePictures();
 			
 			payload.product.pictures= pictures;
-			
-			console.log(JSON.stringify(payload.product));
 			
 			$.post(
 				'/account/me/inventory',

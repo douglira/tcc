@@ -19,6 +19,7 @@ import dao.ProductItemDAO;
 import dao.ProductPictureDAO;
 import database.elasticsearch.ElasticsearchFacade;
 import enums.MessengerType;
+import enums.ProductSituation;
 import enums.Status;
 import models.Category;
 import models.Messenger;
@@ -77,12 +78,19 @@ public class InventoryController extends HttpServlet {
 
 		Seller seller = new Seller();
 		seller.setId(person.getId());
+		
+		if (!validateTitle(seller, product.getTitle().trim())) {
+			msg = new Messenger("Já existe um produto com este título", MessengerType.ERROR);
+			out.print(gJson.toJson(msg));
+			return;
+		};
 
 		Category category = new Category();
 		category.setId(Integer.parseInt(categoryId));
 
 		product.setCategory(category);
 		product.setSeller(seller);
+		product.setSituation(ProductSituation.LINKED);
 		product.setStatus(Status.ACTIVE);
 
 		ProductItemDAO productItemDao = new ProductItemDAO(true);
@@ -97,17 +105,26 @@ public class InventoryController extends HttpServlet {
 			productItem = productItemDao.create(productItem);
 			
 			ProductPictureDAO pictureDao = new ProductPictureDAO(productItemDao.getConnection());
-			ArrayList<ProductPicture> pictures = new ArrayList<ProductPicture>();
+
+			if (product.getPictures() != null) {				
+				ArrayList<ProductPicture> pictures = new ArrayList<ProductPicture>();
 			
-			for (ProductPicture picture : product.getPictures()) {
-				picture.setProductItem(productItem);
-				picture = pictureDao.create(picture);
-				picture.setProductItem(null);
-				pictures.add(picture);
+				for (ProductPicture picture : product.getPictures()) {
+					picture.setProductItem(productItem);
+					picture = pictureDao.create(picture);
+					picture.setProductItem(null);
+					pictures.add(picture);
+				}
+				
+				productItem.setThumbnail(pictures.get(0));
+				productItem.setPictures(pictures);
+			} else {
+				ProductPicture picture = new ProductPicture();
+				picture.setUrlPath(getBaseUrl(request) + "/assets/images/thumbnail-not-available.jpg");
+				picture.setName("not-available");
+				product.setThumbnail(picture);
 			}
 			
-			productItem.setThumbnail(pictures.get(0));
-			productItem.setPictures(pictures);
 
 			msg = new Messenger("Seu novo produto foi cadastrado com sucesso em nosso sistema.", MessengerType.SUCCESS);
 		} else {
@@ -119,11 +136,28 @@ public class InventoryController extends HttpServlet {
 			productItem.addBasedProduct(product);
 
 			productItem.updatePrices();
-
+			
 			productItemDao = new ProductItemDAO(true);
 			productItemDao.initTransaction();
 			productItemDao.updatePricesAndRelevance(productItem);
 
+			
+			ProductPictureDAO pictureDao = new ProductPictureDAO(productItemDao.getConnection());
+			ArrayList<ProductPicture> pictures = new ProductPictureDAO(true).findByProductItem(productItem.getId());
+			
+			int remainingPicturesCount = ProductItem.MAX_PICTURES - pictures.size();
+			if (product.getPictures() != null && remainingPicturesCount > 0) {
+				for (ProductPicture picture : product.getPictures()) {
+					picture.setProductItem(productItem);
+					picture = pictureDao.create(picture);
+					picture.setProductItem(null);
+					pictures.add(picture);
+				}
+			}
+
+			productItem.setThumbnail(pictures.get(pictures.size() - 1));
+			productItem.setPictures(pictures);
+			
 			msg = new Messenger("Seu novo produto foi vinculado a um anúncio já cadastrado com sucesso.",
 					MessengerType.SUCCESS);
 		}
@@ -136,12 +170,37 @@ public class InventoryController extends HttpServlet {
 		out.close();
 	}
 
+	private boolean validateTitle(Seller seller, String title) {
+		boolean isValid = true;
+		
+		ArrayList<Product> products = new ProductDAO(true).findBySeller(seller.getId());
+		if (!products.isEmpty()) {
+			for (Product product : products) {
+				if (product.getTitle().toLowerCase() == title.toLowerCase()) {
+					isValid = false;
+					break;
+				}
+			}
+		}
+		
+		return isValid;
+	}
+
 	private Product validatePictures(Product product) {
-		if (product.getPictures() == null || product.getPictures().size() == 0) {
+		if (product.getPictures() == null || product.getPictures().isEmpty() || product.getPictures().size() == 0) {
+			product.setPictures(null);
 			return product;
 		}
 		
 		product.setThumbnail(product.getPictures().get(0));
 		return product;
+	}
+	
+	private String getBaseUrl(HttpServletRequest request) {
+		String scheme = request.getScheme() + "://";
+		String serverName = request.getServerName();
+		String serverPort = (request.getServerPort() == 80) ? "" : ":" + request.getServerPort();
+		String contextPath = request.getContextPath();
+		return scheme + serverName + serverPort + contextPath;
 	}
 }

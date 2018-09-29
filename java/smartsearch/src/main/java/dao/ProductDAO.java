@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import enums.ProductSituation;
 import enums.Status;
 import models.Category;
 import models.Product;
@@ -25,7 +26,8 @@ public class ProductDAO extends GenericDAO {
 	public void create(Product product) {
 		PreparedStatement stmt = null;
 		String sql = "INSERT INTO " + TABLE_NAME + " (seller_id, product_item_id, category_id, title, description, "
-				+ "price, available_quantity, status, sold_quantity, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, CAST( ? as status_entity), "
+				+ "price, available_quantity, situation, status, sold_quantity, created_at) VALUES (?, ?, ?, ?, "
+				+ "?, ?, ?, CAST( ? as product_situation), CAST( ? as status_entity), "
 				+ "0, NOW())";
 		try {
 			stmt = this.conn.prepareStatement(sql);
@@ -36,7 +38,8 @@ public class ProductDAO extends GenericDAO {
 			stmt.setString(5, product.getDescription());
 			stmt.setDouble(6, product.getPrice());
 			stmt.setInt(7, product.getAvailableQuantity());
-			stmt.setString(8, product.getStatus().toString());
+			stmt.setString(8, product.getSituation().toString());
+			stmt.setString(9, product.getStatus().toString());
 			stmt.execute();
 			this.conn.commit();
 
@@ -66,7 +69,6 @@ public class ProductDAO extends GenericDAO {
 		ArrayList<Product> products = new ArrayList<Product>();
 
 		try {
-			System.out.println("ProductItemId -> " + productItemId);
 			stmt = this.conn.prepareStatement(sql);
 			stmt.setInt(1, productItemId);
 			stmt.setString(2, Status.ACTIVE.toString());
@@ -89,6 +91,7 @@ public class ProductDAO extends GenericDAO {
 				product.setPrice(rs.getDouble("price"));
 				product.setSoldQuantity(rs.getInt("sold_quantity"));
 				product.setAvailableQuantity(rs.getInt("available_quantity"));
+				product.setSituation(ProductSituation.valueOf(rs.getString("situation")));
 				product.setStatus(Status.ACTIVE);
 
 				products.add(product);
@@ -106,6 +109,54 @@ public class ProductDAO extends GenericDAO {
 			}
 		}
 
+		return products;
+	}
+	
+	public ArrayList<Product> findBySeller(int sellerId) {
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		ArrayList<Product> products = new ArrayList<Product>();
+		String sql = "SELECT * FROM " + TABLE_NAME + " WHERE seller_id = ?";
+		
+		try {
+			stmt = this.conn.prepareStatement(sql);
+			stmt.setInt(1, sellerId);
+			rs = stmt.executeQuery();
+			
+			while(rs.next()) {
+				Product product = new Product();
+				
+				product.setId(rs.getInt("id"));
+				product.setTitle(rs.getString("title"));
+				product.setDescription(rs.getString("description"));
+				product.setPrice(rs.getDouble("price"));
+				product.setSoldQuantity(rs.getInt("sold_quantity"));
+				product.setAvailableQuantity(rs.getInt("available_quantity"));
+				product.setStatus(Status.valueOf(rs.getString("status")));
+				
+				Seller seller = new Seller();
+				seller.setId(rs.getInt("seller_id"));
+				
+				Category category = new Category();
+				category.setId(rs.getInt("category_id"));
+				
+				product.setSeller(seller);
+				product.setCategory(category);
+				
+				products.add(product);
+			}
+		} catch(SQLException sqlError) {
+			sqlError.printStackTrace();
+		} finally {
+			if (this.conn != null) {
+				try {
+					this.conn.close();
+				} catch (SQLException sqlException) {
+					throw new RuntimeException(sqlException);
+				}
+			}
+		}
+		
 		return products;
 	}
 }
