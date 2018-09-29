@@ -122,7 +122,7 @@ public class InventoryController extends HttpServlet {
 				ProductPicture picture = new ProductPicture();
 				picture.setUrlPath(getBaseUrl(request) + "/assets/images/thumbnail-not-available.jpg");
 				picture.setName("not-available");
-				product.setThumbnail(picture);
+				productItem.setThumbnail(picture);
 			}
 			
 

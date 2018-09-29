@@ -111,13 +111,19 @@ new Vue({
 			this.productsPredict = data;
 		}, 450),
 		async savePictures() {
-			this.picturesDropzone.processQueue();
 			
-			return new Promise(resolve => {
-				this.picturesDropzone.on('successmultiple', (files, response) => {
-					resolve(JSON.parse(response));
+			if (this.picturesDropzone.getQueuedFiles() && this.picturesDropzone.getQueuedFiles().length) {				
+				this.picturesDropzone.processQueue();
+				
+				return new Promise(resolve => {
+					this.picturesDropzone.on('successmultiple', (files, response) => {
+						resolve(JSON.parse(response));
+					});
 				});
-			});
+			} else {
+				return [];
+			}
+			
 		},
 		async save() {
 			let isValid = true;
@@ -146,6 +152,8 @@ new Vue({
 				
 				$(`#${key}`).hasClass('border-danger') && $(`#${key}`).removeClass('border-danger');
 			})
+			
+			console.log(isValid)
 			
 			if (!isValid) {
 				return null;
