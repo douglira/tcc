@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 
 import dao.AddressDAO;
 import dao.PersonDAO;
+import dao.UserDAO;
 import models.Address;
 import models.Person;
 import models.User;
@@ -93,17 +94,22 @@ public class PersonDataController extends HttpServlet {
 		address.setPostalCode(postalCode);
 		address.setPerson(person);
 
-		new PersonDAO(true).update(person);
+		HttpSession session = ((HttpServletRequest) request).getSession();
+		User user = (User) session.getAttribute("loggedUser");
+
+		user.generateDisplayName(person.getAccountOwner());
+		UserDAO userDao = new UserDAO(true);
+		userDao.initTransaction();
+		userDao.updateDisplayName(user);
+
+		new PersonDAO(userDao.getConnection()).update(person);
 
 		if (addressId == 0) {
 			address = new AddressDAO(true).create(address);
 		} else {
 			new AddressDAO(true).update(address);
 		}
-		
-		HttpSession session = ((HttpServletRequest) request).getSession();
-		User user = (User) session.getAttribute("loggedUser");
-		
+
 		person.setUser(user);
 		person.setAddress(address);
 		address.setPerson(null);

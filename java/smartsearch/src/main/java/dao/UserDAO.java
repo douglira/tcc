@@ -217,4 +217,18 @@ public class UserDAO extends GenericDAO {
 			}
 		}
 	}
+
+	public void updateDisplayName(User user) {
+		PreparedStatement stmt = null;
+		String sql = "UPDATE " + TABLE_NAME + " SET display_name = ? WHERE id = ?";
+
+		try {
+			stmt = this.conn.prepareStatement(sql);
+			stmt.setString(1, user.getDisplayName());
+			stmt.setInt(2, user.getId());
+			stmt.executeUpdate();
+		}catch (SQLException sqlError) {
+			System.out.println("UserDAO.updateDisplayName [ERROR]: " + sqlError);
+		}
+	}
 }
