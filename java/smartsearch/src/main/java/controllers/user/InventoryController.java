@@ -2,7 +2,6 @@ package controllers.user;
 
 import com.google.gson.Gson;
 import dao.FileDAO;
-import dao.PersonDAO;
 import dao.ProductDAO;
 import dao.ProductItemDAO;
 import database.elasticsearch.ElasticsearchFacade;
@@ -12,7 +11,6 @@ import enums.Status;
 import libs.Helper;
 import models.*;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,19 +29,46 @@ public class InventoryController extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        Gson gJson = new Gson();
+        Messenger msg;
+
+        try {
+            String list = request.getParameter("list");
+            HttpSession session = request.getSession();
+            Person person = (Person) session.getAttribute("loggedPerson");
+            String jsonElement = null;
+            String baseUrl = Helper.getBaseUrl(request);
+
+            if (list != null && list.equals("products")) {
+                jsonElement = this.getSellerProducts(person, baseUrl);
+            } else if (list != null && list.equals("product-items")) {
+//                jsonElement = this.getSellerProductItems(person);
+            } else {
+                jsonElement = gJson.toJson(new Messenger("Ops, requisição inválida", MessengerType.ERROR));
+            }
+
+            out.print(jsonElement);
+            out.close();
+        } catch (Exception error) {
+            error.printStackTrace();
+            System.out.println("InventoryController.doGet [ERROR]: " + error);
+            Helper.responseError(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
+        }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        Messenger msg;
         Gson gJson = new Gson();
+        Messenger msg;
 
         try {
 
             HttpSession session = request.getSession();
-            User user = (User) session.getAttribute("loggedUser");
+            Person person = (Person) session.getAttribute("loggedPerson");
 
             String categoryId = request.getParameter("categoryId");
             String productItemId = request.getParameter("productItemId");
@@ -60,17 +85,11 @@ public class InventoryController extends HttpServlet {
             ProductItem productItem = new ProductItem();
             productItem.setTitle(product.getTitle().trim());
 
-            Person person = new Person();
-            person.setUser(user);
-
-            PersonDAO personDao = new PersonDAO(true);
-            person = personDao.findByUser(person);
-
             Seller seller = new Seller();
             seller.setId(person.getId());
 
             if (!validateTitle(seller, product.getTitle().trim())) {
-                msg = new Messenger("Já existe um produto com este título", MessengerType.ERROR);
+                msg = new Messenger("Já existe um produto com este título em seu estoque", MessengerType.ERROR);
                 out.print(gJson.toJson(msg));
                 return;
             }
@@ -112,7 +131,7 @@ public class InventoryController extends HttpServlet {
 
                 productItem = productItemDao.findById(productItem);
                 productItem.setRelevance(productItem.getRelevance() + 1);
-                productItem.setBasedProducts(new ProductDAO(true).findProductsByProductItem(productItem.getId()));
+                productItem.setBasedProducts(new ProductDAO(true).findByProductItem(productItem.getId()));
                 productItem.addBasedProduct(product);
 
                 productItem.updatePrices();
@@ -166,12 +185,10 @@ public class InventoryController extends HttpServlet {
             new ElasticsearchFacade().indexProductItem(productItem);
             out.print(gJson.toJson(msg));
             out.close();
-        } catch(Exception error) {
+        } catch (Exception error) {
             error.printStackTrace();
             System.out.println("InventoryController.doPost [ERROR]: " + error);
-            msg = new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR);
-            out.print(gJson.toJson(msg));
-            out.close();
+            Helper.responseError(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
     }
 
@@ -190,4 +207,23 @@ public class InventoryController extends HttpServlet {
 
         return isValid;
     }
+
+    private String getSellerProducts(Person person, String baseUrl) {
+        Gson gJson = new Gson();
+
+        ArrayList<Product> products = new ProductDAO(true).findBySeller(person.getId());
+
+        products.forEach(product -> {
+            product.setPictures(new FileDAO(true).getProductPictures(product.getId()));
+            product.setDefaultThumbnail(baseUrl);
+        });
+
+        return gJson.toJson(products);
+    }
+
+//    private String getSellerProductItems(Person person) {
+//        Gson gJson = new Gson();
+//
+//        ArrayList<ProductItem> productItems = new  ProductItemDAO(true).findBySeller(person.getId());
+//    }
 }

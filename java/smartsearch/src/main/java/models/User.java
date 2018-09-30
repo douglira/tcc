@@ -11,6 +11,7 @@ import enums.UserRoles;
 
 public class User {
     private int id;
+    private Person person;
     private String email;
     private String username;
     private String displayName;
@@ -38,6 +39,10 @@ public class User {
     public void setId(int id) {
         this.id = id;
     }
+
+    public Person getPerson () { return person; }
+
+    public void setPerson(Person person) { this.person = person; }
 
     public String getEmail() {
         return email;

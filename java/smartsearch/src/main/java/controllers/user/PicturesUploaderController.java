@@ -19,57 +19,56 @@ import models.File;
 
 @WebServlet("/products/pictures/upload")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5
-		* 5)
+        * 5)
 public class PicturesUploaderController extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-	private static final String UPLOAD_DIRECTORY = "pictures";
+    private static final long serialVersionUID = 1L;
+    private static final String UPLOAD_DIRECTORY = "pictures";
 
-	public PicturesUploaderController() {
-		super();
-	}
+    public PicturesUploaderController() {
+        super();
+    }
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-	}
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+    }
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		response.setContentType("text/html;charset=UTF-8");
-		PrintWriter out = response.getWriter();
-		Gson gJson = new Gson();
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        Gson gJson = new Gson();
 
-		String uploadPath = request.getServletContext().getRealPath("") + java.io.File.separator + UPLOAD_DIRECTORY;
-		java.io.File uploadDir = new java.io.File(uploadPath);
+        String uploadPath = request.getServletContext().getRealPath("") + UPLOAD_DIRECTORY;
+        java.io.File uploadDir = new java.io.File(uploadPath);
 
-		if (!uploadDir.exists())
-			uploadDir.mkdir();
+        if (!uploadDir.exists()) uploadDir.mkdir();
 
-		String baseUrl = Helper.getBaseUrl(request);
+        String baseUrl = Helper.getBaseUrl(request);
 
-		ArrayList<File> pictures = new ArrayList<File>();
+        ArrayList<File> pictures = new ArrayList<File>();
 
-		for (Part part : request.getParts()) {
-			String filename = String.valueOf(System.currentTimeMillis()) + "_" + part.getSubmittedFileName();
-			String filenamePath = uploadPath + java.io.File.separator + filename;
-			String urlPath = baseUrl + java.io.File.separator + UPLOAD_DIRECTORY + java.io.File.separator + filename;
-			part.write(filenamePath);
+        for (Part part : request.getParts()) {
+            String filename = String.valueOf(System.currentTimeMillis()) + "_" + part.getSubmittedFileName();
+            String filenamePath = uploadPath + java.io.File.separator + filename;
+            String urlPath = baseUrl + java.io.File.separator + UPLOAD_DIRECTORY + java.io.File.separator + filename;
+            part.write(filenamePath);
 
-			File picture = new File();
-			picture.setName(part.getSubmittedFileName());
-			picture.setFilename(filenamePath);
-			picture.setUrlPath(urlPath);
-			picture.setSize(part.getSize());
+            File picture = new File();
+            picture.setName(part.getSubmittedFileName());
+            picture.setFilename(filenamePath);
+            picture.setUrlPath(urlPath);
+            picture.setSize(part.getSize());
 
-			String type = part.getContentType().toString().split("/")[0];
-			String subtype = part.getContentType().toString().split("/")[1];
+            String type = part.getContentType().toString().split("/")[0];
+            String subtype = part.getContentType().toString().split("/")[1];
 
-			picture.setType(type);
-			picture.setSubtype(subtype);
+            picture.setType(type);
+            picture.setSubtype(subtype);
 
-			pictures.add(picture);
-		}
+            pictures.add(picture);
+        }
 
-		out.println(gJson.toJson(pictures));
-		out.close();
-	}
+        out.println(gJson.toJson(pictures));
+        out.close();
+    }
 }

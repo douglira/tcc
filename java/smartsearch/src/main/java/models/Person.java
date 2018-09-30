@@ -1,104 +1,104 @@
 package models;
 
-import java.sql.Timestamp;
+import java.util.Calendar;
 
 public class Person {
-	private int id;
-	private Address address;
-	private String accountOwner;
-	private long tel;
-	private User user;
-	private String corporateName;
-	private long stateRegistration;
-	private long cnpj;
-	private Timestamp createdAt;
-	private Timestamp updatedAt;
-	
-	public Person() {
-		
-	}
-	
-	public Person(User user) {
-		this.user = user;
-	}
+    private int id;
+    private Address address;
+    private String accountOwner;
+    private long tel;
+    private User user;
+    private String corporateName;
+    private long stateRegistration;
+    private long cnpj;
+    private Calendar createdAt;
+    private Calendar updatedAt;
 
-	public int getId() {
-		return id;
-	}
+    public Person() {
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    }
 
-	public Address getAddress() {
-		return address;
-	}
+    public Person(User user) {
+        this.user = user;
+    }
 
-	public void setAddress(Address address) {
-		this.address = address;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public String getAccountOwner() {
-		return accountOwner;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setAccountOwner(String accountOwner) {
-		this.accountOwner = accountOwner;
-	}
+    public Address getAddress() {
+        return address;
+    }
 
-	public long getTel() {
-		return tel;
-	}
+    public void setAddress(Address address) {
+        this.address = address;
+    }
 
-	public void setTel(long tel) {
-		this.tel = tel;
-	}
+    public String getAccountOwner() {
+        return accountOwner;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public void setAccountOwner(String accountOwner) {
+        this.accountOwner = accountOwner;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public long getTel() {
+        return tel;
+    }
 
-	public String getCorporateName() {
-		return corporateName;
-	}
+    public void setTel(long tel) {
+        this.tel = tel;
+    }
 
-	public void setCorporateName(String corporateName) {
-		this.corporateName = corporateName;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public long getStateRegistration() {
-		return stateRegistration;
-	}
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-	public void setStateRegistration(long stateRegistration) {
-		this.stateRegistration = stateRegistration;
-	}
+    public String getCorporateName() {
+        return corporateName;
+    }
 
-	public long getCnpj() {
-		return cnpj;
-	}
+    public void setCorporateName(String corporateName) {
+        this.corporateName = corporateName;
+    }
 
-	public void setCnpj(long cnpj) {
-		this.cnpj = cnpj;
-	}
+    public long getStateRegistration() {
+        return stateRegistration;
+    }
 
-	public Timestamp getCreatedAt() {
-		return createdAt;
-	}
+    public void setStateRegistration(long stateRegistration) {
+        this.stateRegistration = stateRegistration;
+    }
 
-	public void setCreatedAt(Timestamp createdAt) {
-		this.createdAt = createdAt;
-	}
+    public long getCnpj() {
+        return cnpj;
+    }
 
-	public Timestamp getUpdatedAt() {
-		return updatedAt;
-	}
+    public void setCnpj(long cnpj) {
+        this.cnpj = cnpj;
+    }
 
-	public void setUpdatedAt(Timestamp updatedAt) {
-		this.updatedAt = updatedAt;
-	}
+    public Calendar getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Calendar createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Calendar getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Calendar updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

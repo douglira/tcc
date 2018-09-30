@@ -1,13 +1,14 @@
 package dao;
 
-import java.sql.*;
-import java.util.ArrayList;
-
 import enums.ProductSituation;
 import enums.Status;
 import models.Category;
 import models.Product;
 import models.Seller;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 public class ProductDAO extends GenericDAO {
     private static final String TABLE_NAME = "products";
@@ -52,7 +53,7 @@ public class ProductDAO extends GenericDAO {
         return product;
     }
 
-    public ArrayList<Product> findProductsByProductItem(int productItemId) {
+    public ArrayList<Product> findByProductItem(int productItemId) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String sql = "SELECT * FROM " + TABLE_NAME
@@ -108,7 +109,7 @@ public class ProductDAO extends GenericDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         ArrayList<Product> products = new ArrayList<Product>();
-        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE seller_id = ?";
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE seller_id = ? ORDER BY created_at DESC";
 
         try {
             stmt = this.conn.prepareStatement(sql);
@@ -125,6 +126,11 @@ public class ProductDAO extends GenericDAO {
                 product.setSoldQuantity(rs.getInt("sold_quantity"));
                 product.setAvailableQuantity(rs.getInt("available_quantity"));
                 product.setStatus(Status.valueOf(rs.getString("status")));
+                product.setSituation(ProductSituation.valueOf(rs.getString("situation")));
+
+                Calendar create_at = Calendar.getInstance();
+                create_at.setTime(rs.getTimestamp("created_at"));
+                product.setCreatedAt(create_at);
 
                 Seller seller = new Seller();
                 seller.setId(rs.getInt("seller_id"));

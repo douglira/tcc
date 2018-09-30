@@ -1,5 +1,3 @@
-<%@page import="models.Person" %>
-<%@page import="models.User" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -16,8 +14,8 @@
     <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/fontawesome/css/all.css">
     <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/base.css">
-    <link href="/assets/libs/toast/toastr.css" rel="stylesheet"/>
-    <link href="/assets/css/user-inventory.css"/>
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/toast/toastr.css"/>
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/user-inventory.css"/>
 </head>
 <body>
 
@@ -55,10 +53,28 @@
 
     <div class="container-products">
         <template v-if="products.length">
-            <div class="card border-light mx-3">
-                <div class="card-body d-flex flex-column">
-                    <img :src="product.thumbnail.urlPath" :alt="product.thumbnail.name">
-                </div>                
+            <div class="card border-light card-product" v-for="product in products"
+                 :key="product.id">
+                <img class="card-img-product" :src="product.thumbnail.urlPath" :alt="product.thumbnail.name">
+                <div class="card-body card-body-product">
+                    <div href="javascript: void(0)" class="card-body-product_primary--info">
+                        <h3 class="text-secondary">{{ product.title }}</h3>
+                        <span class="text-success">R$ {{ product.price.toFixed(2) }}</span>
+                    </div>
+                    <div class="card-body-product_secondary--info">
+                        <small v-if="product.situation === 'LINKED'" class="text-muted">Vinculado</small>
+                        <small class="text-warning" v-else>Desvinculado</small>
+                        <div>
+                            <p class="text-dark ">Vendidos: {{ product.soldQuantity }}</p>
+                            <p :class="[product.availableQuantity > 10 ? 'text-dark' : 'text-warning']">Em estoque: {{
+                                product.availableQuantity }}</p>
+                        </div>
+                    </div>
+                    <a role="button" aria-pressed="true"
+                       class="btn btn btn-outline-info btn-block btn-sm btn-product-details">
+                        Ver detalhes
+                    </a>
+                </div>
             </div>
         </template>
         <template v-else>

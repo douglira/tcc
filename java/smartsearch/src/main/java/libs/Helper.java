@@ -1,6 +1,10 @@
 package libs;
 
+import com.google.gson.Gson;
+import models.Messenger;
+
 import javax.servlet.http.HttpServletRequest;
+import java.io.PrintWriter;
 
 public class Helper {
     public static String getBaseUrl(HttpServletRequest request) {
@@ -9,5 +13,11 @@ public class Helper {
         String serverPort = (request.getServerPort() == 80) ? "" : ":" + request.getServerPort();
         String contextPath = request.getContextPath();
         return scheme + serverName + serverPort + contextPath;
+    }
+
+    public static void responseError(PrintWriter out, Messenger msg) {
+        Gson gJson = new Gson();
+        out.print(gJson.toJson(msg));
+        out.close();
     }
 }

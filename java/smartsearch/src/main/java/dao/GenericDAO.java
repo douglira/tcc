@@ -10,7 +10,11 @@ public abstract class GenericDAO {
 	
 	protected GenericDAO(boolean getConnection) {
 		if (getConnection) {
-			this.conn = ConnectionFactory.getConnection();
+			try {
+				this.conn = ConnectionFactory.getConnection();
+			} catch(SQLException errorSql) {
+				throw new RuntimeException(errorSql);
+			}
 		}
 	}
 
@@ -26,19 +30,15 @@ public abstract class GenericDAO {
 		return this.conn;
 	}
 
-	public void initTransaction() {
-		try {
-			this.conn.setAutoCommit(false);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	public void initTransaction() throws SQLException{
+		this.conn.setAutoCommit(false);
 	}
 
-	public void closeTransaction() {
-		try {
-			this.conn.setAutoCommit(true);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	public void closeTransaction() throws SQLException{
+		this.conn.setAutoCommit(true);
+	}
+
+	public void closeConnection() throws SQLException {
+		this.conn.close();
 	}
 }

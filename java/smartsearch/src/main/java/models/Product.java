@@ -150,4 +150,17 @@ public class Product {
 			this.status = Status.ACTIVE;
 		}
 	}
+
+	public void setDefaultThumbnail(String baseUrlPath) {
+		if (this.pictures != null && !this.pictures.isEmpty()) {
+			this.thumbnail = this.pictures.get(this.pictures.size() - 1);
+			return;
+		}
+
+		File defaultThumbnail = new File();
+
+		defaultThumbnail.setName("picture-not-available");
+		defaultThumbnail.setUrlPath(baseUrlPath + "/assets/images/thumbnail-not-available.jpg");
+		this.thumbnail = defaultThumbnail;
+	}
 }

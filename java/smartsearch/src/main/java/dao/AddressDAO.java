@@ -43,17 +43,23 @@ public class AddressDAO extends GenericDAO {
 			if (rs.next()) {
 				address.setId(rs.getInt("id"));
 			}
-			
+			this.conn.commit();
 		} catch (SQLException e) {
+			try {
+				this.conn.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+				System.out.println("AddressDAO.create [ERROR](1): " + e1);
+			}
 			e.printStackTrace();
-			System.out.println("AddressDAO.create [ERROR](1): " + e);
+			System.out.println("AddressDAO.create [ERROR](2): " + e);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException sqlException) {
 					sqlException.printStackTrace();
-					System.out.println("AddressDAO.create [ERROR](2): " + sqlException);
+					System.out.println("AddressDAO.create [ERROR](3): " + sqlException);
 				}
 			}
 		}
@@ -78,16 +84,23 @@ public class AddressDAO extends GenericDAO {
 			stmt.setInt(9, address.getPerson().getId());
 			stmt.executeUpdate();
 
+			this.conn.commit();
 		} catch (SQLException e) {
+			try {
+				this.conn.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+				System.out.println("AddressDAO.update [ERROR](1): " + e1);
+			}
 			e.printStackTrace();
-			System.out.println("AddressDAO.update [ERROR](1): " + e);
+			System.out.println("AddressDAO.update [ERROR](2): " + e);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException sqlException) {
 					sqlException.printStackTrace();
-					System.out.println("AddressDAO.update [ERROR](2): " + sqlException);
+					System.out.println("AddressDAO.update [ERROR](3): " + sqlException);
 				}
 			}
 		}
