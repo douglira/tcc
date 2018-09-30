@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import models.ProductItem;
-import models.ProductPicture;
 
 public class ProductItemDAO extends GenericDAO {
 	private static final String TABLE_NAME = "product_items";
@@ -42,7 +41,7 @@ public class ProductItemDAO extends GenericDAO {
 			}
 
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			System.out.println("ProductItem.create [ERROR]: " + e);
 		}
 
 		return productItem;
@@ -65,20 +64,15 @@ public class ProductItemDAO extends GenericDAO {
 				productItem.setMarketPrice(rs.getDouble("market_price"));
 				productItem.setMaxPrice(rs.getDouble("max_price"));
 				productItem.setMinPrice(rs.getDouble("min_price"));
-				
-				ProductPicture picture = new ProductPicture();
-				picture.setUrlPath(rs.getString("thumbnail_path"));
-				
-				productItem.setThumbnail(picture);
 			}
 		} catch (SQLException sqlError) {
-			System.out.println("ProductItem.findById" + sqlError);
+			System.out.println("ProductItem.findById [ERROR](1): " + sqlError);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException sqlException) {
-					throw new RuntimeException(sqlException);
+					System.out.println("ProductItem.findById [ERROR](2): " + sqlException);
 				}
 			}
 		}
@@ -100,7 +94,7 @@ public class ProductItemDAO extends GenericDAO {
 			stmt.setInt(5, productItem.getId());
 			stmt.executeUpdate();
 		} catch(SQLException sqlException) {
-			System.out.println("ProductItemDAO.updateSimple: ERROR -> " + sqlException);
+			System.out.println("ProductItemDAO.updateSimple: [ERROR]: " + sqlException);
 		}
 	}
 }

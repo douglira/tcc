@@ -1,6 +1,5 @@
 package controllers.user;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -15,7 +14,7 @@ import javax.servlet.http.Part;
 
 import com.google.gson.Gson;
 
-import models.ProductPicture;
+import models.File;
 
 @WebServlet("/products/pictures/upload")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5
@@ -38,28 +37,33 @@ public class PicturesUploaderController extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		Gson gJson = new Gson();
 
-		String uploadPath = request.getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;
-		File uploadDir = new File(uploadPath);
+		String uploadPath = request.getServletContext().getRealPath("") + java.io.File.separator + UPLOAD_DIRECTORY;
+		java.io.File uploadDir = new java.io.File(uploadPath);
 
 		if (!uploadDir.exists())
 			uploadDir.mkdir();
 
 		String baseUrl = getBaseUrl(request);
 
-		ArrayList<ProductPicture> pictures = new ArrayList<ProductPicture>();
+		ArrayList<File> pictures = new ArrayList<File>();
 
 		for (Part part : request.getParts()) {
 			String filename = String.valueOf(System.currentTimeMillis()) + "_" + part.getSubmittedFileName();
-			String filenamePath = uploadPath + File.separator + filename;
-			String urlPath = baseUrl + File.separator + UPLOAD_DIRECTORY + File.separator + filename;
+			String filenamePath = uploadPath + java.io.File.separator + filename;
+			String urlPath = baseUrl + java.io.File.separator + UPLOAD_DIRECTORY + java.io.File.separator + filename;
 			part.write(filenamePath);
 
-			ProductPicture picture = new ProductPicture();
+			File picture = new File();
 			picture.setName(part.getSubmittedFileName());
 			picture.setFilename(filenamePath);
 			picture.setUrlPath(urlPath);
 			picture.setSize(part.getSize());
-			picture.setType(part.getContentType().toString());
+
+			String type = part.getContentType().toString().split("/")[0];
+			String subtype = part.getContentType().toString().split("/")[1];
+
+			picture.setType(type);
+			picture.setSubtype(subtype);
 
 			pictures.add(picture);
 		}

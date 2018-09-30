@@ -31,8 +31,10 @@ public class BuyerDAO extends GenericDAO {
 				this.conn.rollback();
 			} catch (SQLException e1) {
 				e1.printStackTrace();
+				System.out.println("BuyerDAO.create [ERROR](1): " + e1);
 			}
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			System.out.println("BuyerDAO.create [ERROR](2): " + e);
 		}
 	}
 }

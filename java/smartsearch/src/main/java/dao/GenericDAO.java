@@ -33,4 +33,12 @@ public abstract class GenericDAO {
 			e.printStackTrace();
 		}
 	}
+
+	public void closeTransaction() {
+		try {
+			this.conn.setAutoCommit(true);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

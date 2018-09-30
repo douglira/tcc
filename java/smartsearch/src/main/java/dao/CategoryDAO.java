@@ -46,13 +46,15 @@ public class CategoryDAO extends GenericDAO {
 			stmt.execute();
 
 		} catch (SQLException sqlException) {
-			throw new RuntimeException(sqlException);
+			sqlException.printStackTrace();
+			System.out.println("CategoryDAO.create [ERROR](1): " + sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
-					throw new RuntimeException(errClose);
+					errClose.printStackTrace();
+					System.out.println("CategoryDAO.create [ERROR](2): " + errClose);
 				}
 			}
 		}

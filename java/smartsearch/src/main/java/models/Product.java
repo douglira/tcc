@@ -16,8 +16,8 @@ public class Product {
 	private double price;
 	private int soldQuantity;
 	private int availableQuantity;
-	private ProductPicture thumbnail;
-	private List<ProductPicture> pictures;
+	private File thumbnail;
+	private List<File> pictures;
 	private ProductSituation situation;
 	private Status status;
 	private Calendar createdAt;
@@ -95,19 +95,19 @@ public class Product {
 		this.availableQuantity = availableQuantity;
 	}
 	
-	public ProductPicture getThumbnail() {
+	public File getThumbnail() {
 		return thumbnail;
 	}
 	
-	public void setThumbnail(ProductPicture thumbnail) {
+	public void setThumbnail(File thumbnail) {
 		this.thumbnail = thumbnail;
 	}
 
-	public List<ProductPicture> getPictures() {
+	public List<File> getPictures() {
 		return pictures;
 	}
 
-	public void setPictures(List<ProductPicture> pictures) {
+	public void setPictures(List<File> pictures) {
 		this.pictures = pictures;
 	}
 	

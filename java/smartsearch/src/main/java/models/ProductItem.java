@@ -9,8 +9,8 @@ public class ProductItem {
 	private int id;
 	private ArrayList<Product> basedProducts;
 	private String title;
-	private ProductPicture thumbnail;
-	private ArrayList<ProductPicture> pictures;
+	private File thumbnail;
+	private ArrayList<File> pictures;
 	private double marketPrice;
 	private double maxPrice;
 	private double minPrice;
@@ -48,19 +48,19 @@ public class ProductItem {
 		this.title = title;
 	}
 
-	public ProductPicture getThumbnail() {
+	public File getThumbnail() {
 		return thumbnail;
 	}
 
-	public void setThumbnail(ProductPicture thumbnail) {
+	public void setThumbnail(File thumbnail) {
 		this.thumbnail= thumbnail;
 	}
 
-	public ArrayList<ProductPicture> getPictures() {
+	public ArrayList<File> getPictures() {
 		return pictures;
 	}
 
-	public void setPictures(ArrayList<ProductPicture> pictures) {
+	public void setPictures(ArrayList<File> pictures) {
 		this.pictures = pictures;
 	}
 
