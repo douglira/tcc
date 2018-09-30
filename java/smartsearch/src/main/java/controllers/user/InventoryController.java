@@ -9,6 +9,7 @@ import database.elasticsearch.ElasticsearchFacade;
 import enums.MessengerType;
 import enums.ProductSituation;
 import enums.Status;
+import libs.Helper;
 import models.*;
 
 import javax.servlet.ServletException;
@@ -101,7 +102,7 @@ public class InventoryController extends HttpServlet {
 
                 validateProductItemPictures = product.getPictures() != null && !product.getPictures().isEmpty();
 
-                productThumbnail.setUrlPath(getBaseUrl(request) + "/assets/images/thumbnail-not-available.jpg");
+                productThumbnail.setUrlPath(Helper.getBaseUrl(request) + "/assets/images/thumbnail-not-available.jpg");
                 productThumbnail.setName("picture-not-available");
                 productItem.setThumbnail(productThumbnail);
 
@@ -188,13 +189,5 @@ public class InventoryController extends HttpServlet {
         }
 
         return isValid;
-    }
-
-    private String getBaseUrl(HttpServletRequest request) {
-        String scheme = request.getScheme() + "://";
-        String serverName = request.getServerName();
-        String serverPort = (request.getServerPort() == 80) ? "" : ":" + request.getServerPort();
-        String contextPath = request.getContextPath();
-        return scheme + serverName + serverPort + contextPath;
     }
 }

@@ -14,6 +14,7 @@ import javax.servlet.http.Part;
 
 import com.google.gson.Gson;
 
+import libs.Helper;
 import models.File;
 
 @WebServlet("/products/pictures/upload")
@@ -43,7 +44,7 @@ public class PicturesUploaderController extends HttpServlet {
 		if (!uploadDir.exists())
 			uploadDir.mkdir();
 
-		String baseUrl = getBaseUrl(request);
+		String baseUrl = Helper.getBaseUrl(request);
 
 		ArrayList<File> pictures = new ArrayList<File>();
 
@@ -70,13 +71,5 @@ public class PicturesUploaderController extends HttpServlet {
 
 		out.println(gJson.toJson(pictures));
 		out.close();
-	}
-
-	private String getBaseUrl(HttpServletRequest request) {
-		String scheme = request.getScheme() + "://";
-		String serverName = request.getServerName();
-		String serverPort = (request.getServerPort() == 80) ? "" : ":" + request.getServerPort();
-		String contextPath = request.getContextPath();
-		return scheme + serverName + serverPort + contextPath;
 	}
 }

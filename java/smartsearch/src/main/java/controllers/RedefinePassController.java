@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import dao.UserDAO;
+import libs.Helper;
 import mail.MailSMTPService;
 import mail.MailerService;
 import mail.ResetPassword;
@@ -22,16 +23,8 @@ public class RedefinePassController extends HttpServlet {
 		super();
 	}
 
-	private String getBaseUrl(HttpServletRequest request) {
-		String scheme = request.getScheme() + "://";
-		String serverName = request.getServerName();
-		String serverPort = (request.getServerPort() == 80) ? "" : ":" + request.getServerPort();
-		String contextPath = request.getContextPath();
-		return scheme + serverName + serverPort + contextPath;
-	}
-
 	private String getUrlRedirect(HttpServletRequest request, String token) {
-		return this.getBaseUrl(request) + "/form/reset_pass?t=" + token;
+		return Helper.getBaseUrl(request) + "/form/reset_pass?t=" + token;
 	}
 
 	@Override
