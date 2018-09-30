@@ -41,7 +41,8 @@ public class ProductItemDAO extends GenericDAO {
 			}
 
 		} catch (SQLException e) {
-			System.out.println("ProductItem.create [ERROR]: " + e);
+			e.printStackTrace();
+			System.out.println("ProductItemDAO.create [ERROR]: " + e);
 		}
 
 		return productItem;
@@ -66,13 +67,15 @@ public class ProductItemDAO extends GenericDAO {
 				productItem.setMinPrice(rs.getDouble("min_price"));
 			}
 		} catch (SQLException sqlError) {
-			System.out.println("ProductItem.findById [ERROR](1): " + sqlError);
+			sqlError.printStackTrace();
+			System.out.println("ProductItemDAO.findById [ERROR](1): " + sqlError);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException sqlException) {
-					System.out.println("ProductItem.findById [ERROR](2): " + sqlException);
+					sqlException.printStackTrace();
+					System.out.println("ProductItemDAO.findById [ERROR](2): " + sqlException);
 				}
 			}
 		}
@@ -94,7 +97,8 @@ public class ProductItemDAO extends GenericDAO {
 			stmt.setInt(5, productItem.getId());
 			stmt.executeUpdate();
 		} catch(SQLException sqlException) {
-			System.out.println("ProductItemDAO.updateSimple: [ERROR]: " + sqlException);
+			sqlException.printStackTrace();
+			System.out.println("ProductItemDAO.updatePricesAndRelevance: [ERROR]: " + sqlException);
 		}
 	}
 }

@@ -48,7 +48,8 @@ public class UserDAO extends GenericDAO {
 			}
 
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			System.out.println("UserDAO.create [ERROR]: " + e);
 		}
 
 		return user;
@@ -78,13 +79,15 @@ public class UserDAO extends GenericDAO {
 			}
 
 		} catch (SQLException sqlException) {
-			throw new RuntimeException(sqlException);
+			sqlException.printStackTrace();
+			System.out.println("UserDAO.checkIfExists [ERROR](1): " + sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
-					throw new RuntimeException(errClose);
+					errClose.printStackTrace();
+					System.out.println("UserDAO.checkIfExists [ERROR](2): " + errClose);
 				}
 			}
 		}
@@ -119,13 +122,15 @@ public class UserDAO extends GenericDAO {
 				users.add(user);
 			}
 		} catch (SQLException sqlException) {
-			throw new RuntimeException(sqlException);
+			sqlException.printStackTrace();
+			System.out.println("UserDAO.report [ERROR](1): " + sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
-					throw new RuntimeException(errClose);
+					errClose.printStackTrace();
+					System.out.println("UserDAO.report [ERROR](2): " + errClose);
 				}
 			}
 		}
@@ -145,13 +150,15 @@ public class UserDAO extends GenericDAO {
 			stmt.execute();
 
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			System.out.println("UserDAO.setPasswordResetToken [ERROR](1): " + e);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException sqlException) {
-					throw new RuntimeException(sqlException);
+					sqlException.printStackTrace();
+					System.out.println("UserDAO.setPasswordResetToken [ERROR](2): " + sqlException);
 				}
 			}
 		}
@@ -180,13 +187,15 @@ public class UserDAO extends GenericDAO {
 				userQuery.setPasswordExpiresIn(passwordExpiresIn);
 			}
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			System.out.println("UserDAO.findPassResetToken [ERROR](1): " + e);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException sqlException) {
-					throw new RuntimeException(sqlException);
+					sqlException.printStackTrace();
+					System.out.println("UserDAO.findPassResetToken [ERROR](2): " + sqlException);
 				}
 			}
 		}
@@ -206,13 +215,15 @@ public class UserDAO extends GenericDAO {
 			stmt.execute();
 
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			System.out.println("UserDAO.updateResetToken [ERROR](1): " + e);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException sqlException) {
-					throw new RuntimeException(sqlException);
+					sqlException.printStackTrace();
+					System.out.println("UserDAO.updateResetToken [ERROR](2): " + sqlException);
 				}
 			}
 		}
@@ -228,6 +239,7 @@ public class UserDAO extends GenericDAO {
 			stmt.setInt(2, user.getId());
 			stmt.executeUpdate();
 		}catch (SQLException sqlError) {
+			sqlError.printStackTrace();
 			System.out.println("UserDAO.updateDisplayName [ERROR]: " + sqlError);
 		}
 	}

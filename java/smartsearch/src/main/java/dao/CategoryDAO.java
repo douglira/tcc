@@ -60,6 +60,29 @@ public class CategoryDAO extends GenericDAO {
 		}
 	}
 
+	private ArrayList<Category> fetch(ResultSet rs) throws SQLException {
+		ArrayList<Category> categories = new ArrayList<Category>();
+
+		while (rs.next()) {
+			Category subcategory = new Category();
+
+			subcategory.setId(rs.getInt("id"));
+			subcategory.setTitle(rs.getString("title"));
+			subcategory.setDescription(rs.getString("description"));
+			subcategory.setLayer(rs.getInt("layer"));
+			subcategory.setLastChild(rs.getBoolean("is_last_child"));
+			subcategory.setStatus(Status.valueOf(rs.getString("status")));
+
+			Calendar createdAt = Calendar.getInstance();
+			createdAt.setTime(rs.getTimestamp("created_at"));
+			subcategory.setCreatedAt(createdAt);
+
+			categories.add(subcategory);
+		}
+
+		return categories;
+	}
+
 	public ArrayList<Category> generals() {
 		ArrayList<Category> categories = new ArrayList<Category>();
 		PreparedStatement stmt = null;
@@ -70,30 +93,17 @@ public class CategoryDAO extends GenericDAO {
 			stmt = this.conn.prepareStatement(sql);
 			rs = stmt.executeQuery();
 
-			while (rs.next()) {
-				Category category = new Category();
-
-				category.setId(rs.getInt("id"));
-				category.setTitle(rs.getString("title"));
-				category.setDescription(rs.getString("description"));
-				category.setLayer(rs.getInt("layer"));
-				category.setLastChild(rs.getBoolean("is_last_child"));
-				category.setStatus(Status.valueOf(rs.getString("status")));
-
-				Calendar createdAt = Calendar.getInstance();
-				createdAt.setTime(rs.getTimestamp("created_at"));
-				category.setCreatedAt(createdAt);
-
-				categories.add(category);
-			}
+			categories = this.fetch(rs);
 		} catch (SQLException sqlException) {
-			throw new RuntimeException(sqlException);
+			sqlException.printStackTrace();
+			System.out.println("CategoryDAO.generals [ERROR](1): " + sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
-					throw new RuntimeException(errClose);
+					errClose.printStackTrace();
+					System.out.println("CategoryDAO.generals [ERROR](2): " + errClose);
 				}
 			}
 		}
@@ -127,13 +137,15 @@ public class CategoryDAO extends GenericDAO {
 			}
 
 		} catch (Exception sqlException) {
-			throw new RuntimeException(sqlException);
+			sqlException.printStackTrace();
+			System.out.println("CategoryDAO.findByTitle [ERROR](1): " + sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
-					throw new RuntimeException(errClose);
+					errClose.printStackTrace();
+					System.out.println("CategoryDAO.findByTitle [ERROR](2): " + errClose);
 				}
 			}
 		}
@@ -168,13 +180,15 @@ public class CategoryDAO extends GenericDAO {
 			}
 
 		} catch (Exception sqlException) {
-			throw new RuntimeException(sqlException);
+			sqlException.printStackTrace();
+			System.out.println("CategoryDAO.findParentByChildId [ERROR](1): " + sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
-					throw new RuntimeException(errClose);
+					errClose.printStackTrace();
+					System.out.println("CategoryDAO.findParentByChildId [ERROR](2): " + errClose);
 				}
 			}
 		}
@@ -193,13 +207,15 @@ public class CategoryDAO extends GenericDAO {
 			stmt.setInt(3, category.getId());
 			stmt.executeUpdate();
 		} catch (Exception sqlException) {
-			throw new RuntimeException(sqlException);
+			sqlException.printStackTrace();
+			System.out.println("CategoryDAO.saveDetails [ERROR](1): " + sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
-					throw new RuntimeException(errClose);
+					errClose.printStackTrace();
+					System.out.println("CategoryDAO.saveDetails [ERROR](2): " + errClose);
 				}
 			}
 		}
@@ -216,30 +232,17 @@ public class CategoryDAO extends GenericDAO {
 			stmt.setInt(1, parentId);
 			rs = stmt.executeQuery();
 
-			while (rs.next()) {
-				Category subcategory = new Category();
-
-				subcategory.setId(rs.getInt("id"));
-				subcategory.setTitle(rs.getString("title"));
-				subcategory.setDescription(rs.getString("description"));
-				subcategory.setLayer(rs.getInt("layer"));
-				subcategory.setLastChild(rs.getBoolean("is_last_child"));
-				subcategory.setStatus(Status.valueOf(rs.getString("status")));
-
-				Calendar createdAt = Calendar.getInstance();
-				createdAt.setTime(rs.getTimestamp("created_at"));
-				subcategory.setCreatedAt(createdAt);
-
-				subcategories.add(subcategory);
-			}
+			subcategories = this.fetch(rs);
 		} catch (SQLException sqlException) {
-			throw new RuntimeException(sqlException);
+			sqlException.printStackTrace();
+			System.out.println("CategoryDAO.subcategoriesByParent [ERROR](1): " + sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
-					throw new RuntimeException(errClose);
+					errClose.printStackTrace();
+					System.out.println("CategoryDAO.subcategoriesByParent [ERROR](2): " +  errClose);
 				}
 			}
 		}
@@ -257,13 +260,15 @@ public class CategoryDAO extends GenericDAO {
 			stmt.setString(2, category.getStatus().toString());
 			stmt.execute();
 		} catch (Exception sqlException) {
-			throw new RuntimeException(sqlException);
+			sqlException.printStackTrace();
+			System.out.println("CategoryDAO.updateStatus [ERROR](1): " +  sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
-					throw new RuntimeException(errClose);
+					errClose.printStackTrace();
+					System.out.println("CategoryDAO.updateStatus [ERROR](2): " +  errClose);
 				}
 			}
 		}
@@ -278,13 +283,15 @@ public class CategoryDAO extends GenericDAO {
 			stmt.setInt(1, category.getId());
 			stmt.execute();
 		} catch (Exception sqlException) {
-			throw new RuntimeException(sqlException);
+			sqlException.printStackTrace();
+			System.out.println("CategoryDAO.destroy [ERROR](1): " +  sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
-					throw new RuntimeException(errClose);
+					errClose.printStackTrace();
+					System.out.println("CategoryDAO.destroy [ERROR](2): " +  errClose);
 				}
 			}
 		}

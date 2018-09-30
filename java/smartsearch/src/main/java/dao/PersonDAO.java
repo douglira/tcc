@@ -47,8 +47,10 @@ public class PersonDAO extends GenericDAO {
 				this.conn.rollback();
 			} catch (SQLException e1) {
 				e1.printStackTrace();
+				System.out.println("PersonDAO.create [ERROR](1): " + e1);
 			}
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			System.out.println("PersonDAO.create [ERROR](2): " + e);
 		}
 		
 		return person;
@@ -69,13 +71,15 @@ public class PersonDAO extends GenericDAO {
 			stmt.execute();
 
 		} catch (SQLException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			System.out.println("PersonDAO.update [ERROR](1): " + e);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException sqlException) {
-					throw new RuntimeException(sqlException);
+					sqlException.printStackTrace();
+					System.out.println("PersonDAO.update [ERROR](2): " + sqlException);
 				}
 			}
 		}
@@ -100,18 +104,15 @@ public class PersonDAO extends GenericDAO {
 				person.setStateRegistration(rs.getLong("state_registration"));
 			}
 		} catch (Exception error) {
-			try {
-				this.conn.rollback();
-			} catch (SQLException e1) {
-				e1.printStackTrace();
-			}
-			throw new RuntimeException(error);
+			error.printStackTrace();
+			System.out.println("PersonDAO.findByUser [ERROR](1): " + error);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException sqlException) {
-					throw new RuntimeException(sqlException);
+					sqlException.printStackTrace();
+					System.out.println("PersonDAO.findByUser [ERROR](2): " + sqlException);
 				}
 			}
 		}

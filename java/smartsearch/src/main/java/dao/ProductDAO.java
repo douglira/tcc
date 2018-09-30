@@ -46,6 +46,7 @@ public class ProductDAO extends GenericDAO {
                 product.setId(rs.getInt("id"));
             }
         } catch (SQLException e) {
+            e.printStackTrace();
             System.out.println("ProductDAO.create [ERROR]: " + e);
         }
         return product;
@@ -87,14 +88,15 @@ public class ProductDAO extends GenericDAO {
                 products.add(product);
             }
         } catch (SQLException e) {
-            System.out.println("ProductDAO.findProductsByProductItem -> " + e);
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            System.out.println("ProductDAO.findProductsByProductItem [ERROR](1): " + e);
         } finally {
             if (this.conn != null) {
                 try {
                     this.conn.close();
                 } catch (SQLException sqlException) {
-                    throw new RuntimeException(sqlException);
+                    sqlException.printStackTrace();
+                    System.out.println("ProductDAO.findProductsByProductItem [ERROR](2): " + sqlException);
                 }
             }
         }
@@ -137,12 +139,14 @@ public class ProductDAO extends GenericDAO {
             }
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
+            System.out.println("ProductDAO.findBySeller [ERROR](1): " + sqlError);
         } finally {
             if (this.conn != null) {
                 try {
                     this.conn.close();
                 } catch (SQLException sqlException) {
-                    throw new RuntimeException(sqlException);
+                    sqlException.printStackTrace();
+                    System.out.println("ProductDAO.findBySeller [ERROR](2): " + sqlException);
                 }
             }
         }

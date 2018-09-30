@@ -35,14 +35,17 @@ private final static String TABLE_NAME = "sellers";
 				this.conn.rollback();
 			} catch (SQLException e1) {
 				e1.printStackTrace();
+				System.out.println("SellerDAO.create [ERROR](1): " + e1);
 			}
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			System.out.println("SellerDAO.create [ERROR](2): " + e);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException sqlException) {
-					throw new RuntimeException(sqlException);
+					sqlException.printStackTrace();
+					System.out.println("SellerDAO.create [ERROR](3): " + sqlException);
 				}
 			}
 		}
