@@ -214,12 +214,13 @@ new Vue({
         title: '',
         price: null,
         availableQuantity: null,
-        description: '',
+        description: null,
         productItemId: null,
         category: {
           id: null,
         },
       };
+      this.productItemPreview = null;
       this.productsPredict = [];
       this.categories = await this.getCategories();
       this.breadcrumbCategories = [{ id: 0, title: 'Geral' }];

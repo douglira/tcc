@@ -45,6 +45,7 @@ public class ElasticsearchFacade {
 		productIndex.setViewsCount(productItem.getViewsCount());
 		productIndex.setThumbnail(productItem.getThumbnail());
 		productIndex.setPictures(productItem.getPictures());
+		productIndex.setStatus(productItem.getStatus());
 
 		Gson gJson = new Gson();
 		String productItemJson = gJson.toJson(productIndex);
@@ -104,14 +105,16 @@ public class ElasticsearchFacade {
 				});
 			}
 
-		} catch (IOException e) {
-			System.out.println("Elasticsearch.getProductsPredict [ERROR]: " + e);
+		} catch (IOException err) {
+			err.printStackTrace();
+			System.out.println("Elasticsearch.getProductsPredict [ERROR](1): " + err);
 		} finally {
 			if (this.client != null) {				
 				try {
 					this.client.close();
 				} catch (IOException e) {
-					System.out.println("Elasticsearch.getProductsPredict - Client.close [ERROR]: " + e);
+					e.printStackTrace();
+					System.out.println("Elasticsearch.getProductsPredict - [ERROR](2): " + e);
 				}
 			}
 		}

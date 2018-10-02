@@ -84,6 +84,7 @@ public class InventoryController extends HttpServlet {
 
             ProductItem productItem = new ProductItem();
             productItem.setTitle(product.getTitle().trim());
+            productItem.setStatus(Status.ACTIVE);
 
             Seller seller = new Seller();
             seller.setId(person.getId());
@@ -108,7 +109,7 @@ public class InventoryController extends HttpServlet {
             File productThumbnail = new File();
             FileDAO fileDao = new FileDAO(false);
 
-            boolean validateProductItemPictures = false;
+            boolean validateProductItemPictures;
             int remainingPicturesCount = ProductItem.MAX_PICTURES;
             if (productItemId == null || productItemId.length() == 0) {
 

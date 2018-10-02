@@ -101,8 +101,9 @@
 
                                     <div class="form-group">
                                         <label for="description">Especificações</label>
-                                        <textarea class="form-control" id="description" name="description" rows="3"
-                                                  style="white-space: pre-wrap">{{ product.description }}</textarea>
+                                        <textarea class="form-control" :value="product.description" id="description"
+                                                  name="description" rows="3"
+                                                  style="white-space: pre-wrap"></textarea>
                                     </div>
 
                                     <div class="form-group">

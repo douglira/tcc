@@ -78,8 +78,8 @@
             </div>
         </template>
         <template v-else>
-            <div class="alert alert-light mt-sm-3 mt-md-3 text-center">
-                <span class="text-muted">Nenhum produto cadastrado no momento</span>
+            <div class="alert alert-light mt-sm-3 mt-md-3 text-center w-100">
+                <span class="text-muted w-100">Nenhum produto cadastrado no momento</span>
             </div>
         </template>
     </div>

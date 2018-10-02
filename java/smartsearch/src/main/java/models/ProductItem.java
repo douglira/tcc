@@ -3,128 +3,139 @@ package models;
 import java.util.ArrayList;
 
 import com.google.gson.annotations.Expose;
+import enums.Status;
 
 public class ProductItem {
 
-	private int id;
-	private ArrayList<Product> basedProducts;
-	private String title;
-	private File thumbnail;
-	private ArrayList<File> pictures;
-	private double marketPrice;
-	private double maxPrice;
-	private double minPrice;
-	private int viewsCount;
-	private int relevance;
-	
-	@Expose(deserialize = false, serialize = false)
-	public static final int MAX_PICTURES = 15;
+    private int id;
+    private ArrayList<Product> basedProducts;
+    private String title;
+    private File thumbnail;
+    private ArrayList<File> pictures;
+    private double marketPrice;
+    private double maxPrice;
+    private double minPrice;
+    private int viewsCount;
+    private int relevance;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
-	
-	public Integer getId() {
-		return id;
-	}
-	
-	public ArrayList<Product> getBasedProducts() {
-		return basedProducts;
-	}
+    private Status status;
 
-	public void setBasedProducts(ArrayList<Product> basedProducts) {
-		this.basedProducts = basedProducts;
-	}
-	
-	public void addBasedProduct(Product product) {
-		this.basedProducts.add(product);
-	}
+    @Expose(deserialize = false, serialize = false)
+    public static final int MAX_PICTURES = 15;
 
-	public String getTitle() {
-		return title;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public File getThumbnail() {
-		return thumbnail;
-	}
+    public ArrayList<Product> getBasedProducts() {
+        return basedProducts;
+    }
 
-	public void setThumbnail(File thumbnail) {
-		this.thumbnail= thumbnail;
-	}
+    public void setBasedProducts(ArrayList<Product> basedProducts) {
+        this.basedProducts = basedProducts;
+    }
 
-	public ArrayList<File> getPictures() {
-		return pictures;
-	}
+    public void addBasedProduct(Product product) {
+        this.basedProducts.add(product);
+    }
 
-	public void setPictures(ArrayList<File> pictures) {
-		this.pictures = pictures;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public double getMarketPrice() {
-		return marketPrice;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public void setMarketPrice(double marketPrice) {
-		this.marketPrice = marketPrice;
-	}
+    public File getThumbnail() {
+        return thumbnail;
+    }
 
-	public double getMaxPrice() {
-		return maxPrice;
-	}
+    public void setThumbnail(File thumbnail) {
+        this.thumbnail = thumbnail;
+    }
 
-	public void setMaxPrice(double maxPrice) {
-		this.maxPrice = maxPrice;
-	}
+    public ArrayList<File> getPictures() {
+        return pictures;
+    }
 
-	public double getMinPrice() {
-		return minPrice;
-	}
+    public void setPictures(ArrayList<File> pictures) {
+        this.pictures = pictures;
+    }
 
-	public void setMinPrice(double minPrice) {
-		this.minPrice = minPrice;
-	}
+    public double getMarketPrice() {
+        return marketPrice;
+    }
 
-	public int getViewsCount() {
-		return viewsCount;
-	}
+    public void setMarketPrice(double marketPrice) {
+        this.marketPrice = marketPrice;
+    }
 
-	public void setViewsCount(int viewsCount) {
-		this.viewsCount = viewsCount;
-	}
+    public double getMaxPrice() {
+        return maxPrice;
+    }
 
-	public int getRelevance() {
-		return relevance;
-	}
+    public void setMaxPrice(double maxPrice) {
+        this.maxPrice = maxPrice;
+    }
 
-	public void setRelevance(int relevance) {
-		this.relevance = relevance;
-	}
+    public double getMinPrice() {
+        return minPrice;
+    }
 
-	public void updatePrices() {		
-		
-		double maxPrice = 0;
-		double minPrice = Integer.MAX_VALUE;
-		double sum = 0;
-		
-		for (Product product: this.basedProducts) {
-			
-			if (product.getPrice() > maxPrice) {
-				maxPrice = product.getPrice();
-			}
-			
-			if (product.getPrice() < minPrice ) {
-				minPrice = product.getPrice();
-			}
-			
-			sum += product.getPrice();
-		}
-		
-		this.marketPrice = sum / this.basedProducts.size();
-		this.maxPrice = maxPrice;
-		this.minPrice = minPrice;
-	}
+    public void setMinPrice(double minPrice) {
+        this.minPrice = minPrice;
+    }
+
+    public int getViewsCount() {
+        return viewsCount;
+    }
+
+    public void setViewsCount(int viewsCount) {
+        this.viewsCount = viewsCount;
+    }
+
+    public int getRelevance() {
+        return relevance;
+    }
+
+    public void setRelevance(int relevance) {
+        this.relevance = relevance;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public void updatePrices() {
+
+        double maxPrice = 0;
+        double minPrice = Integer.MAX_VALUE;
+        double sum = 0;
+
+        for (Product product : this.basedProducts) {
+
+            if (product.getPrice() > maxPrice) {
+                maxPrice = product.getPrice();
+            }
+
+            if (product.getPrice() < minPrice) {
+                minPrice = product.getPrice();
+            }
+
+            sum += product.getPrice();
+        }
+
+        this.marketPrice = sum / this.basedProducts.size();
+        this.maxPrice = maxPrice;
+        this.minPrice = minPrice;
+    }
 }
