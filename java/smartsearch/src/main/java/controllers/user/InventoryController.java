@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 @WebServlet(urlPatterns = {"/account/me/inventory"})
@@ -74,7 +75,7 @@ public class InventoryController extends HttpServlet {
             String productItemId = request.getParameter("productItemId");
             String productJson = request.getParameter("product");
 
-            if (categoryId == null || categoryId.length() == 0 || productJson == null || productJson.length() == 0) {
+            if (validateParameters(categoryId, productJson)) {
                 msg = new Messenger("Operação inválida.", MessengerType.ERROR);
                 out.print(gJson.toJson(msg));
                 return;
@@ -105,47 +106,20 @@ public class InventoryController extends HttpServlet {
 
             ProductItemDAO productItemDao = new ProductItemDAO(true);
 
-            ArrayList<File> pictures = new ArrayList<File>();
-            File productThumbnail = new File();
-            FileDAO fileDao = new FileDAO(false);
+            Boolean validateProductItemPictures = true;
+            Integer remainingPicturesCount = ProductItem.MAX_PICTURES;
 
-            boolean validateProductItemPictures;
-            int remainingPicturesCount = ProductItem.MAX_PICTURES;
             if (productItemId == null || productItemId.length() == 0) {
-
-                productItem.setMarketPrice(product.getPrice());
-                productItem.setMaxPrice(product.getPrice());
-                productItem.setMinPrice(product.getPrice());
-
-                productItemDao.initTransaction();
-                productItem = productItemDao.create(productItem);
-
-                validateProductItemPictures = product.getPictures() != null && !product.getPictures().isEmpty();
-
-                productThumbnail.setUrlPath(Helper.getBaseUrl(request) + "/assets/images/thumbnail-not-available.jpg");
-                productThumbnail.setName("picture-not-available");
-                productItem.setThumbnail(productThumbnail);
+                createNewProductItem(productItem, product, productItemDao);
+                productItem.setDefaultThumbnail(Helper.getBaseUrl(request));
 
                 msg = new Messenger("Seu novo produto foi cadastrado com sucesso em nosso sistema.", MessengerType.SUCCESS);
             } else {
                 productItem.setId(Integer.parseInt(productItemId));
-
-                productItem = productItemDao.findById(productItem);
-                productItem.setRelevance(productItem.getRelevance() + 1);
-                productItem.setBasedProducts(new ProductDAO(true).findByProductItem(productItem.getId()));
-                productItem.addBasedProduct(product);
-
-                productItem.updatePrices();
-
-                productItemDao = new ProductItemDAO(true);
-                productItemDao.initTransaction();
-                productItemDao.updatePricesAndRelevance(productItem);
-
-                fileDao = new FileDAO(productItemDao.getConnection());
-                pictures = new FileDAO(true).getProductItemPictures(productItem.getId());
-
-                remainingPicturesCount = ProductItem.MAX_PICTURES - pictures.size();
-                validateProductItemPictures = product.getPictures() != null && remainingPicturesCount > 0;
+                attachNewProduct(product, productItem, productItemDao);
+                remainingPicturesCount = getRemainingPictures(productItem);
+                validateProductItemPictures = validateRemainingPictures(product, productItem, remainingPicturesCount);
+                productItem.setDefaultThumbnail(Helper.getBaseUrl(request));
 
                 msg = new Messenger("Seu novo produto foi vinculado a um anúncio já cadastrado com sucesso.",
                         MessengerType.SUCCESS);
@@ -154,6 +128,8 @@ public class InventoryController extends HttpServlet {
             product.setProductItem(productItem);
             ProductDAO productDao = new ProductDAO(productItemDao.getConnection());
             product = productDao.create(product);
+
+            FileDAO fileDao = new FileDAO(false);
             fileDao.setConnection(productDao.getConnection());
 
             if (product.getPictures() != null && !product.getPictures().isEmpty()) {
@@ -173,17 +149,19 @@ public class InventoryController extends HttpServlet {
                         }
 
                         fileDao.attachProductItem(productItem.getId(), picture.getId());
-                        pictures.add(picture);
+                        productItem.addPicture(picture);
 
                         remainingPicturesCount--;
                     }
                 }
-                productItem.setThumbnail(pictures.get(pictures.size() - 1));
-                productItem.setPictures(pictures);
+                productItem.setDefaultThumbnail(Helper.getBaseUrl(request));
             }
 
             fileDao.closeTransaction();
+            fileDao.closeConnection();
+
             new ElasticsearchFacade().indexProductItem(productItem);
+
             out.print(gJson.toJson(msg));
             out.close();
         } catch (Exception error) {
@@ -191,6 +169,43 @@ public class InventoryController extends HttpServlet {
             System.out.println("InventoryController.doPost [ERROR]: " + error);
             Helper.responseError(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
+    }
+
+    private Integer getRemainingPictures(ProductItem productItem) {
+        productItem.setPictures(new FileDAO(true).getProductItemPictures(productItem.getId()));
+
+        return ProductItem.MAX_PICTURES - productItem.getPictures().size();
+    }
+
+    private Boolean validateRemainingPictures(Product product, ProductItem productItem, Integer remainingPicturesCount) {
+        remainingPicturesCount = ProductItem.MAX_PICTURES - productItem.getPictures().size();
+        return product.getPictures() != null && remainingPicturesCount > 0;
+    }
+
+    private void attachNewProduct(Product product, ProductItem productItem, ProductItemDAO productItemDao) throws SQLException {
+
+        productItem = new ProductItemDAO(true).findById(productItem);
+        productItem.setRelevance(productItem.getRelevance() + 1);
+        productItem.setBasedProducts(new ProductDAO(true).findByProductItem(productItem.getId()));
+        productItem.addBasedProduct(product);
+
+        productItem.updatePrices();
+
+        productItemDao.initTransaction();
+        productItemDao.updatePricesAndRelevance(productItem);
+    }
+
+    private void createNewProductItem(ProductItem productItem, Product product, ProductItemDAO productItemDao) throws SQLException {
+        productItem.setMarketPrice(product.getPrice());
+        productItem.setMaxPrice(product.getPrice());
+        productItem.setMinPrice(product.getPrice());
+
+        productItemDao.initTransaction();
+        productItem = productItemDao.create(productItem);
+    }
+
+    private boolean validateParameters(String categoryId, String productJson) {
+        return categoryId == null || categoryId.length() == 0 || productJson == null || productJson.length() == 0;
     }
 
     private boolean validateTitle(Seller seller, String title) {

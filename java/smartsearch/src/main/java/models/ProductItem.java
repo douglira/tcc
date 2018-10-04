@@ -11,7 +11,7 @@ public class ProductItem {
     private ArrayList<Product> basedProducts;
     private String title;
     private File thumbnail;
-    private ArrayList<File> pictures;
+    private ArrayList<File> pictures = new ArrayList<File>();
     private double marketPrice;
     private double maxPrice;
     private double minPrice;
@@ -115,6 +115,10 @@ public class ProductItem {
         this.status = status;
     }
 
+    public void addPicture(File picture) {
+        this.pictures.add(picture);
+    }
+
     public void updatePrices() {
 
         double maxPrice = 0;
@@ -137,5 +141,18 @@ public class ProductItem {
         this.marketPrice = sum / this.basedProducts.size();
         this.maxPrice = maxPrice;
         this.minPrice = minPrice;
+    }
+
+    public void setDefaultThumbnail(String baseUrlPath) {
+        if (this.pictures != null && !this.pictures.isEmpty()) {
+            this.thumbnail = this.pictures.get(this.pictures.size() - 1);
+            return;
+        }
+
+        File defaultThumbnail = new File();
+
+        defaultThumbnail.setName("picture-not-available");
+        defaultThumbnail.setUrlPath(baseUrlPath + "/assets/images/thumbnail-not-available.jpg");
+        this.thumbnail = defaultThumbnail;
     }
 }

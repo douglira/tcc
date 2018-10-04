@@ -7,7 +7,7 @@ $(document).ready(function() {
 });
 
 function loadCategories(params) {
-	$.get('/admin/categories/json', params, function(data) {
+	$.get('/categories/json', params, function(data) {
 		mountBreadcrumb();
 		mountTableCategories(JSON.parse(data));
 	});

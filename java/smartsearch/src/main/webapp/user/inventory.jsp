@@ -66,7 +66,7 @@
                         <small class="text-warning" v-else>Desvinculado</small>
                         <div>
                             <p class="text-dark ">Vendidos: {{ product.soldQuantity }}</p>
-                            <p :class="[product.availableQuantity > 10 ? 'text-dark' : 'text-warning']">Em estoque: {{
+                            <p :class="[product.availableQuantity > 10 ? 'text-dark' : 'text-danger']">Em estoque: {{
                                 product.availableQuantity }}</p>
                         </div>
                     </div>

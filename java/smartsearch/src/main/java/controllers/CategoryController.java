@@ -2,7 +2,7 @@ package controllers;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,14 +12,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
-import database.elasticsearch.ElasticsearchFacade;
-import models.ProductItem;
+import dao.CategoryDAO;
+import models.Category;
 
-@WebServlet(urlPatterns = "/products/search")
-public class ProductSearchAjaxController extends HttpServlet {
+@WebServlet("/categories/json")
+public class CategoryController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public ProductSearchAjaxController() {
+	public CategoryController() {
 		super();
 	}
 
@@ -27,18 +27,27 @@ public class ProductSearchAjaxController extends HttpServlet {
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
-
+		
+		String parentId = request.getParameter("parentId");
+		
 		Gson gJson = new Gson();
 
-		String productItemTitle = request.getParameter("productPredictTitle");
-
-		List<ProductItem> products = new ElasticsearchFacade().getProductsPredict(productItemTitle);
-
-		out.print(gJson.toJson(products));
+		ArrayList<Category> categories = null;
+		
+		if (parentId != null && parentId.length() != 0) {
+			categories = new CategoryDAO(true).subcategoriesByParent(Integer.parseInt(parentId));
+			out.print(gJson.toJson(categories));
+			out.close();
+			return;
+		}
+		
+		categories = new CategoryDAO(true).generals();
+		out.print(gJson.toJson(categories));
 		out.close();
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 	}
+
 }

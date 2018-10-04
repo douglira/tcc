@@ -107,7 +107,7 @@ new Vue({
     },
     getPredictProducts: _.debounce(async function(productTitle) {
       // predict at elasticsearch
-      const { data } = await axios.get(`/products/search?productPredictTitle=${productTitle}`);
+      const { data } = await axios.get(`/products/predict?productPredictTitle=${productTitle}`);
       this.productsPredict = data;
     }, 450),
     async savePictures() {
