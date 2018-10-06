@@ -54,17 +54,22 @@ new Vue({
       const categoryId = Number(event.target.value);
       const category = this.categories.find(cat => cat.id === categoryId);
 
-      if (category.isLastChild) {
+      if (category && category.isLastChild) {
         this.product.category = { ...category };
         return;
       }
 
       this.categories = await this.getCategories(categoryId);
 
-      const index = this.breadcrumbCategories.findIndex(cat => cat.id === category.id);
+      const index = this.breadcrumbCategories.findIndex(cat => cat.id === categoryId);
 
       if (index === -1) {
         this.breadcrumbCategories = [...this.breadcrumbCategories, category];
+      }
+
+      if (index === 0 ) {
+        this.breadcrumbCategories = [this.breadcrumbCategories[index]];
+        this.product.category = { id: null };
       }
     },
     async onClickBreadcrumbCategory(categoryId) {

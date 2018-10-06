@@ -182,7 +182,8 @@
                                     <label for="categoryId">Categorias</label>
                                     <select id="categoryId" name="categoryId" class="custom-select"
                                             @change="onChangeCategorySelection">
-                                        <template v-for="(category, index) in categories">
+                                        <option selected :value="null">Selecione</option>
+                                        <template v-for="(category, categoryIndex) in categories">
                                             <option :value="category.id">{{ category.title }}</option>
                                         </template>
                                     </select>
