@@ -6,6 +6,7 @@
 	User user = (User) session.getAttribute("loggedUser");
 %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/header.css">
 <header id="appHeader" class="header">
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
 		<a class="navbar-brand" href="/">LOGOTIPO</a>
@@ -45,9 +46,48 @@
 
 
 				<template v-if="username">
-					<button class="btn-notification">
-						<i class="fas fa-shopping-basket"></i>
-					</button>
+                    <div class="dropdown">
+                        <button
+                                class="btn-notification dropdown-toggle"
+                                type="button"
+                                id="btnHeaderPR"
+                                aria-haspopup="true"
+                                data-toggle="dropdown">
+                            <template v-if="purchaseRequest && purchaseRequest.listProducts.length">
+                                <span class="btn-cart-badge bg-danger" >{{ purchaseRequest.listProducts.length }}</span>
+                            </template>
+                            <i class="fas fa-shopping-cart"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="btnHeaderPR">
+                            <template v-if="purchaseRequest && purchaseRequest.listProducts.length">
+                                <ul class="list-group list-group-flush pr-header-container">
+                                    <h6 class="text-info dropdown-header text-justify d-flex align-items-center justify-content-center">
+                                        Abrangência
+                                        &nbsp;
+                                        <span :class="['badge', 'text-white', purchaseRequest.propagationCount <= 1 ? 'badge-danger' : 'badge-info']">
+                                            {{ purchaseRequest.propagationCount }}
+                                        </span>
+                                    </h6>
+                                    <li
+                                        role="button"
+                                        v-for="(prItem, prIndex) in purchaseRequest.listProducts"
+                                        :key="prItem.product.id"
+                                        class="list-group-item list-group-item-action pr-header-item">
+                                        <img class="pr-header-item-thumbnail" :src="prItem.product.thumbnail.urlPath" :alt="prItem.product.thumbnail.name">
+                                        <div class="pr-header-item-title text-muted">{{ prItem.product.title }}</div>
+                                    </li>
+                                </ul>
+                            </template>
+                            <template v-else>
+                                <div
+                                    style="font-size: 12px;"
+                                    class="p-md-3 p-lg-3 p-sm-3 alert alert-light text-center font-italic text-muted"
+                                    role="alert">
+                                    Nenhum pedido de compra criado...
+                                </div>
+                            </template>
+                        </div>
+                    </div>
 					<button class="btn-notification">
 						<i class="far fa-bell"></i>
 					</button>
@@ -108,6 +148,11 @@
 </header>
 <c:if test="<%=user != null && user.getRole() == UserRoles.COMMON%>">
 	<input type="hidden" id="inputHeaderUsername" value="<%= user.getUsername() %>"/>
+	<script src="<%=request.getContextPath()%>/assets/libs/fontawesome/js/all.js"></script>
+	<script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
+	<script src="<%=request.getContextPath()%>/assets/libs/toast/toastr.min.js"></script>
+	<script src="<%=request.getContextPath()%>/assets/libs/axios/axios-dist.min.js"></script>
 	<script src="<%=request.getContextPath() %>/assets/libs/vuejs/vue-dist.js"></script>
+	<script src="<%=request.getContextPath() %>/assets/libs/helper.js"></script>
 	<script src="<%=request.getContextPath() %>/assets/js/header-websocket.js"></script>
 </c:if>

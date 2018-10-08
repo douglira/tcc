@@ -56,6 +56,10 @@ public class PurchaseRequestDAO extends GenericDAO {
         purchaseRequest.setViewsCount(rs.getInt("views_count"));
         purchaseRequest.setPropagationCount(rs.getInt("propagation_count"));
 
+        Calendar dueDateAverage = Calendar.getInstance();
+        dueDateAverage.setTime(rs.getTimestamp("due_date_average"));
+        purchaseRequest.setDueDateAverage(dueDateAverage);
+
         Calendar createdAt = Calendar.getInstance();
         createdAt.setTime(rs.getTimestamp("created_at"));
         purchaseRequest.setCreatedAt(createdAt);
@@ -63,11 +67,11 @@ public class PurchaseRequestDAO extends GenericDAO {
         try {
             Calendar updatedAt = Calendar.getInstance();
             updatedAt.setTime(rs.getTimestamp("updated_at"));
-            purchaseRequest.setCreatedAt(updatedAt);
+            purchaseRequest.setUpdatedAt(updatedAt);
 
             Calendar closedAt = Calendar.getInstance();
             closedAt.setTime(rs.getTimestamp("closed_at"));
-            purchaseRequest.setCreatedAt(closedAt);
+            purchaseRequest.setClosedAt(closedAt);
         } catch (NullPointerException error) {
             // error.printStackTrace();
         }

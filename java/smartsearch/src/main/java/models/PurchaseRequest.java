@@ -19,6 +19,7 @@ public class PurchaseRequest {
     private int viewsCount;
     private double totalAmount;
     private Calendar createdAt;
+    private Calendar updatedAt;
     private Calendar closedAt;
 
     public int getId() {
@@ -107,6 +108,14 @@ public class PurchaseRequest {
 
     public void setCreatedAt(Calendar createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public Calendar getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Calendar updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public Calendar getClosedAt() {

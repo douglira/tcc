@@ -52,13 +52,14 @@ header form input::placeholder {
 	justify-content: center;
 	align-items: center;
 	background-color: inherit;
-	padding: 5px;
+	padding: 10px;
 	border: 0;
 	font-size: 24px;
 	cursor: pointer;
-	margin: 5px;
+	/*margin: 5px;*/
 	color: #999;
 	border-radius: 50%;
+	position: relative;
 }
 
 .btn-notification:hover {

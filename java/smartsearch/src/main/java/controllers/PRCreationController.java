@@ -1,16 +1,14 @@
 package controllers;
 
 import com.google.gson.Gson;
-import dao.ProductItemDAO;
-import dao.ProductListDAO;
-import dao.PurchaseRequestDAO;
-import dao.SellerDAO;
+import controllers.socket.PRCreationSocket;
+import dao.*;
 import enums.MessengerType;
 import enums.PRStage;
 import libs.Helper;
 import models.*;
+import models.socket.PRCreation;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +22,7 @@ import java.util.Calendar;
 
 @WebServlet(name = "PRCreationController", urlPatterns = {"/purchase_request/new"})
 public class PRCreationController extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         Gson gJson = new Gson();
@@ -34,12 +32,15 @@ public class PRCreationController extends HttpServlet {
             String action = request.getParameter("actionCreation");
 
             HttpSession session = request.getSession();
+            User user = (User) session.getAttribute("loggedUser");
             Person person = (Person) session.getAttribute("loggedPerson");
 
             if (person == null || person.getId() <= 0) {
                 Helper.responseMessage(out, new Messenger("Realize o login ou crie uma conta para montar seu pedido de compra.", MessengerType.WARNING, "WARNING_MISSING_LOGGED_USER"));
                 return;
             }
+
+            user.setPerson(person);
 
             if (action == null || action.equals("single")) {
                 String productItemId = request.getParameter("productItemId");
@@ -62,7 +63,7 @@ public class PRCreationController extends HttpServlet {
                     productList.setQuantity(0);
                 }
 
-                singleCreation(out, person, productList);
+                singleCreation(out, Helper.getBaseUrl(request), user, productList);
                 return;
             } else if (action.equals("bulk")) {
                 // bulk creation
@@ -76,11 +77,11 @@ public class PRCreationController extends HttpServlet {
         }
     }
 
-    private void singleCreation(PrintWriter out, Person person, ProductList productList) throws SQLException {
+    private void singleCreation(PrintWriter out, String baseUrl, User user, ProductList productList) throws SQLException {
         Gson gJson = new Gson();
 
         Buyer buyer = new Buyer();
-        buyer.setId(person.getId());
+        buyer.setId(user.getPerson().getId());
 
         ProductItem productItem = (ProductItem) productList.getProduct();
         productItem = new ProductItemDAO(true).findById(productItem);
@@ -134,11 +135,67 @@ public class PRCreationController extends HttpServlet {
         purchaseRequestDao.closeTransaction();
         purchaseRequestDao.closeConnection();
 
+        pushSocketPurchaseRequest(user, purchaseRequest, baseUrl);
+
         out.print(gJson.toJson(purchaseRequest));
         out.close();
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void pushSocketPurchaseRequest(User user, PurchaseRequest purchaseRequest, String baseUrl) {
+        ArrayList<ProductList> products = new ProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
+        fetchPictures(products, baseUrl);
 
+        purchaseRequest.setListProducts(products);
+
+        user.setPerson(null);
+        PRCreation prCreation = new PRCreation(user, purchaseRequest);
+        PRCreationSocket.sendPurchaseRequestUpdated(prCreation);
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        Gson gJson = new Gson();
+
+        try {
+            HttpSession session = request.getSession();
+            Person person = (Person) session.getAttribute("loggedPerson");
+            Buyer buyer = new Buyer();
+            buyer.setId(person.getId());
+
+            PurchaseRequest purchaseRequest = new PurchaseRequest();
+            purchaseRequest.setBuyer(buyer);
+            purchaseRequest.setStage(PRStage.CREATION);
+
+            ArrayList<PurchaseRequest> prs = new PurchaseRequestDAO(true).findByStageAndBuyer(purchaseRequest);
+            if (prs != null && !prs.isEmpty()) {
+                purchaseRequest = prs.get(0);
+
+                ArrayList<ProductList> products = new ProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
+                fetchPictures(products, Helper.getBaseUrl(request));
+
+                purchaseRequest.setListProducts(products);
+                purchaseRequest.calculateAmount();
+            } else {
+                purchaseRequest = null;
+            }
+
+            out.print(gJson.toJson(purchaseRequest));
+            out.close();
+        } catch (Exception err) {
+            err.printStackTrace();
+            System.out.println("PRCreationController.doGet [ERROR]: " + err);
+            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
+        }
+    }
+
+    private void fetchPictures(ArrayList<ProductList> products, String baseUrl) {
+        products.forEach(productList -> {
+            synchronized (productList) {
+                ProductItem productItem = (ProductItem) productList.getProduct();
+                productItem.setPictures(new FileDAO(true).getProductItemPictures(productItem.getId()));
+                productItem.setDefaultThumbnail(baseUrl);
+            }
+        });
     }
 }

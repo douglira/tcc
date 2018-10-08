@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-@WebServlet(name = "ProductHomepageController", urlPatterns = "/products/homepage")
+@WebServlet(name = "ProductHomepageController", urlPatterns = {"/products/homepage", "/products/homepage/search"})
 public class ProductHomepageController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     }
