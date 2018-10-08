@@ -5,7 +5,7 @@ new Vue({
       productItemPreview: null,
       product: {
         title: '',
-        price: null,
+        basePrice: null,
         availableQuantity: null,
         description: '',
         productItemId: null,
@@ -140,7 +140,7 @@ new Vue({
         productItemId,
         product: {
           title: this.product.title,
-          price: this.product.price,
+          basePrice: this.product.basePrice,
           availableQuantity: this.product.availableQuantity,
           description: this.product.description,
         }
@@ -217,7 +217,7 @@ new Vue({
     async resetData() {
       this.product = {
         title: '',
-        price: null,
+        basePrice: null,
         availableQuantity: null,
         description: null,
         productItemId: null,

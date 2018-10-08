@@ -83,13 +83,13 @@
 
                                     <div class="form-row d-flex justify-content-between align-bottom">
                                         <div class="form-group col-md-6">
-                                            <label for="price">Preço</label>
+                                            <label for="basePrice">Preço</label>
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text">R$</span>
                                                 </div>
-                                                <input class="form-control" type="number" id="price" name="price"
-                                                       step="0.01" min="0.01" v-model="product.price">
+                                                <input class="form-control" type="number" id="basePrice" name="basePrice"
+                                                       step="0.01" min="0.01" v-model="product.basePrice">
                                             </div>
                                         </div>
                                         <div class="form-group col-md-6">
@@ -137,7 +137,7 @@
                                                 </div>
                                                 <div class="price_content-product-item">
                                                     <p class="text-success">R$ {{
-                                                        productItemPreview.marketPrice.toFixed(2)
+                                                        productItemPreview.basePrice.toFixed(2)
                                                         }}</p>
                                                     <small class="text-muted">
                                                         Flutuação (R$)

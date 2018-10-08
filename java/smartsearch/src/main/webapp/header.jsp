@@ -46,6 +46,9 @@
 
 				<template v-if="username">
 					<button class="btn-notification">
+						<i class="fas fa-shopping-basket"></i>
+					</button>
+					<button class="btn-notification">
 						<i class="far fa-bell"></i>
 					</button>
 				</template>

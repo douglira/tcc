@@ -5,14 +5,9 @@ import java.util.ArrayList;
 import com.google.gson.annotations.Expose;
 import enums.Status;
 
-public class ProductItem {
+public class ProductItem extends ProductRepresentation {
 
-    private int id;
     private ArrayList<Product> basedProducts;
-    private String title;
-    private File thumbnail;
-    private ArrayList<File> pictures = new ArrayList<File>();
-    private double marketPrice;
     private double maxPrice;
     private double minPrice;
     private int viewsCount;
@@ -22,14 +17,6 @@ public class ProductItem {
 
     @Expose(deserialize = false, serialize = false)
     public static final int MAX_PICTURES = 15;
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getId() {
-        return id;
-    }
 
     public ArrayList<Product> getBasedProducts() {
         return basedProducts;
@@ -41,38 +28,6 @@ public class ProductItem {
 
     public void addBasedProduct(Product product) {
         this.basedProducts.add(product);
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public File getThumbnail() {
-        return thumbnail;
-    }
-
-    public void setThumbnail(File thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
-    public ArrayList<File> getPictures() {
-        return pictures;
-    }
-
-    public void setPictures(ArrayList<File> pictures) {
-        this.pictures = pictures;
-    }
-
-    public double getMarketPrice() {
-        return marketPrice;
-    }
-
-    public void setMarketPrice(double marketPrice) {
-        this.marketPrice = marketPrice;
     }
 
     public double getMaxPrice() {
@@ -127,32 +82,19 @@ public class ProductItem {
 
         for (Product product : this.basedProducts) {
 
-            if (product.getPrice() > maxPrice) {
-                maxPrice = product.getPrice();
+            if (product.getBasePrice() > maxPrice) {
+                maxPrice = product.getBasePrice();
             }
 
-            if (product.getPrice() < minPrice) {
-                minPrice = product.getPrice();
+            if (product.getBasePrice() < minPrice) {
+                minPrice = product.getBasePrice();
             }
 
-            sum += product.getPrice();
+            sum += product.getBasePrice();
         }
 
-        this.marketPrice = sum / this.basedProducts.size();
+        this.basePrice = sum / this.basedProducts.size();
         this.maxPrice = maxPrice;
         this.minPrice = minPrice;
-    }
-
-    public void setDefaultThumbnail(String baseUrlPath) {
-        if (this.pictures != null && !this.pictures.isEmpty()) {
-            this.thumbnail = this.pictures.get(this.pictures.size() - 1);
-            return;
-        }
-
-        File defaultThumbnail = new File();
-
-        defaultThumbnail.setName("picture-not-available");
-        defaultThumbnail.setUrlPath(baseUrlPath + "/assets/images/thumbnail-not-available.jpg");
-        this.thumbnail = defaultThumbnail;
     }
 }

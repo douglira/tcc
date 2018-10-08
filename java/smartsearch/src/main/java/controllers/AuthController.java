@@ -4,7 +4,6 @@ import dao.BuyerDAO;
 import dao.PersonDAO;
 import dao.SellerDAO;
 import dao.UserDAO;
-import enums.QuotesExpiration;
 import enums.Status;
 import enums.UserRoles;
 import models.Buyer;
@@ -19,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Hashtable;
 
 @WebServlet(urlPatterns = "/auth")
 public class AuthController extends HttpServlet {
@@ -35,6 +33,7 @@ public class AuthController extends HttpServlet {
 
         HttpSession session = request.getSession();
         session.removeAttribute("loggedUser");
+        session.removeAttribute("loggedPerson");
         response.sendRedirect("/");
     }
 
@@ -122,7 +121,7 @@ public class AuthController extends HttpServlet {
 
             Seller seller = new Seller();
             seller.setId(person.getId());
-            seller.setQuotesExpirationPeriod(QuotesExpiration.A_MONTH);
+            seller.setQuotesExpirationPeriod(30); // Default: 30 days
 
             SellerDAO sellerDao = new SellerDAO(buyerDao.getConnection());
             sellerDao.create(seller);

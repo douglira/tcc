@@ -24,12 +24,12 @@ public class ProductItemDAO extends GenericDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String sql = "INSERT INTO " + TABLE_NAME + " (title, views_count, relevance, "
-                + "market_price, max_price, min_price, status) VALUES (?, 0, 1, ?, ?, ?, CAST(? AS status_entity))";
+                + "base_price, max_price, min_price, status) VALUES (?, 0, 1, ?, ?, ?, CAST(? AS status_entity))";
 
         try {
             stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, productItem.getTitle());
-            stmt.setDouble(2, productItem.getMarketPrice());
+            stmt.setDouble(2, productItem.getBasePrice());
             stmt.setDouble(3, productItem.getMaxPrice());
             stmt.setDouble(4, productItem.getMinPrice());
             stmt.setString(5, productItem.getStatus().toString());
@@ -64,10 +64,12 @@ public class ProductItemDAO extends GenericDAO {
                 productItem.setTitle(rs.getString("title"));
                 productItem.setViewsCount(rs.getInt("views_count"));
                 productItem.setRelevance(rs.getInt("relevance"));
-                productItem.setMarketPrice(rs.getDouble("market_price"));
+                productItem.setBasePrice(rs.getDouble("base_price"));
                 productItem.setMaxPrice(rs.getDouble("max_price"));
                 productItem.setMinPrice(rs.getDouble("min_price"));
                 productItem.setStatus(Status.valueOf(rs.getString("status")));
+            } else {
+                productItem = null;
             }
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
@@ -88,12 +90,12 @@ public class ProductItemDAO extends GenericDAO {
 
     public void updatePricesAndRelevance(ProductItem productItem) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET market_price = ?, max_price = ?, min_price = ?, relevance = ? "
+        String sql = "UPDATE " + TABLE_NAME + " SET base_price = ?, max_price = ?, min_price = ?, relevance = ? "
                 + "WHERE id = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);
-            stmt.setDouble(1, productItem.getMarketPrice());
+            stmt.setDouble(1, productItem.getBasePrice());
             stmt.setDouble(2, productItem.getMaxPrice());
             stmt.setDouble(3, productItem.getMinPrice());
             stmt.setInt(4, productItem.getRelevance());

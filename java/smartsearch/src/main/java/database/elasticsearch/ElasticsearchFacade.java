@@ -36,7 +36,7 @@ public class ElasticsearchFacade {
         ProductItem productIndex = new ProductItem();
         productIndex.setTitle(productItem.getTitle());
         productIndex.setId(productItem.getId());
-        productIndex.setMarketPrice(productItem.getMarketPrice());
+        productIndex.setBasePrice(productItem.getBasePrice());
         productIndex.setMaxPrice(productItem.getMaxPrice());
         productIndex.setMinPrice(productItem.getMinPrice());
         productIndex.setRelevance(productItem.getRelevance());
@@ -48,7 +48,7 @@ public class ElasticsearchFacade {
         Gson gJson = new Gson();
         String productItemJson = gJson.toJson(productIndex);
 
-        IndexRequest indexRequest = new IndexRequest("product_items", "_doc", productIndex.getId().toString());
+        IndexRequest indexRequest = new IndexRequest("product_items", "_doc", String.valueOf(productIndex.getId()));
         indexRequest.source(productItemJson, XContentType.JSON);
 
         try {

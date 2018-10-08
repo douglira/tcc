@@ -52,11 +52,11 @@ header form input::placeholder {
 	justify-content: center;
 	align-items: center;
 	background-color: inherit;
-	padding: 10px;
+	padding: 5px;
 	border: 0;
 	font-size: 24px;
 	cursor: pointer;
-	margin: 10px;
+	margin: 5px;
 	color: #999;
 	border-radius: 50%;
 }

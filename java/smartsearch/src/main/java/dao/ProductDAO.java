@@ -25,7 +25,7 @@ public class ProductDAO extends GenericDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String sql = "INSERT INTO " + TABLE_NAME + " (seller_id, product_item_id, category_id, title, description, "
-                + "price, available_quantity, situation, status, sold_quantity, created_at) VALUES (?, ?, ?, ?, "
+                + "base_price, available_quantity, situation, status, sold_quantity, created_at) VALUES (?, ?, ?, ?, "
                 + "?, ?, ?, CAST( ? as product_situation), CAST( ? as status_entity), "
                 + "0, NOW())";
         try {
@@ -35,7 +35,7 @@ public class ProductDAO extends GenericDAO {
             stmt.setInt(3, product.getCategory().getId());
             stmt.setString(4, product.getTitle());
             stmt.setString(5, product.getDescription());
-            stmt.setDouble(6, product.getPrice());
+            stmt.setDouble(6, product.getBasePrice());
             stmt.setInt(7, product.getAvailableQuantity());
             stmt.setString(8, product.getSituation().toString());
             stmt.setString(9, product.getStatus().toString());
@@ -80,7 +80,7 @@ public class ProductDAO extends GenericDAO {
                 product.setCategory(category);
                 product.setTitle(rs.getString("title"));
                 product.setDescription(rs.getString("description"));
-                product.setPrice(rs.getDouble("price"));
+                product.setBasePrice(rs.getDouble("base_price"));
                 product.setSoldQuantity(rs.getInt("sold_quantity"));
                 product.setAvailableQuantity(rs.getInt("available_quantity"));
                 product.setSituation(ProductSituation.valueOf(rs.getString("situation")));
@@ -122,7 +122,7 @@ public class ProductDAO extends GenericDAO {
                 product.setId(rs.getInt("id"));
                 product.setTitle(rs.getString("title"));
                 product.setDescription(rs.getString("description"));
-                product.setPrice(rs.getDouble("price"));
+                product.setBasePrice(rs.getDouble("base_price"));
                 product.setSoldQuantity(rs.getInt("sold_quantity"));
                 product.setAvailableQuantity(rs.getInt("available_quantity"));
                 product.setStatus(Status.valueOf(rs.getString("status")));

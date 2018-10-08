@@ -48,7 +48,7 @@ public class ProductHomepageController extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("ProductHomepageController.doGet [ERROR]: " + e);
-            Helper.responseError(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
+            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
 
     }

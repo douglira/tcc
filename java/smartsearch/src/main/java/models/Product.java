@@ -1,35 +1,21 @@
 package models;
 
 import java.util.Calendar;
-import java.util.List;
 
 import enums.ProductSituation;
 import enums.Status;
 
-public class Product {
-	private int id;
+public class Product extends ProductRepresentation {
 	private Seller seller;
 	private ProductItem productItem;
 	private Category category;
-	private String title;
 	private String description;
-	private double price;
 	private int soldQuantity;
 	private int availableQuantity;
-	private File thumbnail;
-	private List<File> pictures;
 	private ProductSituation situation;
 	private Status status;
 	private Calendar createdAt;
 	private Calendar updatedAt;
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
 
 	public Seller getSeller() {
 		return seller;
@@ -55,28 +41,12 @@ public class Product {
 		this.category = category;
 	}
 
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
 	public String getDescription() {
 		return description;
 	}
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public double getPrice() {
-		return price;
-	}
-
-	public void setPrice(double price) {
-		this.price = price;
 	}
 
 	public int getSoldQuantity() {
@@ -93,22 +63,6 @@ public class Product {
 
 	public void setAvailableQuantity(int availableQuantity) {
 		this.availableQuantity = availableQuantity;
-	}
-	
-	public File getThumbnail() {
-		return thumbnail;
-	}
-	
-	public void setThumbnail(File thumbnail) {
-		this.thumbnail = thumbnail;
-	}
-
-	public List<File> getPictures() {
-		return pictures;
-	}
-
-	public void setPictures(List<File> pictures) {
-		this.pictures = pictures;
 	}
 	
 	public ProductSituation getSituation() {
@@ -149,18 +103,5 @@ public class Product {
 		} else {
 			this.status = Status.ACTIVE;
 		}
-	}
-
-	public void setDefaultThumbnail(String baseUrlPath) {
-		if (this.pictures != null && !this.pictures.isEmpty()) {
-			this.thumbnail = this.pictures.get(this.pictures.size() - 1);
-			return;
-		}
-
-		File defaultThumbnail = new File();
-
-		defaultThumbnail.setName("picture-not-available");
-		defaultThumbnail.setUrlPath(baseUrlPath + "/assets/images/thumbnail-not-available.jpg");
-		this.thumbnail = defaultThumbnail;
 	}
 }

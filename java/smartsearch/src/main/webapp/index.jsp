@@ -27,7 +27,7 @@
                 <div class="card-body card-body-product">
                     <a href="javascript: void(0)" class="card-body-product_primary--info text-muted">
                         <h3 class="text-secondary">{{ product.title }}</h3>
-                        <span class="text-success">R$ {{ product.marketPrice.toFixed(2) }}</span>
+                        <span class="text-success">R$ {{ product.basePrice.toFixed(2) }}</span>
                     </a>
                     <div class="card-body-product_secondary--info">
                         <div>
@@ -40,10 +40,10 @@
                             product.maxPrice.toFixed(2) }}
                         </small>
                     </div>
-                    <a role="button" aria-pressed="true"
+                    <button type="button" @click="onClickAddToPR(product)"
                        class="btn btn btn-outline-info btn-block btn-sm btn-product-details">
                         Adicionar ao pedido
-                    </a>
+                    </button>
                 </div>
             </div>
         </template>

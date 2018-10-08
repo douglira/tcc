@@ -15,7 +15,7 @@ public class Helper {
         return scheme + serverName + serverPort + contextPath;
     }
 
-    public static void responseError(PrintWriter out, Messenger msg) {
+    public static void responseMessage(PrintWriter out, Messenger msg) {
         Gson gJson = new Gson();
         out.print(gJson.toJson(msg));
         out.close();

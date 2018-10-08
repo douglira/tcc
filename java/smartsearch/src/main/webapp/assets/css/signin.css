@@ -71,7 +71,7 @@ small::after {
 	margin: 3px 0 10px 0;
 }
 
-.link-forgot_pass::hover {
+.link-forgot_pass:hover {
 	font-size: 13.5px;
 	color: #17a2b8 !important;
 }

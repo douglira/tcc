@@ -9,6 +9,19 @@ new Vue({
     this.loadData();
   },
   methods: {
+    onClickAddToPR(productItem) {
+      $.post(
+        '/purchase_request/new',
+        {
+          actionCreation: 'single',
+          productItemId: productItem.id,
+          productItemQuantity: 1,
+        }
+      )
+    },
+    showMessage(msg, topic = 'success') {
+      toastr[topic.toLowerCase()](msg);
+    },
     async loadData() {
       const response = await axios.get('/products/homepage');
       if (response.status !== 200) {
@@ -16,9 +29,6 @@ new Vue({
       }
 
       this.products = response.data;
-    },
-    showMessage(msg, topic = 'success') {
-      toastr[topic.toLowerCase()](msg);
     },
   },
 });

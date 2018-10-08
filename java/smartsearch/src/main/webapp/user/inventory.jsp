@@ -59,7 +59,7 @@
                 <div class="card-body card-body-product">
                     <div href="javascript: void(0)" class="card-body-product_primary--info">
                         <h3 class="text-secondary">{{ product.title }}</h3>
-                        <span class="text-success">R$ {{ product.price.toFixed(2) }}</span>
+                        <span class="text-success">R$ {{ product.basePrice.toFixed(2) }}</span>
                     </div>
                     <div class="card-body-product_secondary--info">
                         <small v-if="product.situation === 'LINKED'" class="text-muted">Vinculado</small>

@@ -123,7 +123,7 @@ public class PersonDataController extends HttpServlet {
 			out.close();
 		} catch(Exception e) {
 			e.printStackTrace();
-			Helper.responseError(out, new Messenger("Erro inesperado, tenta mais tarde", MessengerType.ERROR));
+			Helper.responseMessage(out, new Messenger("Erro inesperado, tenta mais tarde", MessengerType.ERROR));
 		}
 	}
 

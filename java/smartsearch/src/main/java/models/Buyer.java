@@ -5,5 +5,4 @@ import java.util.Calendar;
 
 public class Buyer extends Person {
 	private ArrayList<PurchaseRequest> purchaseRequest;
-	private Calendar createdAt;
 }

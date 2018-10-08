@@ -56,7 +56,7 @@ public class InventoryController extends HttpServlet {
         } catch (Exception error) {
             error.printStackTrace();
             System.out.println("InventoryController.doGet [ERROR]: " + error);
-            Helper.responseError(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
+            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
     }
 
@@ -167,7 +167,7 @@ public class InventoryController extends HttpServlet {
         } catch (Exception error) {
             error.printStackTrace();
             System.out.println("InventoryController.doPost [ERROR]: " + error);
-            Helper.responseError(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
+            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
     }
 
@@ -196,9 +196,9 @@ public class InventoryController extends HttpServlet {
     }
 
     private void createNewProductItem(ProductItem productItem, Product product, ProductItemDAO productItemDao) throws SQLException {
-        productItem.setMarketPrice(product.getPrice());
-        productItem.setMaxPrice(product.getPrice());
-        productItem.setMinPrice(product.getPrice());
+        productItem.setBasePrice(product.getBasePrice());
+        productItem.setMaxPrice(product.getBasePrice());
+        productItem.setMinPrice(product.getBasePrice());
 
         productItemDao.initTransaction();
         productItem = productItemDao.create(productItem);

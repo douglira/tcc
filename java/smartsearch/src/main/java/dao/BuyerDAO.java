@@ -25,6 +25,7 @@ public class BuyerDAO extends GenericDAO {
 		try {
 			stmt = this.conn.prepareStatement(sql);
 			stmt.setInt(1, buyer.getId());
+			stmt.execute();
 			
 		} catch (SQLException e) {
 			try {
