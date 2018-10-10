@@ -6,6 +6,14 @@ public class ProductList {
 	private int quantity;
 	private double subtotalAmount;
 
+	public ProductList() {
+
+	}
+
+	public ProductList(ProductRepresentation product) {
+		this.product = product;
+	}
+
 	public ProductRepresentation getProduct() {
 		return product;
 	}

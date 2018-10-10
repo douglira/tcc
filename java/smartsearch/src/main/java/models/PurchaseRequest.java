@@ -135,6 +135,11 @@ public class PurchaseRequest {
     }
 
     public void calculateDueDateAverage(ArrayList<Seller> sellers) {
+        if (sellers == null || sellers.isEmpty()) {
+            this.dueDateAverage = Calendar.getInstance();
+            return;
+        }
+
         List<Integer> days = sellers
                 .stream()
                 .mapToInt(Seller::getQuotesExpirationPeriod)
@@ -142,7 +147,12 @@ public class PurchaseRequest {
                 .boxed()
                 .collect(Collectors.toList());
 
-        int index = ((int) Math.ceil(days.size() / 2)) - 1;
+        int index;
+        if (days.size() == 1) {
+            index = 0;
+        } else {
+            index = ((int) Math.ceil(days.size() / 2)) - 1;
+        }
         int daysResult = days.get(index);
 
         Calendar dueDateAverage = Calendar.getInstance();

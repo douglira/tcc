@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class ProductListDAO extends GenericDAO {
-    private static final String TABLE_PIVOT_PR = "pr_products";
+    private static final String TABLE_NAME = "pr_products";
     private static final String TABLE_RELATION_PI = "product_items";
 
     public ProductListDAO(boolean getConnection) {
@@ -24,7 +24,7 @@ public class ProductListDAO extends GenericDAO {
 
     public void attachPurchaseRequest(int purchaseRequestId, ProductList productList) {
         PreparedStatement stmt = null;
-        String sql = "INSERT INTO " + TABLE_PIVOT_PR + " (purchase_request_id, product_item_id, " +
+        String sql = "INSERT INTO " + TABLE_NAME + " (purchase_request_id, product_item_id, " +
                 "quantity, additional_spec) VALUES (?, ?, ?, ?)";
 
         try {
@@ -62,7 +62,7 @@ public class ProductListDAO extends GenericDAO {
 
     public boolean validateProductInsertion(int purchaseRequestId, ProductList productList) {
         PreparedStatement stmt = null;
-        String sql = "SELECT * FROM " + TABLE_PIVOT_PR + " WHERE purchase_request_id = ? AND product_item_id = ?";
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE purchase_request_id = ? AND product_item_id = ?";
         boolean isValid = false;
 
         try {
@@ -79,7 +79,7 @@ public class ProductListDAO extends GenericDAO {
                     this.conn.close();
                 } catch (SQLException err) {
                     err.printStackTrace();
-                    System.out.println("ProductListDAO.validateProductInsertion [ERROR](1): " + err);
+                    System.out.println("ProductListDAO.validateProductInsertion [ERROR](2): " + err);
                 }
             }
         }
@@ -90,8 +90,8 @@ public class ProductListDAO extends GenericDAO {
     public ArrayList<ProductList> findByPurchaseRequest(int purchaseRequestId) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        String sql = "SELECT * FROM " + TABLE_PIVOT_PR + " INNER JOIN " + TABLE_RELATION_PI +
-                " ON " + TABLE_PIVOT_PR + ".product_item_id = " + TABLE_RELATION_PI + ".id" +
+        String sql = "SELECT * FROM " + TABLE_NAME + " INNER JOIN " + TABLE_RELATION_PI +
+                " ON " + TABLE_NAME + ".product_item_id = " + TABLE_RELATION_PI + ".id" +
                 " WHERE purchase_request_id = ?";
         ArrayList<ProductList> products = new ArrayList<ProductList>();
 
@@ -115,11 +115,30 @@ public class ProductListDAO extends GenericDAO {
                     this.conn.close();
                 } catch (SQLException err) {
                     err.printStackTrace();
-                    System.out.println("ProductListDAO.findByPurchaseRequest [ERROR](1): " + err);
+                    System.out.println("ProductListDAO.findByPurchaseRequest [ERROR](2): " + err);
                 }
             }
         }
 
         return products;
+    }
+
+    public void updateQuantityAndSpec(int purchaseRequestId, ProductList productList) {
+        PreparedStatement stmt = null;
+        String sql = "UPDATE " + TABLE_NAME + " SET quantity = ?, additional_spec = ? " +
+                "WHERE purchase_request_id = ? AND product_item_id = ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, productList.getQuantity());
+            stmt.setString(2, productList.getAdditionalSpec());
+            stmt.setInt(3, purchaseRequestId);
+            stmt.setInt(4, productList.getProduct().getId());
+            stmt.execute();
+            this.conn.commit();
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("ProductListDAO.updateQuantityAndSpec [ERROR](1): " + err);
+        }
     }
 }

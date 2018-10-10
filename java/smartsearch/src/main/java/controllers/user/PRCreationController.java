@@ -1,4 +1,4 @@
-package controllers;
+package controllers.user;
 
 import com.google.gson.Gson;
 import controllers.socket.PRCreationSocket;
@@ -35,10 +35,7 @@ public class PRCreationController extends HttpServlet {
             User user = (User) session.getAttribute("loggedUser");
             Person person = (Person) session.getAttribute("loggedPerson");
 
-            if (person == null || person.getId() <= 0) {
-                Helper.responseMessage(out, new Messenger("Realize o login ou crie uma conta para montar seu pedido de compra.", MessengerType.WARNING, "WARNING_MISSING_LOGGED_USER"));
-                return;
-            }
+            if (!isAuthenticated(response, person)) return;
 
             user.setPerson(person);
 
@@ -87,7 +84,7 @@ public class PRCreationController extends HttpServlet {
         productItem = new ProductItemDAO(true).findById(productItem);
 
         if (productItem == null) {
-            Helper.responseMessage(out, new Messenger("Produto inexistente na base de dados.", MessengerType.WARNING));
+            Helper.responseMessage(out, new Messenger("Produto não encontrado.", MessengerType.WARNING));
             return;
         }
         productList.setProduct(productItem);
@@ -149,7 +146,7 @@ public class PRCreationController extends HttpServlet {
 
         user.setPerson(null);
         PRCreation prCreation = new PRCreation(user, purchaseRequest);
-        PRCreationSocket.sendPurchaseRequestUpdated(prCreation);
+        PRCreationSocket.sendPurchaseRequestUpdated(prCreation, baseUrl);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -160,6 +157,9 @@ public class PRCreationController extends HttpServlet {
         try {
             HttpSession session = request.getSession();
             Person person = (Person) session.getAttribute("loggedPerson");
+
+            if (!isAuthenticated(response, person)) return;
+
             Buyer buyer = new Buyer();
             buyer.setId(person.getId());
 
@@ -197,5 +197,15 @@ public class PRCreationController extends HttpServlet {
                 productItem.setDefaultThumbnail(baseUrl);
             }
         });
+    }
+
+    private boolean isAuthenticated(HttpServletResponse response, Person person) throws IOException {
+        if (person == null || person.getId() <= 0) {
+            response.setStatus(401);
+            PrintWriter out = response.getWriter();
+            Helper.responseMessage(out, new Messenger("Realize o login ou crie uma conta para montar seu pedido de compra.", MessengerType.WARNING, "WARNING_MISSING_LOGGED_USER"));
+            return false;
+        }
+        return true;
     }
 }

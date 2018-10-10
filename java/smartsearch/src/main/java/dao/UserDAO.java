@@ -134,7 +134,7 @@ public class UserDAO extends GenericDAO {
 
     public void setPasswordResetToken(User user) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET password_reset_token = ?, password_expires_in = ? WHERE email = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET password_reset_token = ?, password_expires_in = ?, updated_at = NOW() WHERE email = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);
@@ -200,7 +200,7 @@ public class UserDAO extends GenericDAO {
     public void updateResetPassword(User user) {
         PreparedStatement stmt = null;
         String sql = "UPDATE " + TABLE_NAME
-                + " SET password_reset_token = NULL, password_expires_in = NULL, password = ? WHERE id = ?";
+                + " SET password_reset_token = NULL, password_expires_in = NULL, password = ?, updated_at = NOW() WHERE id = ?";
 
         try {
             stmt = conn.prepareStatement(sql);
@@ -225,7 +225,7 @@ public class UserDAO extends GenericDAO {
 
     public void updateDisplayName(User user) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET display_name = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET display_name = ?, updated_at = NOW() WHERE id = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);

@@ -22,8 +22,8 @@ public class PurchaseRequestDAO extends GenericDAO {
     public PurchaseRequest create(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        String sql = "INSERT INTO " + TABLE_NAME + " (buyer_id, stage, additional_data, due_date_average, " +
-                "total_amount, views_count, propagation_count, created_at) VALUES (?, CAST(? AS pr_stage), ?, ?, ?, ?, ?, NOW())";
+        String sql = "INSERT INTO " + TABLE_NAME + " (id, buyer_id, stage, additional_data, due_date_average, " +
+                "total_amount, views_count, propagation_count, created_at) VALUES (nextval('pr_sequence'), ?, CAST(? AS pr_stage), ?, ?, ?, ?, ?, NOW())";
         try {
             stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             stmt.setInt(1, purchaseRequest.getBuyer().getId());
@@ -83,6 +83,36 @@ public class PurchaseRequestDAO extends GenericDAO {
         return purchaseRequest;
     }
 
+    public PurchaseRequest findById(PurchaseRequest purchaseRequest) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, purchaseRequest.getId());
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                purchaseRequest = this.fetch(rs, purchaseRequest);
+            }
+        } catch (SQLException sqlError) {
+            sqlError.printStackTrace();
+            System.out.println("PurchaseRequestDAO.findById [ERROR](1): " + sqlError);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException sqlError) {
+                    sqlError.printStackTrace();
+                    System.out.println("PurchaseRequestDAO.findById [ERROR](2): " + sqlError);
+                }
+            }
+        }
+
+        return purchaseRequest;
+    }
+
     public ArrayList<PurchaseRequest> findByStageAndBuyer(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -120,7 +150,7 @@ public class PurchaseRequestDAO extends GenericDAO {
 
     public void updatePropagation(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET propagation_count = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET propagation_count = ?, updated_at = NOW() WHERE id = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);
@@ -135,7 +165,7 @@ public class PurchaseRequestDAO extends GenericDAO {
 
     public void updateDueDate(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET due_date_average = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET due_date_average = ?, updated_at = NOW() WHERE id = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);
@@ -145,6 +175,27 @@ public class PurchaseRequestDAO extends GenericDAO {
         } catch (SQLException err) {
             err.printStackTrace();
             System.out.println("PurchaseRequestDAO.updateDueDate [ERROR]: " + err);
+        }
+    }
+
+    public void updateTotalAmount(PurchaseRequest purchaseRequest) {
+        PreparedStatement stmt = null;
+        String sql = "UPDATE " + TABLE_NAME + " SET total_amount = ?, updated_at = NOW() WHERE id = ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setDouble(1, purchaseRequest.getTotalAmount());
+            stmt.setInt(2, purchaseRequest.getId());
+            stmt.execute();
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("PurchaseRequestDAO.updateDueDate [ERROR](1): " + err);
+            try {
+                this.conn.rollback();
+            } catch (SQLException error) {
+                error.printStackTrace();
+                System.out.println("PurchaseRequestDAO.updateDueDate [ERROR](2): " + error);
+            }
         }
     }
 }

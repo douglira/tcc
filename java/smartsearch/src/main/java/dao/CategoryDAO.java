@@ -198,7 +198,7 @@ public class CategoryDAO extends GenericDAO {
 
 	public void saveDetails(Category category) {
 		PreparedStatement stmt = null;
-		String sql = "UPDATE " + TABLE_NAME + " SET title = ?, description = ? WHERE id = ?";
+		String sql = "UPDATE " + TABLE_NAME + " SET title = ?, description = ?, updated_at = NOW() WHERE id = ?";
 
 		try {
 			stmt = this.conn.prepareStatement(sql);

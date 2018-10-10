@@ -32,7 +32,7 @@ DECLARE
   returnedId integer;
   rowSelect record;
 BEGIN
-  UPDATE categories SET status = categoryStatus WHERE id = categoryId RETURNING id INTO returnedId;
+  UPDATE categories SET status = categoryStatus, updated_at = NOW() WHERE id = categoryId RETURNING id INTO returnedId;
   
   IF returnedId > 0 THEN
     FOR rowSelect IN SELECT id FROM categories WHERE parent_id = returnedId

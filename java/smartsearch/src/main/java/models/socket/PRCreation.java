@@ -11,6 +11,10 @@ public class PRCreation {
 
     }
 
+    public PRCreation(User to) {
+        this.to = to;
+    }
+
     public PRCreation(User to, PurchaseRequest purchaseRequest) {
         this.to = to;
         this.purchaseRequest = purchaseRequest;
