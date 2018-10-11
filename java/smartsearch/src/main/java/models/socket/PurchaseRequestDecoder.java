@@ -1,12 +1,13 @@
 package models.socket;
 
 import com.google.gson.Gson;
+import models.PurchaseRequest;
 
 import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
-public class PRCreationDecoder implements Decoder.Text<PRCreation> {
+public class PurchaseRequestDecoder implements Decoder.Text<PurchaseRequest> {
     
     private static Gson gson = new Gson();
     
@@ -16,8 +17,8 @@ public class PRCreationDecoder implements Decoder.Text<PRCreation> {
     }
 
     @Override
-    public PRCreation decode(String payload) throws DecodeException {
-        return gson.fromJson(payload, PRCreation.class);
+    public PurchaseRequest decode(String payload) throws DecodeException {
+        return gson.fromJson(payload, PurchaseRequest.class);
     }
 
     @Override

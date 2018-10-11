@@ -95,6 +95,8 @@ public class PurchaseRequestDAO extends GenericDAO {
 
             if (rs.next()) {
                 purchaseRequest = this.fetch(rs, purchaseRequest);
+            } else {
+                purchaseRequest = null;
             }
         } catch (SQLException sqlError) {
             sqlError.printStackTrace();
@@ -195,6 +197,36 @@ public class PurchaseRequestDAO extends GenericDAO {
             } catch (SQLException error) {
                 error.printStackTrace();
                 System.out.println("PurchaseRequestDAO.updateDueDate [ERROR](2): " + error);
+            }
+        }
+    }
+
+    public void destroy(int purchaseRequestId) {
+        PreparedStatement stmt = null;
+        String sql = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, purchaseRequestId);
+            stmt.execute();
+            this.conn.commit();
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("PurchaseRequestDAO.destroy [ERROR](1): " + err);
+            try {
+                this.conn.rollback();
+            } catch (SQLException error) {
+                error.printStackTrace();
+                System.out.println("PurchaseRequestDAO.destroy [ERROR](2): " + error);
+            }
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException err) {
+                    err.printStackTrace();
+                    System.out.println("PurchaseRequestDAO.destroy [ERROR](3): " + err);
+                }
             }
         }
     }

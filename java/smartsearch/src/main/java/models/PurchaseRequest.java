@@ -5,10 +5,11 @@ import enums.PRStage;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PurchaseRequest {
-    private int id;
+    private Integer id;
     private Buyer buyer;
     private ArrayList<ProductList> listProducts = new ArrayList<ProductList>();
     private ArrayList<Quote> quotes;
@@ -22,11 +23,11 @@ public class PurchaseRequest {
     private Calendar updatedAt;
     private Calendar closedAt;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -158,5 +159,18 @@ public class PurchaseRequest {
         Calendar dueDateAverage = Calendar.getInstance();
         dueDateAverage.add(Calendar.DAY_OF_YEAR, daysResult);
         this.dueDateAverage = dueDateAverage;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PurchaseRequest that = (PurchaseRequest) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

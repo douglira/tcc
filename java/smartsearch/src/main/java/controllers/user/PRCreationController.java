@@ -1,13 +1,12 @@
 package controllers.user;
 
 import com.google.gson.Gson;
-import controllers.socket.PRCreationSocket;
+import controllers.socket.PurchaseRequestSocket;
 import dao.*;
 import enums.MessengerType;
 import enums.PRStage;
 import libs.Helper;
 import models.*;
-import models.socket.PRCreation;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -20,7 +19,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-@WebServlet(name = "PRCreationController", urlPatterns = {"/purchase_request/new"})
+@WebServlet(name = "PRCreationController", urlPatterns = {"/purchase_request/new", "/account/purchase_request/new"})
 public class PRCreationController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -29,8 +28,6 @@ public class PRCreationController extends HttpServlet {
         Messenger msg;
 
         try {
-            String action = request.getParameter("actionCreation");
-
             HttpSession session = request.getSession();
             User user = (User) session.getAttribute("loggedUser");
             Person person = (Person) session.getAttribute("loggedPerson");
@@ -39,34 +36,29 @@ public class PRCreationController extends HttpServlet {
 
             user.setPerson(person);
 
-            if (action == null || action.equals("single")) {
-                String productItemId = request.getParameter("productItemId");
-                String productItemQuantity = request.getParameter("productItemQuantity");
-                String productItemAdditionalSpec = request.getParameter("productItemAdditionalSpec");
 
-                if (productItemId == null || productItemId.length() == 0) {
-                    Helper.responseMessage(out, new Messenger("Operação inválida.", MessengerType.ERROR));
-                    return;
-                }
-                ProductItem productItem = new ProductItem();
-                productItem.setId(Integer.parseInt(productItemId));
+            String productItemId = request.getParameter("productItemId");
+            String productItemQuantity = request.getParameter("productItemQuantity");
+            String productItemAdditionalSpec = request.getParameter("productItemAdditionalSpec");
 
-                ProductList productList = new ProductList();
-                productList.setAdditionalSpec(productItemAdditionalSpec);
-                productList.setProduct(productItem);
-                if (productItemQuantity != null && productItemQuantity.length() > 0) {
-                    productList.setQuantity(Integer.parseInt(productItemQuantity));
-                } else {
-                    productList.setQuantity(0);
-                }
-
-                singleCreation(out, Helper.getBaseUrl(request), user, productList);
+            if (productItemId == null || productItemId.length() == 0) {
+                Helper.responseMessage(out, new Messenger("Operação inválida.", MessengerType.ERROR));
                 return;
-            } else if (action.equals("bulk")) {
-                // bulk creation
+            }
+            ProductItem productItem = new ProductItem();
+            productItem.setId(Integer.parseInt(productItemId));
+
+            ProductList productList = new ProductList();
+            productList.setAdditionalSpec(productItemAdditionalSpec);
+            productList.setProduct(productItem);
+
+            if (productItemQuantity != null && productItemQuantity.length() > 0) {
+                productList.setQuantity(Integer.parseInt(productItemQuantity));
+            } else {
+                productList.setQuantity(0);
             }
 
-            out.close();
+            addProductItem(out, Helper.getBaseUrl(request), user, productList);
         } catch (Exception error) {
             error.printStackTrace();
             System.out.println("PRCreationController.doPost [ERROR]: " + error);
@@ -74,7 +66,7 @@ public class PRCreationController extends HttpServlet {
         }
     }
 
-    private void singleCreation(PrintWriter out, String baseUrl, User user, ProductList productList) throws SQLException {
+    private void addProductItem(PrintWriter out, String baseUrl, User user, ProductList productList) throws SQLException {
         Gson gJson = new Gson();
 
         Buyer buyer = new Buyer();
@@ -117,6 +109,7 @@ public class PRCreationController extends HttpServlet {
             }
             ArrayList<ProductList> products = new ProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
             products.add(productList);
+            products.sort(ProductList::compareTo);
             purchaseRequest.setListProducts(products);
             purchaseRequest.calculateAmount();
 
@@ -145,48 +138,7 @@ public class PRCreationController extends HttpServlet {
         purchaseRequest.setListProducts(products);
 
         user.setPerson(null);
-        PRCreation prCreation = new PRCreation(user, purchaseRequest);
-        PRCreationSocket.sendPurchaseRequestUpdated(prCreation, baseUrl);
-    }
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        Gson gJson = new Gson();
-
-        try {
-            HttpSession session = request.getSession();
-            Person person = (Person) session.getAttribute("loggedPerson");
-
-            if (!isAuthenticated(response, person)) return;
-
-            Buyer buyer = new Buyer();
-            buyer.setId(person.getId());
-
-            PurchaseRequest purchaseRequest = new PurchaseRequest();
-            purchaseRequest.setBuyer(buyer);
-            purchaseRequest.setStage(PRStage.CREATION);
-
-            ArrayList<PurchaseRequest> prs = new PurchaseRequestDAO(true).findByStageAndBuyer(purchaseRequest);
-            if (prs != null && !prs.isEmpty()) {
-                purchaseRequest = prs.get(0);
-
-                ArrayList<ProductList> products = new ProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
-                fetchPictures(products, Helper.getBaseUrl(request));
-
-                purchaseRequest.setListProducts(products);
-                purchaseRequest.calculateAmount();
-            } else {
-                purchaseRequest = null;
-            }
-
-            out.print(gJson.toJson(purchaseRequest));
-            out.close();
-        } catch (Exception err) {
-            err.printStackTrace();
-            System.out.println("PRCreationController.doGet [ERROR]: " + err);
-            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
-        }
+        PurchaseRequestSocket.sendUpdatedPRCreation(user, purchaseRequest, baseUrl);
     }
 
     private void fetchPictures(ArrayList<ProductList> products, String baseUrl) {
@@ -207,5 +159,30 @@ public class PRCreationController extends HttpServlet {
             return false;
         }
         return true;
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            String purchaseRequestId = request.getParameter("pr");
+
+            if (purchaseRequestId == null || purchaseRequestId.length() < 4) {
+                response.sendRedirect(request.getContextPath() + "/");
+                return;
+            }
+
+            PurchaseRequest purchaseRequest = new PurchaseRequest();
+            purchaseRequest.setId(Integer.parseInt(purchaseRequestId));
+            purchaseRequest = new PurchaseRequestDAO(true).findById(purchaseRequest);
+
+            if (purchaseRequest == null) {
+                response.sendRedirect(request.getContextPath() + "/");
+                return;
+            }
+
+            request.getRequestDispatcher(request.getContextPath() + "/user/purchase-request-creation.jsp").forward(request, response);
+        } catch (Exception err) {
+            err.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/");
+        }
     }
 }

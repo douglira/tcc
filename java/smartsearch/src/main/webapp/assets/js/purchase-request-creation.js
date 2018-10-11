@@ -18,6 +18,16 @@ const VueComponent = new Vue({
     await this.loadData();
     this.wsPurchaseRequestUpdate();
   },
+  mounted() {
+    $('#propagationPopover').popover({
+      trigger: 'focus'
+    });
+  },
+  computed: {
+    dueDateAverage() {
+      return Formatter.getDate(this.purchaseRequest.dueDateAverage)
+    }
+  },
   methods: {
     onClickEditProduct(productList) {
       this.modalData = {
@@ -28,6 +38,25 @@ const VueComponent = new Vue({
       };
       $('#modalProductItemEdit').modal('show');
     },
+    onClickRemoveProduct(productList) {
+      this.modalData = {
+        productItemId: productList.product.id,
+        productItemTitle: productList.product.title,
+      };
+      $('#modalProductItemRemove').modal('show');
+    },
+    confirmRemove(productList) {
+      $.post(
+        '/account/purchase_request/edit?action=remove',
+        {
+          purchaseRequestId: this.purchaseRequest.id,
+          productItemId: this.modalData.productItemId,
+        }
+      )
+        .always(() => {
+          $('#modalProductItemRemove').modal('hide');
+        })
+    },
     saveEditProduct() {
       const payload = {
         quantity: this.modalData.quantity,
@@ -35,36 +64,48 @@ const VueComponent = new Vue({
       };
 
       $.post(
-        '/account/purchase_request/edit',
+        '/account/purchase_request/edit?action=update',
         {
           purchaseRequestId: this.purchaseRequest.id,
           productItemId: this.modalData.productItemId,
           productList: JSON.stringify(payload),
         }
       )
-        .done(res => {
-          console.log(res);
-        })
         .always(() => {
           $('#modalProductItemEdit').modal('hide');
         })
     },
     wsPurchaseRequestUpdate() {
-      const wsPurchaseRequest = new WebSocket(`ws://localhost:8080/purchase_request/creation/${this.username}`);
+      const wsPurchaseRequest = new WebSocket(`ws://localhost:8080/account/purchase_request/${this.username}`);
       wsPurchaseRequest.onmessage = (event) => {
-        const payload = JSON.parse(event.data);
+        const purchaseRequest = JSON.parse(event.data);
 
-        this.purchaseRequest = payload.purchaseRequest;
+        if (purchaseRequest.id && purchaseRequest.stage === 'CREATION') {
+          this.purchaseRequest = purchaseRequest;
+        } else {
+          window.location.replace('/');
+          this.purchaseRequest = null;
+        }
       }
     },
     async loadData() {
-      const response = await axios.get('/purchase_request/new');
+      const response = await axios.get('/account/purchase_request/edit');
       this.purchaseRequest = response.data;
     },
   },
 });
 
 $('#modalProductItemEdit').on('hidden.bs.modal', () => {
+  VueComponent.$root.modalData = {
+    productItemId: null,
+    productItemTitle: '',
+    quantity: null,
+    additionalSpec: null,
+  };
+});
+
+
+$('#modalProductItemRemove').on('hidden.bs.modal', () => {
   VueComponent.$root.modalData = {
     productItemId: null,
     productItemTitle: '',

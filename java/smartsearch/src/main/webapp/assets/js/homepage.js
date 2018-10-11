@@ -13,7 +13,6 @@ new Vue({
       $.post(
         '/purchase_request/new',
         {
-          actionCreation: 'single',
           productItemId: productItem.id,
           productItemQuantity: 1,
         },

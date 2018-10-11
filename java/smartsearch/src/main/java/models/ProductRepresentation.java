@@ -3,17 +3,17 @@ package models;
 import java.util.ArrayList;
 
 public abstract class ProductRepresentation {
-    protected int id;
+    protected Integer id;
     protected String title;
     protected double basePrice;
     protected File thumbnail;
     protected ArrayList<File> pictures;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

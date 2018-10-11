@@ -22,7 +22,7 @@ new Vue({
 	methods: {
 		async loadPurchaseRequest() {
 				try {
-          const response = await axios.get('/purchase_request/new');
+          const response = await axios.get('/account/purchase_request/edit');
           if (response.status === 200) {
             this.purchaseRequest = response.data;
           }
@@ -36,7 +36,7 @@ new Vue({
 		initializeConnection() {
 			const wsNotify = new WebSocket(`ws://localhost:8080/notify/${this.username}`);
 			wsNotify.onmessage = this.handleNotification;
-			const wsPurchaseRequest = new WebSocket(`ws://localhost:8080/purchase_request/creation/${this.username}`)
+			const wsPurchaseRequest = new WebSocket(`ws://localhost:8080/account/purchase_request/${this.username}`);
       wsPurchaseRequest.onmessage = this.handlePurchaseRequestCreation
 		},
 		handleNotification(event) {
@@ -46,9 +46,13 @@ new Vue({
 			console.log(notification);
 		},
     handlePurchaseRequestCreation(event) {
-		  const payload = JSON.parse(event.data);
+		  const purchaseRequest = JSON.parse(event.data);
 
-		  this.purchaseRequest = payload.purchaseRequest;
+			if (!purchaseRequest.id) {
+				this.purchaseRequest = null;
+			}
+
+		  this.purchaseRequest = purchaseRequest;
     }
 	}
 });

@@ -1,4 +1,4 @@
-const HelperFunctions = {
+const Formatter = {
   getDate(calendar) {
     return new Date(
       calendar.year,
@@ -7,6 +7,6 @@ const HelperFunctions = {
       calendar.hourOfDay,
       calendar.minute,
       calendar.second,
-    )
+    ).toLocaleDateString()
   },
 };

@@ -106,7 +106,7 @@
                                 <ul class="list-group list-group-flush pr-header-container">
                                     <h6
                                         style="display: flex !important; justify-content: space-between !important; align-items: center !important;"
-                                        class="text-info dropdown-header text-justify d-flex align-items-center justify-content-center">
+                                        class="text-info dropdown-header text-justify d-flex align-items-center justify-content-center text-uppercase">
                                         Abrangência
                                         &nbsp;
                                         <span :class="['badge', 'text-white', purchaseRequest.propagationCount <= 1 ? 'badge-danger' : 'badge-info']">
@@ -123,7 +123,7 @@
                                         <div class="pr-header-item-title text-muted">{{ prItem.product.title }}</div>
                                     </li>
                                     <a class="dropdown-item text-center text-danger p-3 p-sm-3 p-md-3 p-lg-3"
-                                       href="/account/purchase_request/new">Ver pedido</a>
+                                       :href="'/account/purchase_request/new?pr=' + purchaseRequest.id">Ver pedido</a>
                                 </ul>
                             </template>
                             <template v-else>

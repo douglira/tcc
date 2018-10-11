@@ -1,12 +1,13 @@
 package models.socket;
 
 import com.google.gson.Gson;
+import models.PurchaseRequest;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
-public class PRCreationEncoder implements Encoder.Text<PRCreation> {
+public class PurchaseRequestEncoder implements Encoder.Text<PurchaseRequest> {
     private static Gson gson = new Gson();
 
     @Override
@@ -20,7 +21,7 @@ public class PRCreationEncoder implements Encoder.Text<PRCreation> {
     }
 
     @Override
-    public String encode(PRCreation prCreation) throws EncodeException {
-        return gson.toJson(prCreation);
+    public String encode(PurchaseRequest payload) throws EncodeException {
+        return gson.toJson(payload);
     }
 }

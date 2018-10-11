@@ -1,6 +1,8 @@
 package models;
 
-public class ProductList {
+import java.util.Objects;
+
+public class ProductList implements Comparable{
 	private ProductRepresentation product;
 	private String additionalSpec;
 	private int quantity;
@@ -45,4 +47,23 @@ public class ProductList {
 	public void calculateAmount() {
         this.subtotalAmount = this.product.basePrice * this.quantity;
     }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		ProductList that = (ProductList) o;
+		return Objects.equals(product.getId(), that.product.getId());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(product);
+	}
+
+	@Override
+	public int compareTo(Object o) {
+		ProductList pl = (ProductList) o;
+		return pl.getProduct().getId().compareTo(pl.getProduct().getId());
+	}
 }

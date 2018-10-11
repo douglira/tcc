@@ -54,6 +54,32 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalProductItemRemove" tabindex="-1" role="dialog" aria-labelledby="modalProductItemRemove" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-info">{{ modalData.productItemTitle }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form @submit.prevent="confirmRemove">
+                    <div class="modal-body">
+                        <div class="d-flex align-item-center text-muted">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 20px;"></i>
+                            &nbsp;
+                            <p>Remover este produto?</p>
+                        </div>
+                        <div class="modal-footer d-flex justify-content-between">
+                            <button type="button" class="btn btn-light text-muted" data-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">Remover</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div class="card border-light mb-sm-3 mb-md-3">
         <div class="card-body">
             <h1 class="card-title text-muted text-uppercase">Pedido de Compra&nbsp;&#45;&nbsp;N&#176;<i>{{ purchaseRequest.id }}</i></h1>
@@ -63,7 +89,17 @@
     <div class="card border-light mb-sm-3 mb-md-3">
         <div class="card-body">
             <p class="text-dark pr-propagation-text">
-                <i class="far fa-question-circle text-dark pr-propagation-icon"></i>
+                <a
+                    id="propagationPopover"
+                    tabindex="0"
+                    role="button"
+                    data-toggle="popover"
+                    data-trigger="focus"
+                    title="Abrangência?"
+                    data-content="Este é o número de fornecedores que possuem os items especificados em estoque. Ao lançar este pedido de compra uma notificação será enviada a eles, portanto quanto maior este número maior serão as chances de concluir um orçamento."
+                    href="javascript:void(0)">
+                    <i class="far fa-question-circle text-dark pr-propagation-icon"></i>
+                </a>
                 &nbsp;
                 Abrangência atual
                 &nbsp;
@@ -82,12 +118,24 @@
                         <span class="text-muted">{{ productList.product.title }}</span>
                         <span class="text-success pr-item-price">R$ {{ productList.product.basePrice.toFixed(2) }}</span>
                     </div>
-                    <p class="pr-item-quantity text-secondary">Qtd.&nbsp;{{ productList.quantity }}</p>
+                    <p class="pr-item-quantity text-secondary">
+                        Qtd.
+                        &nbsp;
+                        <strong>{{ productList.quantity }}</strong>
+                    </p>
                     <button type="button" class="text-info pr-item-edit_button" @click="onClickEditProduct(productList)">
-                        <i class="far fa-edit"></i>
+                        <i class="fas fa-pen-square"></i>
+                    </button>
+                    <button type="button" class="text-danger pr-item-edit_button" @click="onClickRemoveProduct(productList)">
+                        <i class="fas fa-times"></i>
                     </button>
                 </li>
             </ul>
+            <div class="pr-total_amount">
+                Total:
+                &nbsp;
+                <span class="text-success">R$&nbsp;{{ purchaseRequest.totalAmount.toFixed(2) }}</span>
+            </div>
         </div>
     </div>
 </div>
