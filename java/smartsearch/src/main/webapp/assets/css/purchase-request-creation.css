@@ -1,15 +1,58 @@
-.pr-propagation-icon {
+.page-title {
+    flex: 1;
+    text-transform: uppercase;
     font-size: 28px;
+}
+
+.pr-created_at {
+    font-size: 14px;
+    text-transform: initial !important;
+}
+
+.pr-btn-delete {
+    font-size: 32px;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    border: 0;
+    background-color: inherit;
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+    margin-right: 20px;
+}
+
+.pr-btn-delete:hover {
+    transform: scale(1.2);
+}
+
+.pr-propagation-icon {
+    font-size: 20px;
     cursor: pointer;
 }
 
 .pr-propagation-text {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    align-items: baseline;
     font-weight: 500;
     font-size: 18px;
     text-transform: uppercase;
+    padding: 30px 0;
+    -webkit-animation: pulsate-bck 1.75s ease-in-out infinite both;
+    animation: pulsate-bck 1.75s ease-in-out infinite both;
+}
+
+.pr-propagation-count {
+    border-radius: 50%;
+    font-size: 20px;
+    padding: 3px;
+    min-width: 32px;
+    min-height: 32px;
+    height: auto;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
 }
 
 .pr-propagation-text span {
@@ -55,20 +98,22 @@
     box-sizing: border-box;
 }
 
-.pr-item-edit_button {
+.pr-item-actions {
     font-size: 24px;
     padding: 5px;
     border: 0;
     background-color: inherit;
     cursor: pointer;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
     margin-left: 10px;
+    -webkit-transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -ms-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
 }
 
-.pr-item-edit_button:hover {
-    background-color: #e1e1e1;
+.pr-item-actions:hover {
+    transform: scale(1.2);
 }
 
 .pr-total_amount {
@@ -78,4 +123,39 @@
     font-weight: 600;
     font-size: 20px;
     margin: 20px 0;
+    text-transform: uppercase;
+}
+
+.btn-publish {
+    padding: 30px auto !important;
+}
+
+@-webkit-keyframes pulsate-bck {
+    0% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+    50% {
+        -webkit-transform: scale(0.9);
+        transform: scale(0.9);
+    }
+    100% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+}
+
+@keyframes pulsate-bck {
+    0% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+    50% {
+        -webkit-transform: scale(0.9);
+        transform: scale(0.9);
+    }
+    100% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
 }

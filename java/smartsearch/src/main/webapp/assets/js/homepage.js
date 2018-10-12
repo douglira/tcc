@@ -1,5 +1,14 @@
+let formatterMixin = {
+  methods: {
+    formatDate: Formatter.fullDate,
+    formatCurrency: Formatter.currency,
+    formatDecimal: Formatter.decimal,
+  },
+};
+
 new Vue({
   el: '#homepageContainer',
+  mixins: [formatterMixin],
   data() {
     return {
       products: [],

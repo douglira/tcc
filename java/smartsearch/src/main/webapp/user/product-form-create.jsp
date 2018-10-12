@@ -204,7 +204,7 @@
             <div class="d-flex justify-content-between">
                 <a role="button" class="btn btn-link bg-white px-md-5 py-md-2 font-weight-bold"
                    href="<%=request.getContextPath() %>/account/inventory">Voltar</a>
-                <button class="btn btn-success btn-submit px-md-5 py-md-2 font-weight-bold" type="submit" value="edit"
+                <button class="btn btn-info btn-submit px-md-5 py-md-2 font-weight-bold" type="submit" value="edit"
                         name="action">Salvar
                 </button>
             </div>

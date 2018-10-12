@@ -157,4 +157,18 @@ public class ProductListDAO extends GenericDAO {
             System.out.println("ProductListDAO.remove [ERROR]: " + err);
         }
     }
+
+    public void removeAll(int purchaseRequestId) {
+        PreparedStatement stmt = null;
+        String sql = "DELETE FROM " + TABLE_NAME + " WHERE purchase_request_id = ? ";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, purchaseRequestId);
+            stmt.execute();
+        } catch(SQLException err) {
+            err.printStackTrace();
+            System.out.println("ProductListDAO.removeAll [ERROR]: " + err);
+        }
+    }
 }

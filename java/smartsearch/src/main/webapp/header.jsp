@@ -151,6 +151,7 @@
         </div>
     </nav>
 </header>
+<script src="<%=request.getContextPath() %>/assets/libs/helper.js"></script>
 <c:if test="<%=user != null && user.getRole() == UserRoles.COMMON%>">
     <input type="hidden" id="inputHeaderUsername" value="<%= user.getUsername() %>"/>
     <script src="<%=request.getContextPath()%>/assets/libs/fontawesome/js/all.js"></script>
@@ -158,6 +159,5 @@
     <script src="<%=request.getContextPath()%>/assets/libs/toast/toastr.min.js"></script>
     <script src="<%=request.getContextPath()%>/assets/libs/axios/axios-dist.min.js"></script>
     <script src="<%=request.getContextPath() %>/assets/libs/vuejs/vue-dist.js"></script>
-    <script src="<%=request.getContextPath() %>/assets/libs/helper.js"></script>
     <script src="<%=request.getContextPath() %>/assets/js/header-websocket.js"></script>
 </c:if>

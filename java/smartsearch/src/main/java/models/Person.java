@@ -3,16 +3,16 @@ package models;
 import java.util.Calendar;
 
 public class Person {
-    private int id;
-    private Address address;
-    private String accountOwner;
-    private long tel;
-    private User user;
-    private String corporateName;
-    private long stateRegistration;
-    private long cnpj;
-    private Calendar createdAt;
-    private Calendar updatedAt;
+    protected int id;
+    protected Address address;
+    protected String accountOwner;
+    protected long tel;
+    protected User user;
+    protected String corporateName;
+    protected long stateRegistration;
+    protected long cnpj;
+    protected Calendar createdAt;
+    protected Calendar updatedAt;
 
     public Person() {
 

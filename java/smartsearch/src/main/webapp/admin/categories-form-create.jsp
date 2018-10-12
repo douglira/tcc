@@ -79,7 +79,7 @@
 			<input type="hidden" id="category-layer-selected" name="category-layer-selected" />
 			<input type="hidden" id="category-is_last_child-selected" name="category-is_last_child-selected" />
 			<hr>
-			<button type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="New">Cadastrar</button>
+			<button type="submit" class="btn btn-info btn-lg btn-block" name="action" value="New">Cadastrar</button>
 		</form>
 		
 	</div>

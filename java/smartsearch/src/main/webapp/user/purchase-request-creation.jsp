@@ -81,30 +81,37 @@
     </div>
 
     <div class="card border-light mb-sm-3 mb-md-3">
-        <div class="card-body">
-            <h1 class="card-title text-muted text-uppercase">Pedido de Compra&nbsp;&#45;&nbsp;N&#176;<i>{{ purchaseRequest.id }}</i></h1>
+        <div class="card-body d-flex flex-nowrap align-items-center">
+            <h1 class="text-muted page-title">
+                Pedido de Compra&nbsp;&#45;&nbsp;&numero;
+                <i>{{ purchaseRequest.id }}</i>
+                <br>
+                <small class="pr-created_at">
+                    <strong>Criado em:</strong>
+                    &nbsp;
+                    {{ formatFullDate(purchaseRequest.createdAt) }}
+                </small>
+            </h1>
+            <button class="text-secondary pr-btn-delete" type="button" @click="deletePurchaseRequest">
+                <i class="fas fa-trash"></i>
+            </button>
         </div>
     </div>
 
     <div class="card border-light mb-sm-3 mb-md-3">
-        <div class="card-body">
-            <p class="text-dark pr-propagation-text">
-                <a
-                    id="propagationPopover"
-                    tabindex="0"
-                    role="button"
-                    data-toggle="popover"
-                    data-trigger="focus"
-                    title="Abrangência?"
-                    data-content="Este é o número de fornecedores que possuem os items especificados em estoque. Ao lançar este pedido de compra uma notificação será enviada a eles, portanto quanto maior este número maior serão as chances de concluir um orçamento."
-                    href="javascript:void(0)">
-                    <i class="far fa-question-circle text-dark pr-propagation-icon"></i>
-                </a>
-                &nbsp;
+        <div class="bg-dark w-100 d-flex justify-content-center align-items-center">
+            <span
+                tabindex="0"
+                data-toggle="popover"
+                class="text-white pr-propagation-text">
                 Abrangência atual
                 &nbsp;
-                <span class="badge badge-dark font-weight-bold">{{ purchaseRequest.propagationCount }}</span>
-            </p>
+                <strong class="bg-light text-dark pr-propagation-count">
+                    {{ purchaseRequest.propagationCount }}
+                </strong>
+            </span>
+        </div>
+        <div class="card-body">
             <ul class="list-group list-group-flush">
                 <li
                     v-for="productList in purchaseRequest.listProducts"
@@ -116,26 +123,42 @@
                         :alt="productList.product.thumbnail.name">
                     <div class="pr-item-title">
                         <span class="text-muted">{{ productList.product.title }}</span>
-                        <span class="text-success pr-item-price">R$ {{ productList.product.basePrice.toFixed(2) }}</span>
+                        <span class="text-success pr-item-price">{{ formatCurrency(productList.product.basePrice) }}</span>
                     </div>
                     <p class="pr-item-quantity text-secondary">
                         Qtd.
                         &nbsp;
                         <strong>{{ productList.quantity }}</strong>
                     </p>
-                    <button type="button" class="text-info pr-item-edit_button" @click="onClickEditProduct(productList)">
-                        <i class="fas fa-pen-square"></i>
+                    <button type="button" class="text-secondary pr-item-actions" @click="onClickEditProduct(productList)">
+                        <i class="far fa-edit"></i>
                     </button>
-                    <button type="button" class="text-danger pr-item-edit_button" @click="onClickRemoveProduct(productList)">
+                    <button type="button" class="text-danger pr-item-actions" @click="onClickRemoveProduct(productList)">
                         <i class="fas fa-times"></i>
                     </button>
                 </li>
             </ul>
-            <div class="pr-total_amount">
-                Total:
-                &nbsp;
-                <span class="text-success">R$&nbsp;{{ purchaseRequest.totalAmount.toFixed(2) }}</span>
+            <div class="d-flex flex-nowrap flex-column flex-sm-column flex-md-column flex-lg-row-reverse">
+                <div style="flex: 1;">
+                    <div class="pr-total_amount">
+                        Total:
+                        &nbsp;
+                        <span class="text-success">{{ formatCurrency(purchaseRequest.totalAmount) }}</span>
+                    </div>
+                    <p class="text-right text-secondary">
+                        Última atualização:&nbsp;
+                        <strong>{{ formatDatetime(purchaseRequest.updatedAt) }}</strong>
+                    </p>
+                </div>
+                <div style="flex: 1; margin: 20px 0;">
+                    <div class="form-group">
+                        <label for="additionalData">Informações adicionais</label>
+                        <textarea class="form-control" id="additionalData" aria-describedby="additionalDataInfo" rows="3" v-model="prAdditionalData"></textarea>
+                        <small id="additionalDataInfo" class="form-text text-muted">Ex: envio, transportadora, negociação...</small>
+                    </div>
+                </div>
             </div>
+            <button type="button" class="btn btn-info btn-lg btn-block btn-publish">Publicar pedido</button>
         </div>
     </div>
 </div>

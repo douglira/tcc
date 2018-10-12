@@ -28,7 +28,6 @@ public class PREditController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         Gson gJson = new Gson();
-        Messenger msg;
 
         try {
             String action = request.getParameter("action");
@@ -78,10 +77,10 @@ public class PREditController extends HttpServlet {
         ArrayList<ProductList> products = new ProductListDAO(true).findByPurchaseRequest(purchaseRequestId);
         if (products.isEmpty()) {
             PurchaseRequest pr = new PurchaseRequest();
-            new PurchaseRequestDAO(productListDao.getConnection()).destroy(purchaseRequestId);
+            new PurchaseRequestDAO(productListDao.getConnection()).destroy(purchaseRequestId, user.getPerson().getId());
 
             pr.setId(null);
-            PurchaseRequestSocket.sendUpdatedPRCreation(user, pr, baseUrl);
+            PurchaseRequestSocket.sendUpdatedPRCreation(user, pr, null);
             return;
         }
 

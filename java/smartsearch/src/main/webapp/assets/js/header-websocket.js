@@ -1,4 +1,4 @@
-new Vue({
+const VueHeader = new Vue({
 	el: '#appHeader',
 	data() {
 		return {

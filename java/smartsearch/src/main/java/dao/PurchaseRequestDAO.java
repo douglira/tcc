@@ -201,13 +201,14 @@ public class PurchaseRequestDAO extends GenericDAO {
         }
     }
 
-    public void destroy(int purchaseRequestId) {
+    public void destroy(int purchaseRequestId, int buyerId) {
         PreparedStatement stmt = null;
-        String sql = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
+        String sql = "DELETE FROM " + TABLE_NAME + " WHERE id = ? AND buyer_id = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);
             stmt.setInt(1, purchaseRequestId);
+            stmt.setInt(2, buyerId);
             stmt.execute();
             this.conn.commit();
         } catch (SQLException err) {

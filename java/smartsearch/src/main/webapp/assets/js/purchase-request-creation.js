@@ -1,9 +1,19 @@
-const VueComponent = new Vue({
+let formatterMixin = {
+  methods: {
+    formatDatetime: Formatter.datetime,
+    formatFullDate: Formatter.fullDate,
+    formatCurrency: Formatter.currency,
+  },
+};
+
+const VuePRCreation = new Vue({
   el: '#userPRCreation',
+  mixins: [formatterMixin],
   data() {
     return {
       username: null,
       purchaseRequest: null,
+      prAdditionalData: '',
       modalData: {
         productItemId: null,
         productItemTitle: '',
@@ -17,16 +27,7 @@ const VueComponent = new Vue({
     this.username = username;
     await this.loadData();
     this.wsPurchaseRequestUpdate();
-  },
-  mounted() {
-    $('#propagationPopover').popover({
-      trigger: 'focus'
-    });
-  },
-  computed: {
-    dueDateAverage() {
-      return Formatter.getDate(this.purchaseRequest.dueDateAverage)
-    }
+    this.initPopover();
   },
   methods: {
     onClickEditProduct(productList) {
@@ -75,6 +76,19 @@ const VueComponent = new Vue({
           $('#modalProductItemEdit').modal('hide');
         })
     },
+    deletePurchaseRequest() {
+      $.post('/account/purchase_request/abort?abortAction=delete', { purchaseRequestId: this.purchaseRequest.id })
+    },
+    initPopover() {
+      $(function () {
+        $('[data-toggle="popover"]').popover({
+          title: 'Abrangência',
+          content: 'Este é o número de fornecedores que possuem os items requisitados abaixo em estoque. Ao lançar este pedido de compra uma notificação será enviada a eles, portanto quanto maior este número maior serão as chances de concluir um orçamento.',
+          trigger: 'hover focus',
+          placement: 'right',
+        });
+      });
+    },
     wsPurchaseRequestUpdate() {
       const wsPurchaseRequest = new WebSocket(`ws://localhost:8080/account/purchase_request/${this.username}`);
       wsPurchaseRequest.onmessage = (event) => {
@@ -96,7 +110,7 @@ const VueComponent = new Vue({
 });
 
 $('#modalProductItemEdit').on('hidden.bs.modal', () => {
-  VueComponent.$root.modalData = {
+  VuePRCreation.$root.modalData = {
     productItemId: null,
     productItemTitle: '',
     quantity: null,
@@ -106,7 +120,7 @@ $('#modalProductItemEdit').on('hidden.bs.modal', () => {
 
 
 $('#modalProductItemRemove').on('hidden.bs.modal', () => {
-  VueComponent.$root.modalData = {
+  VuePRCreation.$root.modalData = {
     productItemId: null,
     productItemTitle: '',
     quantity: null,

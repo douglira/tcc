@@ -27,7 +27,7 @@
                 <div class="card-body card-body-product">
                     <a href="javascript: void(0)" class="card-body-product_primary--info text-muted">
                         <h3 class="text-secondary">{{ product.title }}</h3>
-                        <span class="text-success">R$ {{ product.basePrice.toFixed(2) }}</span>
+                        <span class="text-success">{{ formatCurrency(product.basePrice) }}</span>
                     </a>
                     <div class="card-body-product_secondary--info">
                         <div>
@@ -36,8 +36,7 @@
                         <small class="text-muted">
                             Flutuação (R$)
                             <br>
-                            {{ product.minPrice.toFixed(2) }} - {{
-                            product.maxPrice.toFixed(2) }}
+                            {{ formatDecimal(product.minPrice) }}&nbsp;&hyphen;&nbsp;{{ formatDecimal(product.maxPrice) }}
                         </small>
                     </div>
                     <button type="button" @click="onClickAddToPR(product)"
