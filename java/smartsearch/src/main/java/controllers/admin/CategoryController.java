@@ -12,7 +12,7 @@ import controllers.admin.command.category.ICategoryCommand;
 import dao.CategoryDAO;
 import models.Category;
 
-@WebServlet(urlPatterns = { "/admin/categories/new", "/admin/categories/edit" })
+@WebServlet(name = "CategoryController", urlPatterns = { "/admin/categories/new", "/admin/categories/edit" })
 public class CategoryController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

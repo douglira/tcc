@@ -17,7 +17,7 @@ import com.google.gson.Gson;
 import libs.Helper;
 import models.File;
 
-@WebServlet("/products/pictures/upload")
+@WebServlet(name= "PicturesUploaderController", urlPatterns = "/products/pictures/upload")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5
         * 5)
 public class PicturesUploaderController extends HttpServlet {

@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+		 pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html lang="pt-br">
 <head>
@@ -19,7 +21,7 @@
 
 	<div class="container">
 		<div class="content">
-			<h1 style="font-size: 28px; color: #666;">Redefinição de senha</h1>
+			<h1 style="font-size: 28px; color: #666;">RedefiniÃ§Ã£o de senha</h1>
 			<%String error = (String) request.getAttribute("error");%>
 			<c:if test="<%=error != null%>">
 				<div class="div-error">
@@ -29,7 +31,7 @@
 			<form action="<%=request.getContextPath()%>/password/redefine" method="POST">
 				<p class="text-secondary text-left" style="font-size: 13px">
 					Insira seu email de cadastro no campo abaixo e em alguns minutos enviaremos um e-mail
-					para que possa resetar sua senha.
+					para que possa redefinir sua senha.
 				</p>
 				<div class="form-group">
 					<label for="emailInput">Email</label>

@@ -75,8 +75,8 @@ public class PurchaseRequest {
         return stage;
     }
 
-    public void setStage(PRStage status) {
-        this.stage = status;
+    public void setStage(PRStage stage) {
+        this.stage = stage;
     }
 
     public Calendar getDueDateAverage() {

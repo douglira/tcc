@@ -57,6 +57,10 @@ public class PREditController extends HttpServlet {
     }
 
     private void updatePurchaseRequestItem(User user, int purchaseRequestId, int productItemId, ProductList productList, String baseUrl) throws SQLException {
+        if (productList.getQuantity() <= 0) {
+            return;
+        }
+
         ProductItem productItem = new ProductItem();
         productItem.setId(productItemId);
         productList.setProduct(productItem);

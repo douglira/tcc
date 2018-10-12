@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Calendar;
+
 public class File {
     private Integer id;
     private String filename;
@@ -8,6 +10,7 @@ public class File {
     private double size;
     private String type;
     private String subtype;
+//    private Calendar createdAt;
 
     public Integer getId() {
         return id;
@@ -64,6 +67,14 @@ public class File {
     public void setSubtype(String subtype) {
         this.subtype = subtype;
     }
+
+//    public Calendar getCreatedAt() {
+//        return createdAt;
+//    }
+//
+//    public void setCreatedAt(Calendar createdAt) {
+//        this.createdAt = createdAt;
+//    }
 
     @Override
     public boolean equals(Object obj) {

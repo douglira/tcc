@@ -15,7 +15,7 @@ import mail.MailerService;
 import mail.ResetPassword;
 import models.User;
 
-@WebServlet(urlPatterns = { "/password/redefine", "/form/reset_pass" })
+@WebServlet(name = "RedefinePassController", urlPatterns = { "/password/redefine", "/form/reset_pass" })
 public class RedefinePassController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

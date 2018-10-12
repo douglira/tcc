@@ -30,6 +30,22 @@ const VuePRCreation = new Vue({
     this.initPopover();
   },
   methods: {
+    onClickPublish() {
+      this.purchaseRequest.additionalData = this.prAdditionalData;
+
+      $.post(
+        '/account/purchase_request/publish',
+        {
+          purchaseRequest: JSON.stringify(this.purchaseRequest),
+        }
+      )
+        .done(() => {
+          console.log('Deu certo!');
+          VueHeader.$data.purchaseRequest = null;
+          this.purchaseRequest = null;
+          window.location.replace('/');
+        });
+    },
     onClickEditProduct(productList) {
       this.modalData = {
         productItemId: productList.product.id,
@@ -82,10 +98,12 @@ const VuePRCreation = new Vue({
     initPopover() {
       $(function () {
         $('[data-toggle="popover"]').popover({
-          title: 'Abrangência',
-          content: 'Este é o número de fornecedores que possuem os items requisitados abaixo em estoque. Ao lançar este pedido de compra uma notificação será enviada a eles, portanto quanto maior este número maior serão as chances de concluir um orçamento.',
           trigger: 'hover focus',
           placement: 'right',
+          title: 'Abrangência',
+          content: `Este é a quantidade de fornecedores que possuem os items requisitados abaixo em estoque. 
+            Ao lançar este pedido de compra uma notificação será enviada a eles, portanto quanto 
+            maior este número maior serão as chances de concluir um orçamento.`,
         });
       });
     },

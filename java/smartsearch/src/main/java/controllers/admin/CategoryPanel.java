@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import dao.CategoryDAO;
 import models.Category;
 
-@WebServlet(urlPatterns = { "/admin/categories" })
+@WebServlet(name = "CategoryPanel", urlPatterns = { "/admin/categories" })
 public class CategoryPanel extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

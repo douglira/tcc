@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import dao.UserDAO;
 import models.User;
 
-@WebServlet("/admin")
+@WebServlet(name= "UserListController", urlPatterns = "/admin")
 public class UserListController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     

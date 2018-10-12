@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+		 pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <html lang="pt-br">
 <head>
@@ -19,7 +21,7 @@
 
 	<div class="container">
 		<div class="content">
-			<h1>Login</h1>
+			<h1 class="text-secondary">Login</h1>
 			<%String error = (String) request.getAttribute("error");%>
 			<c:if test="<%=error != null%>">
 				<div class="div-error">
@@ -38,7 +40,7 @@
 				</div>
 				<button class="btn btn-primary" type="submit" value="signin" name="action" >Entrar</button>
 				<small>ou</small>
-				<p><a href="<%=request.getContextPath() %>/register" class="text-info">Não possui conta? Cadastrar</a></p>
+				<p><a href="<%=request.getContextPath() %>/register" class="text-info">NÃ£o possui conta? Cadastrar</a></p>
 			</form>
 		</div>
 	</div>

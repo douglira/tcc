@@ -8,9 +8,7 @@ public class ProductList implements Comparable{
 	private int quantity;
 	private double subtotalAmount;
 
-	public ProductList() {
-
-	}
+	public ProductList() {}
 
 	public ProductList(ProductRepresentation product) {
 		this.product = product;

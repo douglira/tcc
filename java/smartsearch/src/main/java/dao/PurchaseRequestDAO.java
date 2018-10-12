@@ -201,6 +201,31 @@ public class PurchaseRequestDAO extends GenericDAO {
         }
     }
 
+    public void updatePublish(PurchaseRequest purchaseRequest) {
+        PreparedStatement stmt = null;
+        String sql = "UPDATE " + TABLE_NAME + " SET stage = CAST(? as pr_stage), additional_data = ? WHERE id = ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setString(1, purchaseRequest.getStage().toString());
+            stmt.setString(2, purchaseRequest.getAdditionalData());
+            stmt.setInt(3, purchaseRequest.getId());
+            stmt.execute();
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("PurchaseRequest.updatePublish [ERROR](1): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException err) {
+                    err.printStackTrace();
+                    System.out.println("PurchaseRequest.updatePublish [ERROR](2): " + err);
+                }
+            }
+        }
+    }
+
     public void destroy(int purchaseRequestId, int buyerId) {
         PreparedStatement stmt = null;
         String sql = "DELETE FROM " + TABLE_NAME + " WHERE id = ? AND buyer_id = ?";

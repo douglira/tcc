@@ -12,6 +12,7 @@ import enums.UserRoles;
 public class User {
     private int id;
     private Person person;
+    private File avatar;
     private String email;
     private String username;
     private String displayName;
@@ -22,6 +23,8 @@ public class User {
     private Status status;
     private Calendar createdAt;
     private Calendar updatedAt;
+    private Calendar lastActive;
+    private Calendar lastInactive;
 
     public User() {
 
@@ -43,6 +46,10 @@ public class User {
     public Person getPerson () { return person; }
 
     public void setPerson(Person person) { this.person = person; }
+
+    public File getAvatar() { return this.avatar; }
+
+    public void setAvatar(File avatar) { this.avatar = avatar; }
 
     public String getEmail() {
         return email;
@@ -122,6 +129,22 @@ public class User {
 
     public void setUpdatedAt(Calendar updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Calendar getLastActive() {
+        return lastActive;
+    }
+
+    public void setLastActive(Calendar lastActive) {
+        this.lastActive = lastActive;
+    }
+
+    public Calendar getLastInactive() {
+        return lastInactive;
+    }
+
+    public void setLastInactive(Calendar lastInactive) {
+        this.lastInactive = lastInactive;
     }
 
     public void generateDisplayName(String fullName) {

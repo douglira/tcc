@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import database.elasticsearch.ElasticsearchFacade;
 import models.ProductItem;
 
-@WebServlet(urlPatterns = "/products/predict")
+@WebServlet(name = "ProductPredictController", urlPatterns = "/products/predict")
 public class ProductPredictController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

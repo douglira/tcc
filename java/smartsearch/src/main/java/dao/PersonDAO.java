@@ -1,11 +1,14 @@
 package dao;
 
+import enums.Status;
 import models.Person;
+import models.User;
 
 import java.sql.*;
 
 public class PersonDAO extends GenericDAO {
     private static final String TABLE_NAME = "people";
+    private static final String TABLE_RELATION_USER = "users";
 
     public PersonDAO(boolean getConnection) {
         super(getConnection);
@@ -105,6 +108,58 @@ public class PersonDAO extends GenericDAO {
                 } catch (SQLException sqlException) {
                     sqlException.printStackTrace();
                     System.out.println("PersonDAO.findByUser [ERROR](2): " + sqlException);
+                }
+            }
+        }
+
+        return person;
+    }
+
+    public Person findByIdWithUser(Person person) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT " + TABLE_NAME + ".*, " +
+                TABLE_RELATION_USER + ".email, " +
+                TABLE_RELATION_USER + ".display_name, " +
+                TABLE_RELATION_USER + ".username, " +
+                TABLE_RELATION_USER + ".status FROM " + TABLE_NAME +
+                " INNER JOIN " + TABLE_RELATION_USER +
+                " ON " + TABLE_NAME + ".user_id = " + TABLE_RELATION_USER + ".id" +
+                " WHERE " + TABLE_NAME + ".id = ? AND " +
+                TABLE_RELATION_USER + ".status = CAST('ACTIVE' as status_entity)";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, person.getId());
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                person.setId(rs.getInt("id"));
+                person.setAccountOwner(rs.getString("account_owner"));
+                person.setCorporateName(rs.getString("corporate_name"));
+                person.setCnpj(rs.getLong("cnpj"));
+                person.setTel(rs.getLong("tel"));
+                person.setStateRegistration(rs.getLong("state_registration"));
+
+                User user = new User();
+                user.setId(rs.getInt("user_id"));
+                user.setEmail(rs.getString("email"));
+                user.setDisplayName(rs.getString("display_name"));
+                user.setUsername(rs.getString("username"));
+                user.setStatus(Status.valueOf(rs.getString("status")));
+
+                person.setUser(user);
+            }
+        } catch (Exception error) {
+            error.printStackTrace();
+            System.out.println("PersonDAO.findByIdWithUser [ERROR](1): " + error);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException sqlException) {
+                    sqlException.printStackTrace();
+                    System.out.println("PersonDAO.findByIdWithUser [ERROR](2): " + sqlException);
                 }
             }
         }

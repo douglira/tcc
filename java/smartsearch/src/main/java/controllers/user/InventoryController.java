@@ -21,7 +21,7 @@ import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-@WebServlet(urlPatterns = {"/account/me/inventory"})
+@WebServlet(name = "InventoryController", urlPatterns = {"/account/me/inventory"})
 public class InventoryController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 

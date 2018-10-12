@@ -2,7 +2,7 @@ package models;
 
 import java.util.ArrayList;
 
-public abstract class ProductRepresentation {
+public class ProductRepresentation {
     protected Integer id;
     protected String title;
     protected double basePrice;

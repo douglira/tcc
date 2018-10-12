@@ -2,6 +2,7 @@ package dao;
 
 import enums.Status;
 import enums.UserRoles;
+import models.File;
 import models.User;
 
 import java.sql.*;
@@ -46,6 +47,92 @@ public class UserDAO extends GenericDAO {
             System.out.println("UserDAO.create [ERROR]: " + e);
         }
 
+        return user;
+    }
+
+    private User fetch(ResultSet rs, User user, String scope) throws SQLException {
+
+        if (scope.equals("full")) {
+            user.setPassword(rs.getString("password"));
+
+            try {
+
+                Calendar updatedAt = Calendar.getInstance();
+                updatedAt.setTime(rs.getTimestamp("updated_at"));
+                user.setUpdatedAt(updatedAt);
+
+                Calendar lastActive = Calendar.getInstance();
+                lastActive.setTime(rs.getTimestamp("last_active"));
+                user.setLastActive(lastActive);
+
+                Calendar lastInactive = Calendar.getInstance();
+                lastInactive.setTime(rs.getTimestamp("last_inactive"));
+                user.setLastInactive(lastInactive);
+            } catch (NullPointerException error) {
+
+            }
+        }
+
+        try {
+            File file = new File();
+
+            file.setId(rs.getInt("file_avatar_id"));
+            file.setName(rs.getString("name"));
+            file.setFilename(rs.getString("filename"));
+            file.setSize(rs.getDouble("size"));
+            file.setUrlPath(rs.getString("url_path"));
+            file.setType(rs.getString("type"));
+            file.setSubtype(rs.getString("subtype"));
+
+//            Calendar createdAt = Calendar.getInstance();
+//            createdAt.setTime(rs.getTimestamp("file_created_at"));
+//            file.setCreatedAt(createdAt);
+
+            user.setAvatar(file);
+        } catch (NullPointerException error) {
+
+        }
+
+        user.setId(rs.getInt("id"));
+        user.setEmail(rs.getString("email"));
+        user.setDisplayName(rs.getString("display_name"));
+        user.setUsername(rs.getString("username"));
+        user.setRole(UserRoles.valueOf(rs.getString("role")));
+        user.setStatus(Status.valueOf(rs.getString("status")));
+
+        Calendar createdAt = Calendar.getInstance();
+        createdAt.setTime(rs.getTimestamp("created_at"));
+        user.setCreatedAt(createdAt);
+
+        return user;
+    }
+
+    public User findById(User user) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, user.getId());
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+               user = this.fetch(rs, user, null);
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            System.out.println("UserDAO.findById [ERROR](1): " + sqlException);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException errClose) {
+                    errClose.printStackTrace();
+                    System.out.println("UserDAO.findById [ERROR](2): " + errClose);
+                }
+            }
+        }
         return user;
     }
 

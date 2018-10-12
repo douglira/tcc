@@ -22,7 +22,7 @@ import models.Messenger;
 import models.Person;
 import models.User;
 
-@WebServlet("/account/me/data")
+@WebServlet(name = "PersonDataController", urlPatterns = "/account/me/data")
 public class PersonDataController extends HttpServlet {
 	private static final long serialVersionUID = 6580597678283605205L;
 

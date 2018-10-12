@@ -76,7 +76,12 @@ BEGIN
         ON product_items.id = products.product_item_id
         INNER JOIN sellers
         ON products.seller_id = sellers.person_id
+        INNER JOIN people 
+        ON sellers.person_id = people.id
+        INNER JOIN users
+        ON people.user_id = users.id
         WHERE products.status = CAST('ACTIVE' AS status_entity)
+        AND users.status = CAST('ACTIVE' as status_entity) 
         AND products.product_item_id = rec_pr.product_item_id
         AND products.available_quantity >= rec_pr.quantity
       ) INTO sellers_ids;

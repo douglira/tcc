@@ -34,7 +34,7 @@
                         <div class="form-group">
                             <label for="productItemQuantity">Quantidade</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" id="productItemQuantity" min="1" step="1" v-model="modalData.quantity">
+                                <input type="number" class="form-control" id="productItemQuantity" autofocus min="1" step="1" v-model="modalData.quantity">
                                 <div class="input-group-append">
                                     <span class="input-group-text">Un.</span>
                                 </div>
@@ -158,7 +158,7 @@
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn btn-info btn-lg btn-block btn-publish">Publicar pedido</button>
+            <button type="button" class="btn btn-info btn-lg btn-block btn-publish" @click="onClickPublish">Publicar pedido</button>
         </div>
     </div>
 </div>
