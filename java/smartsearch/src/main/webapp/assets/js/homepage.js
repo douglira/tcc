@@ -32,6 +32,10 @@ new Vue({
             // console.log(msg);
             window.location.replace('/signin');
           }
+
+          if (status === 400 && msg.cause === 'PRODUCT_AVAILABLE') {
+            this.showMessage(msg.content, msg.type);
+          }
         })
     },
     showMessage(msg, topic = 'success') {

@@ -37,7 +37,6 @@ public class PRCreationController extends HttpServlet {
 
             user.setPerson(person);
 
-
             String productItemId = request.getParameter("productItemId");
             String productItemQuantity = request.getParameter("productItemQuantity");
             String productItemAdditionalSpec = request.getParameter("productItemAdditionalSpec");
@@ -48,6 +47,12 @@ public class PRCreationController extends HttpServlet {
             }
             ProductItem productItem = new ProductItem();
             productItem.setId(Integer.parseInt(productItemId));
+
+            if (isInvalidSellerPurchase(productItem, person)) {
+                response.setStatus(400);
+                Helper.responseMessage(response.getWriter(), new Messenger("Produto ainda disponível em seu estoque!", MessengerType.WARNING, "PRODUCT_AVAILABLE"));
+                return;
+            }
 
             updateViewsCount(Integer.parseInt(productItemId), Helper.getBaseUrl(request));
 
@@ -67,6 +72,11 @@ public class PRCreationController extends HttpServlet {
             System.out.println("PRCreationController.doPost [ERROR]: " + error);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
+    }
+
+    private boolean isInvalidSellerPurchase(ProductItem productItem, Person person) {
+        Product product = new ProductDAO(true).findByProductItemAndSeller(productItem.getId(), person.getId());
+        return product != null && product.getAvailableQuantity() > 0;
     }
 
     private void updateViewsCount(int productItemId , String baseUrl) {

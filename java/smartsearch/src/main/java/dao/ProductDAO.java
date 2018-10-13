@@ -4,6 +4,7 @@ import enums.ProductSituation;
 import enums.Status;
 import models.Category;
 import models.Product;
+import models.ProductItem;
 import models.Seller;
 
 import java.sql.*;
@@ -54,6 +55,44 @@ public class ProductDAO extends GenericDAO {
         return product;
     }
 
+    private Product fetch(ResultSet rs, Product product) throws SQLException {
+        product.setId(rs.getInt("id"));
+        product.setTitle(rs.getString("title"));
+        product.setDescription(rs.getString("description"));
+        product.setBasePrice(rs.getDouble("base_price"));
+        product.setSoldQuantity(rs.getInt("sold_quantity"));
+        product.setAvailableQuantity(rs.getInt("available_quantity"));
+        product.setStatus(Status.valueOf(rs.getString("status")));
+        product.setSituation(ProductSituation.valueOf(rs.getString("situation")));
+
+        Calendar create_at = Calendar.getInstance();
+        create_at.setTime(rs.getTimestamp("created_at"));
+        product.setCreatedAt(create_at);
+
+        try {
+            Calendar updated_at = Calendar.getInstance();
+            updated_at.setTime(rs.getTimestamp("updated_at"));
+            product.setUpdatedAt(updated_at);
+        } catch (NullPointerException err) {
+
+        }
+
+        Seller seller = new Seller();
+        seller.setId(rs.getInt("seller_id"));
+
+        Category category = new Category();
+        category.setId(rs.getInt("category_id"));
+
+        ProductItem productItem = new ProductItem();
+        productItem.setId(rs.getInt("product_item_id"));
+
+        product.setSeller(seller);
+        product.setCategory(category);
+        product.setProductItem(productItem);
+
+        return product;
+    }
+
     public ArrayList<Product> findByProductItem(int productItemId) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -68,24 +107,7 @@ public class ProductDAO extends GenericDAO {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Seller seller = new Seller();
-                seller.setId(rs.getInt("seller_id"));
-
-                Category category = new Category();
-                category.setId(rs.getInt("category_id"));
-
-                Product product = new Product();
-                product.setId(rs.getInt("id"));
-
-                product.setSeller(seller);
-                product.setCategory(category);
-                product.setTitle(rs.getString("title"));
-                product.setDescription(rs.getString("description"));
-                product.setBasePrice(rs.getDouble("base_price"));
-                product.setSoldQuantity(rs.getInt("sold_quantity"));
-                product.setAvailableQuantity(rs.getInt("available_quantity"));
-                product.setSituation(ProductSituation.valueOf(rs.getString("situation")));
-                product.setStatus(Status.ACTIVE);
+                Product product = this.fetch(rs, new Product());
 
                 products.add(product);
             }
@@ -118,29 +140,7 @@ public class ProductDAO extends GenericDAO {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product();
-
-                product.setId(rs.getInt("id"));
-                product.setTitle(rs.getString("title"));
-                product.setDescription(rs.getString("description"));
-                product.setBasePrice(rs.getDouble("base_price"));
-                product.setSoldQuantity(rs.getInt("sold_quantity"));
-                product.setAvailableQuantity(rs.getInt("available_quantity"));
-                product.setStatus(Status.valueOf(rs.getString("status")));
-                product.setSituation(ProductSituation.valueOf(rs.getString("situation")));
-
-                Calendar create_at = Calendar.getInstance();
-                create_at.setTime(rs.getTimestamp("created_at"));
-                product.setCreatedAt(create_at);
-
-                Seller seller = new Seller();
-                seller.setId(rs.getInt("seller_id"));
-
-                Category category = new Category();
-                category.setId(rs.getInt("category_id"));
-
-                product.setSeller(seller);
-                product.setCategory(category);
+                Product product = this.fetch(rs, new Product());
 
                 products.add(product);
             }
@@ -159,5 +159,38 @@ public class ProductDAO extends GenericDAO {
         }
 
         return products;
+    }
+
+    public Product findByProductItemAndSeller(int productItemId, int sellerId) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT * FROM " + TABLE_NAME +
+                " WHERE product_item_id = ? AND seller_id = ? AND status = CAST('ACTIVE' as status_entity)";
+        Product product = null;
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, productItemId);
+            stmt.setInt(2, sellerId);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                product = this.fetch(rs, new Product());
+            }
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("ProductDAO.findByProductItemAndSeller [ERROR](1): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException sqlException) {
+                    sqlException.printStackTrace();
+                    System.out.println("ProductDAO.findByProductItemAndSeller [ERROR](2): " + sqlException);
+                }
+            }
+        }
+
+        return product;
     }
 }
