@@ -5,8 +5,13 @@ import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-public class NotificationDecoder implements Decoder.Text<Notification> {
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class NotificationDecoder implements Decoder.Text<ArrayList<Notification>> {
 
 	private static Gson gson = new Gson();
 
@@ -16,8 +21,9 @@ public class NotificationDecoder implements Decoder.Text<Notification> {
 	}
 
 	@Override
-	public Notification decode(String payload) throws DecodeException {
-		return gson.fromJson(payload, Notification.class);
+	public ArrayList<Notification> decode(String payload) throws DecodeException {
+		Type listType = new TypeToken<ArrayList<Notification>>(){}.getType();
+		return gson.fromJson(payload, listType);
 	}
 
 	@Override

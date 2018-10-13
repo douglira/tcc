@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import dao.CategoryDAO;
 import models.Category;
 
-@WebServlet(name = "CategoryController", urlPatterns = "/categories/json")
+@WebServlet(name = "CategoryControllerJson", urlPatterns = "/categories/json")
 public class CategoryController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

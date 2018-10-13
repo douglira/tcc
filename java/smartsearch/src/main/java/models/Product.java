@@ -14,8 +14,6 @@ public class Product extends ProductRepresentation {
 	private int availableQuantity;
 	private ProductSituation situation;
 	private Status status;
-	private Calendar createdAt;
-	private Calendar updatedAt;
 
 	public Seller getSeller() {
 		return seller;
@@ -79,22 +77,6 @@ public class Product extends ProductRepresentation {
 
 	public void setStatus(Status status) {
 		this.status = status;
-	}
-
-	public Calendar getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(Calendar createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public Calendar getUpdatedAt() {
-		return updatedAt;
-	}
-
-	public void setUpdatedAt(Calendar updatedAt) {
-		this.updatedAt = updatedAt;
 	}
 
 	public void toggleStatus() {

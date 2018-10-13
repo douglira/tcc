@@ -19,7 +19,7 @@ public class User {
     private String password;
     private String passwordResetToken;
     private Calendar passwordExpiresIn;
-    private UserRoles role = UserRoles.COMMON;
+    private UserRoles role;
     private Status status;
     private Calendar createdAt;
     private Calendar updatedAt;
@@ -33,6 +33,11 @@ public class User {
     public User(String email) {
         super();
         this.email = email;
+    }
+
+    public User(int id, String username) {
+        this.id = id;
+        this.username = username;
     }
 
     public int getId() {

@@ -13,9 +13,11 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.stream.Collectors;
 
 @ServerEndpoint(value = "/account/purchase_request/{username}", encoders = PurchaseRequestEncoder.class, decoders = PurchaseRequestDecoder.class)
 public class PurchaseRequestSocket {
@@ -42,6 +44,30 @@ public class PurchaseRequestSocket {
 
     @OnError
     public void onError(Session session, Throwable throwable) {
+        System.out.println("PurchaseRequestSocket error on connect: " + throwable.getMessage());
+    }
+
+    public static void sendUpdatedPRCreation(User user, PurchaseRequest purchaseRequest, String baseUrl) {
+        if (purchaseRequest == null) {
+            purchaseRequest = PurchaseRequestSocket.getPurchaseRequest(user, baseUrl);
+        }
+
+        PurchaseRequest prPayload = purchaseRequest;
+
+        endpoints.forEach(endpoint -> {
+            synchronized (endpoint) {
+                String username = PurchaseRequestSocket.users.get(endpoint.session.getId());
+
+                if (username.equals(user.getUsername())) {
+                    try {
+                        endpoint.session.getBasicRemote()
+                                .sendObject(prPayload);
+                    } catch (IOException | EncodeException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
     }
 
     private static PurchaseRequest getPurchaseRequest(User user, String baseUrl) {
@@ -71,28 +97,5 @@ public class PurchaseRequestSocket {
         }
 
         return purchaseRequest;
-    }
-
-    public static void sendUpdatedPRCreation(User user, PurchaseRequest purchaseRequest, String baseUrl) {
-        if (purchaseRequest == null) {
-            purchaseRequest = PurchaseRequestSocket.getPurchaseRequest(user, baseUrl);
-        }
-
-        PurchaseRequest prPayload = purchaseRequest;
-
-        endpoints.forEach(endpoint -> {
-            synchronized (endpoint) {
-                String username = PurchaseRequestSocket.users.get(endpoint.session.getId());
-
-                if (username.equals(user.getUsername())) {
-                    try {
-                        endpoint.session.getBasicRemote()
-                                .sendObject(prPayload);
-                    } catch (IOException | EncodeException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
     }
 }

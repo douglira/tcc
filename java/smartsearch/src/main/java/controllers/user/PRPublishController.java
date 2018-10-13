@@ -1,16 +1,21 @@
 package controllers.user;
 
 import com.google.gson.Gson;
+import controllers.socket.NotificationSocket;
+import dao.NotificationDAO;
 import dao.PersonDAO;
 import dao.PurchaseRequestDAO;
 import dao.SellerDAO;
 import enums.MessengerType;
+import enums.NotificationStatus;
+import enums.NotificationResource;
 import enums.PRStage;
 import libs.Helper;
 import mail.MailSMTPService;
 import mail.MailerService;
 import mail.PublishedPurchaseRequest;
 import models.*;
+import models.socket.Notification;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 @WebServlet(name = "PRPublishController", urlPatterns = {"/account/purchase_request/publish", "/account/purchase_request/details"})
@@ -56,12 +62,15 @@ public class PRPublishController extends HttpServlet {
                     getPurchaseRequestUrl(request, purchaseRequest));
             mailer.setMail(MailSMTPService.getInstance());
 
-            Runnable runnable = () -> {
+            Runnable socketTask = () -> {
+                socketNotification(sellerUsers, purchaseRequest);
+            };
+            Runnable mailTask = () -> {
                 mailNotification(mailer, sellerUsers);
-                socketNotification(sellerUsers);
             };
 
-            new Thread(runnable).start();
+            new Thread(socketTask).start();
+            new Thread(mailTask).start();
 
             out.close();
         } catch (Exception err) {
@@ -71,13 +80,21 @@ public class PRPublishController extends HttpServlet {
         }
     }
 
-    private void socketNotification(ArrayList<User> sellerUsers) {
-        
-    }
+    private void socketNotification(ArrayList<User> sellerUsers, PurchaseRequest purchaseRequest) {
+        sellerUsers.forEach(sellerUser -> {
+            synchronized (sellerUser) {
+                Notification notification = new Notification();
+                notification.setFrom(null);
+                notification.setTo(sellerUser);
+                notification.setResourceId(purchaseRequest.getId());
+                notification.setResourceType(NotificationResource.PURCHASE_REQUEST);
+                notification.setStatus(NotificationStatus.PENDING);
+                notification.setContent("Novo pedido de compra encontrado para você no valor de " + NumberFormat.getCurrencyInstance().format(purchaseRequest.getTotalAmount()));
 
-    private String getPurchaseRequestUrl(HttpServletRequest request, PurchaseRequest purchaseRequest) {
-        String baseUrl = Helper.getBaseUrl(request);
-        return baseUrl + "/account/quotes/suggest?pr=" + String.valueOf(purchaseRequest.getId());
+                new NotificationDAO(true).create(notification);
+                NotificationSocket.pushLastNotifications(sellerUser);
+            }
+        });
     }
 
     private void mailNotification(MailerService mailer, ArrayList<User> sellerUsers) {
@@ -87,6 +104,11 @@ public class PRPublishController extends HttpServlet {
                 mailer.send();
             }
         });
+    }
+
+    private String getPurchaseRequestUrl(HttpServletRequest request, PurchaseRequest purchaseRequest) {
+        String baseUrl = Helper.getBaseUrl(request);
+        return baseUrl + "/account/quotes/suggest?pr=" + String.valueOf(purchaseRequest.getId());
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

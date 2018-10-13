@@ -1,13 +1,10 @@
 package dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import enums.Status;
 import models.ProductItem;
+
+import java.sql.*;
+import java.util.Calendar;
 
 public class ProductItemDAO extends GenericDAO {
     private static final String TABLE_NAME = "product_items";
@@ -24,7 +21,7 @@ public class ProductItemDAO extends GenericDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String sql = "INSERT INTO " + TABLE_NAME + " (title, views_count, relevance, "
-                + "base_price, max_price, min_price, status) VALUES (?, 0, 1, ?, ?, ?, CAST(? AS status_entity))";
+                + "base_price, max_price, min_price, status, created_at) VALUES (?, 0, 1, ?, ?, ?, CAST(? AS status_entity), ?)";
 
         try {
             stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -33,6 +30,7 @@ public class ProductItemDAO extends GenericDAO {
             stmt.setDouble(3, productItem.getMaxPrice());
             stmt.setDouble(4, productItem.getMinPrice());
             stmt.setString(5, productItem.getStatus().toString());
+            stmt.setTimestamp(6, new Timestamp(productItem.getCreatedAt().getTimeInMillis()));
             stmt.execute();
 
             rs = stmt.getGeneratedKeys();
@@ -50,6 +48,31 @@ public class ProductItemDAO extends GenericDAO {
         return productItem;
     }
 
+    private ProductItem fetch(ResultSet rs, ProductItem productItem) throws SQLException {
+        productItem.setId(rs.getInt("id"));
+        productItem.setTitle(rs.getString("title"));
+        productItem.setViewsCount(rs.getInt("views_count"));
+        productItem.setRelevance(rs.getInt("relevance"));
+        productItem.setBasePrice(rs.getDouble("base_price"));
+        productItem.setMaxPrice(rs.getDouble("max_price"));
+        productItem.setMinPrice(rs.getDouble("min_price"));
+        productItem.setStatus(Status.valueOf(rs.getString("status")));
+
+        try {
+            Calendar createdAt = Calendar.getInstance();
+            createdAt.setTime(rs.getTimestamp("created_at"));
+            productItem.setCreatedAt(createdAt);
+
+            Calendar updatedAt = Calendar.getInstance();
+            updatedAt.setTime(rs.getTimestamp("updated_at"));
+            productItem.setUpdatedAt(updatedAt);
+        } catch(NullPointerException err) {
+
+        }
+
+        return productItem;
+    }
+
     public ProductItem findById(ProductItem productItem) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -61,13 +84,7 @@ public class ProductItemDAO extends GenericDAO {
             rs = stmt.executeQuery();
 
             if (rs.next()) {
-                productItem.setTitle(rs.getString("title"));
-                productItem.setViewsCount(rs.getInt("views_count"));
-                productItem.setRelevance(rs.getInt("relevance"));
-                productItem.setBasePrice(rs.getDouble("base_price"));
-                productItem.setMaxPrice(rs.getDouble("max_price"));
-                productItem.setMinPrice(rs.getDouble("min_price"));
-                productItem.setStatus(Status.valueOf(rs.getString("status")));
+                productItem = this.fetch(rs, productItem);
             } else {
                 productItem = null;
             }
@@ -90,7 +107,7 @@ public class ProductItemDAO extends GenericDAO {
 
     public void updatePricesAndRelevance(ProductItem productItem) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET base_price = ?, max_price = ?, min_price = ?, relevance = ? "
+        String sql = "UPDATE " + TABLE_NAME + " SET base_price = ?, max_price = ?, min_price = ?, relevance = ?, updated_at = ? "
                 + "WHERE id = ?";
 
         try {
@@ -99,11 +116,43 @@ public class ProductItemDAO extends GenericDAO {
             stmt.setDouble(2, productItem.getMaxPrice());
             stmt.setDouble(3, productItem.getMinPrice());
             stmt.setInt(4, productItem.getRelevance());
-            stmt.setInt(5, productItem.getId());
+
+            productItem.setUpdatedAt(Calendar.getInstance());
+            stmt.setTimestamp(5, new Timestamp(productItem.getUpdatedAt().getTimeInMillis()));
+
+            stmt.setInt(6, productItem.getId());
             stmt.executeUpdate();
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
             System.out.println("ProductItemDAO.updatePricesAndRelevance: [ERROR]: " + sqlException);
+        }
+    }
+
+    public void updateViewsCount(ProductItem productItem) {
+        PreparedStatement stmt = null;
+        String sql = "UPDATE " + TABLE_NAME + " SET views_count = ?, updated_at = ? WHERE id = ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, productItem.getViewsCount());
+
+            productItem.setUpdatedAt(Calendar.getInstance());
+            stmt.setTimestamp(2, new Timestamp(productItem.getUpdatedAt().getTimeInMillis()));
+
+            stmt.setInt(3, productItem.getId());
+            stmt.executeUpdate();
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("ProductItemDAO.updateViewsCount [ERROR](1): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException err) {
+                    err.printStackTrace();
+                    System.out.println("ProductItemDAO.updateViewsCount [ERROR](2): " + err);
+                }
+            }
         }
     }
 }

@@ -1,5 +1,13 @@
+let FormatterMixin = {
+  methods: {
+    formatCurrency: Formatter.currency,
+    formatDecimal: Formatter.decimal,
+  }
+};
+
 new Vue({
   el: '#productNew',
+  mixins: [FormatterMixin],
   data() {
     return {
       productItemPreview: null,

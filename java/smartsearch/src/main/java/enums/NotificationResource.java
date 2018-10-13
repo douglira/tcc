@@ -1,5 +1,5 @@
 package enums;
 
-public enum NotificationTopic {
+public enum NotificationResource {
 	ORDER, PAYMENT, QUOTE, PURCHASE_REQUEST;
 }

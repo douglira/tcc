@@ -1,6 +1,7 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class ProductRepresentation {
     protected Integer id;
@@ -8,6 +9,8 @@ public class ProductRepresentation {
     protected double basePrice;
     protected File thumbnail;
     protected ArrayList<File> pictures;
+    protected Calendar createdAt;
+    protected Calendar updatedAt;
 
     public Integer getId() {
         return id;
@@ -47,6 +50,22 @@ public class ProductRepresentation {
 
     public void setPictures(ArrayList<File> pictures) {
         this.pictures = pictures;
+    }
+
+    public Calendar getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Calendar createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Calendar getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Calendar updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public void setDefaultThumbnail(String baseUrlPath) {

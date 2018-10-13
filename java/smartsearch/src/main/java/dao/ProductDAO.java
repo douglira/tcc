@@ -27,7 +27,7 @@ public class ProductDAO extends GenericDAO {
         String sql = "INSERT INTO " + TABLE_NAME + " (seller_id, product_item_id, category_id, title, description, "
                 + "base_price, available_quantity, situation, status, sold_quantity, created_at) VALUES (?, ?, ?, ?, "
                 + "?, ?, ?, CAST( ? as product_situation), CAST( ? as status_entity), "
-                + "0, NOW())";
+                + "0, ?)";
         try {
             stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             stmt.setInt(1, product.getSeller().getId());
@@ -39,6 +39,7 @@ public class ProductDAO extends GenericDAO {
             stmt.setInt(7, product.getAvailableQuantity());
             stmt.setString(8, product.getSituation().toString());
             stmt.setString(9, product.getStatus().toString());
+            stmt.setTimestamp(10, new Timestamp(product.getCreatedAt().getTimeInMillis()));
             stmt.execute();
 
             rs = stmt.getGeneratedKeys();

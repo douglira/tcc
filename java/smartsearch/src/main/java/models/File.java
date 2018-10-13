@@ -10,7 +10,7 @@ public class File {
     private double size;
     private String type;
     private String subtype;
-//    private Calendar createdAt;
+    private Calendar createdAt;
 
     public Integer getId() {
         return id;
@@ -68,13 +68,13 @@ public class File {
         this.subtype = subtype;
     }
 
-//    public Calendar getCreatedAt() {
-//        return createdAt;
-//    }
-//
-//    public void setCreatedAt(Calendar createdAt) {
-//        this.createdAt = createdAt;
-//    }
+    public Calendar getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Calendar createdAt) {
+        this.createdAt = createdAt;
+    }
 
     @Override
     public boolean equals(Object obj) {

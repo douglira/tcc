@@ -6,7 +6,9 @@ import javax.websocket.EndpointConfig;
 
 import com.google.gson.Gson;
 
-public class NotificationEncoder implements Encoder.Text<Notification> {
+import java.util.ArrayList;
+
+public class NotificationEncoder implements Encoder.Text<ArrayList<Notification>> {
 
 	private static Gson gson = new Gson();
 
@@ -21,8 +23,8 @@ public class NotificationEncoder implements Encoder.Text<Notification> {
 	}
 
 	@Override
-	public String encode(Notification notification) throws EncodeException {
-		return gson.toJson(notification);
+	public String encode(ArrayList<Notification> notifications) throws EncodeException {
+		return gson.toJson(notifications);
 	}
 
 }

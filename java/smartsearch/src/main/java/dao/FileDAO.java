@@ -4,6 +4,7 @@ import models.File;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class FileDAO extends GenericDAO {
     private static final String TABLE_NAME = "files";
@@ -22,7 +23,7 @@ public class FileDAO extends GenericDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String sql = "INSERT INTO " + TABLE_NAME + " (filename, name, size, "
-                + "type, subtype, url_path, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+                + "type, subtype, url_path, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try {
             stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -32,6 +33,10 @@ public class FileDAO extends GenericDAO {
             stmt.setString(4, file.getType());
             stmt.setString(5, file.getSubtype());
             stmt.setString(6, file.getUrlPath());
+
+            file.setCreatedAt(Calendar.getInstance());
+            stmt.setTimestamp(7, new Timestamp(file.getCreatedAt().getTimeInMillis()));
+
             stmt.execute();
 
             rs = stmt.getGeneratedKeys();
@@ -59,6 +64,10 @@ public class FileDAO extends GenericDAO {
             file.setType(rs.getString("type"));
             file.setSubtype(rs.getString("subtype"));
             file.setUrlPath(rs.getString("url_path"));
+
+            Calendar createdAt = Calendar.getInstance();
+            createdAt.setTime(rs.getTimestamp("created_at"));
+            file.setCreatedAt(createdAt);
 
             files.add(file);
         }

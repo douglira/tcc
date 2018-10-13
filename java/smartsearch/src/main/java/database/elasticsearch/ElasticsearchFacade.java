@@ -44,6 +44,8 @@ public class ElasticsearchFacade {
         productIndex.setThumbnail(productItem.getThumbnail());
         productIndex.setPictures(productItem.getPictures());
         productIndex.setStatus(productItem.getStatus());
+        productIndex.setCreatedAt(productItem.getCreatedAt());
+        productIndex.setUpdatedAt(productItem.getUpdatedAt());
 
         Gson gJson = new Gson();
         String productItemJson = gJson.toJson(productIndex);

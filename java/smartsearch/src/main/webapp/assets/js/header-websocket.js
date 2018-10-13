@@ -3,6 +3,7 @@ const VueHeader = new Vue({
 	data() {
 		return {
 			purchaseRequest: null,
+      notifications: [],
 			username: '',
 		}
 	},
@@ -10,14 +11,10 @@ const VueHeader = new Vue({
     const username = document.getElementById('inputHeaderUsername').value;
     if (username) {
       this.username = username;
+      await this.loadNotifications();
       this.initializeConnection();
       await this.loadPurchaseRequest();
     }
-	},
-	computed: {
-		allNotifications() {
-			return null;
-		}
 	},
 	methods: {
 		async loadPurchaseRequest() {
@@ -30,8 +27,14 @@ const VueHeader = new Vue({
 					console.log('loadPurchaseRequest ERROR: ' + err);
 				}
 		},
-		loadNotifications() {
-			
+		async loadNotifications() {
+			const response = await axios.get('/account/me/notifications');
+			console.log(response);
+			if (response.status === 200) {
+				this.notifications = response.data;
+			} else if (response.status === 503) {
+				console.log(response.data);
+			}
 		},
 		initializeConnection() {
 			const wsNotify = new WebSocket(`ws://localhost:8080/notify/${this.username}`);
@@ -40,10 +43,7 @@ const VueHeader = new Vue({
       wsPurchaseRequest.onmessage = this.handlePurchaseRequestCreation
 		},
 		handleNotification(event) {
-			console.log('Receiving notification!');
-			
-			const notification = JSON.parse(event.data);
-			console.log(notification);
+			console.log(JSON.parse(event.data));
 		},
     handlePurchaseRequestCreation(event) {
 		  const purchaseRequest = JSON.parse(event.data);

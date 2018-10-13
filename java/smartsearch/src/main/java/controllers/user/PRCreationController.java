@@ -3,6 +3,7 @@ package controllers.user;
 import com.google.gson.Gson;
 import controllers.socket.PurchaseRequestSocket;
 import dao.*;
+import database.elasticsearch.ElasticsearchFacade;
 import enums.MessengerType;
 import enums.PRStage;
 import libs.Helper;
@@ -48,6 +49,8 @@ public class PRCreationController extends HttpServlet {
             ProductItem productItem = new ProductItem();
             productItem.setId(Integer.parseInt(productItemId));
 
+            updateViewsCount(Integer.parseInt(productItemId), Helper.getBaseUrl(request));
+
             ProductList productList = new ProductList();
             productList.setAdditionalSpec(productItemAdditionalSpec);
             productList.setProduct(productItem);
@@ -64,6 +67,19 @@ public class PRCreationController extends HttpServlet {
             System.out.println("PRCreationController.doPost [ERROR]: " + error);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
+    }
+
+    private void updateViewsCount(int productItemId , String baseUrl) {
+        ProductItem productItem = new ProductItem();
+        productItem.setId(productItemId);
+
+        productItem = new ProductItemDAO(true).findById(productItem);
+        productItem.setViewsCount(productItem.getViewsCount() + 1);
+        new ProductItemDAO(true).updateViewsCount(productItem);
+        productItem.setPictures(new FileDAO(true).getProductItemPictures(productItem.getId()));
+        productItem.setDefaultThumbnail(baseUrl);
+
+        new ElasticsearchFacade().indexProductItem(productItem);
     }
 
     private void addProductItem(PrintWriter out, String baseUrl, User user, ProductList productList) throws SQLException {

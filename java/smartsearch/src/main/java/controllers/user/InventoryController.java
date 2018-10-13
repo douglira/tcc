@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 @WebServlet(name = "InventoryController", urlPatterns = {"/account/me/inventory"})
 public class InventoryController extends HttpServlet {
@@ -103,6 +104,7 @@ public class InventoryController extends HttpServlet {
             product.setSeller(seller);
             product.setSituation(ProductSituation.LINKED);
             product.setStatus(Status.ACTIVE);
+            product.setCreatedAt(Calendar.getInstance());
 
             ProductItemDAO productItemDao = new ProductItemDAO(true);
 
@@ -110,7 +112,7 @@ public class InventoryController extends HttpServlet {
             Integer remainingPicturesCount = ProductItem.MAX_PICTURES;
 
             if (productItemId == null || productItemId.length() == 0) {
-                createNewProductItem(productItem, product, productItemDao);
+                productItem = createNewProductItem(productItem, product, productItemDao);
                 productItem.setDefaultThumbnail(Helper.getBaseUrl(request));
 
                 msg = new Messenger("Seu novo produto foi cadastrado com sucesso em nosso sistema.", MessengerType.SUCCESS);
@@ -195,13 +197,15 @@ public class InventoryController extends HttpServlet {
         productItemDao.updatePricesAndRelevance(productItem);
     }
 
-    private void createNewProductItem(ProductItem productItem, Product product, ProductItemDAO productItemDao) throws SQLException {
+    private ProductItem createNewProductItem(ProductItem productItem, Product product, ProductItemDAO productItemDao) throws SQLException {
         productItem.setBasePrice(product.getBasePrice());
         productItem.setMaxPrice(product.getBasePrice());
         productItem.setMinPrice(product.getBasePrice());
+        productItem.setCreatedAt(Calendar.getInstance());
+        productItem.setPictures(new ArrayList<File>());
 
         productItemDao.initTransaction();
-        productItem = productItemDao.create(productItem);
+        return productItemDao.create(productItem);
     }
 
     private boolean validateParameters(String categoryId, String productJson) {

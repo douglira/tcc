@@ -125,9 +125,10 @@
                                             <div class="info_container-product-item">
                                                 <div class="info_content-product-item">
                                                     <p class="text-dark">{{ productItemPreview.title }}</p>
-                                                    <small class="text-secondary">Relevância: {{
-                                                        productItemPreview.relevance
-                                                        }}
+                                                    <small class="text-secondary">
+                                                        Abrangência:
+                                                        &nbsp;
+                                                        {{ productItemPreview.relevance }}
                                                     </small>
                                                     <br/>
                                                     <small class="text-muted">Visualizações: {{
@@ -136,14 +137,15 @@
                                                     </small>
                                                 </div>
                                                 <div class="price_content-product-item">
-                                                    <p class="text-success">R$ {{
-                                                        productItemPreview.basePrice.toFixed(2)
-                                                        }}</p>
+                                                    <p class="text-success">
+                                                        {{ formatCurrency(productItemPreview.basePrice) }}
+                                                    </p>
                                                     <small class="text-muted">
                                                         Flutuação (R$)
                                                         <br/>
-                                                        {{ productItemPreview.maxPrice.toFixed(2) }} - {{
-                                                        productItemPreview.minPrice.toFixed(2) }}
+                                                        {{ formatDecimal(productItemPreview.maxPrice) }}
+                                                        &nbsp;&hyphen;&nbsp;
+                                                        {{ formatDecimal(productItemPreview.minPrice) }}
                                                     </small>
                                                 </div>
                                             </div>

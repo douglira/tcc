@@ -23,7 +23,7 @@ public class PurchaseRequestDAO extends GenericDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String sql = "INSERT INTO " + TABLE_NAME + " (id, buyer_id, stage, additional_data, due_date_average, " +
-                "total_amount, views_count, propagation_count, created_at) VALUES (nextval('pr_sequence'), ?, CAST(? AS pr_stage), ?, ?, ?, ?, ?, NOW())";
+                "total_amount, views_count, propagation_count, created_at) VALUES (nextval('pr_sequence'), ?, CAST(? AS pr_stage), ?, ?, ?, ?, ?, ?)";
         try {
             stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             stmt.setInt(1, purchaseRequest.getBuyer().getId());
@@ -33,6 +33,10 @@ public class PurchaseRequestDAO extends GenericDAO {
             stmt.setDouble(5, purchaseRequest.getTotalAmount());
             stmt.setInt(6, purchaseRequest.getViewsCount());
             stmt.setInt(7, purchaseRequest.getPropagationCount());
+
+            purchaseRequest.setCreatedAt(Calendar.getInstance());
+            stmt.setTimestamp(8, new Timestamp(purchaseRequest.getCreatedAt().getTimeInMillis()));
+
             stmt.execute();
 
             rs = stmt.getGeneratedKeys();
@@ -152,12 +156,16 @@ public class PurchaseRequestDAO extends GenericDAO {
 
     public void updatePropagation(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET propagation_count = ?, updated_at = NOW() WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET propagation_count = ?, updated_at = ? WHERE id = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);
             stmt.setInt(1, purchaseRequest.getPropagationCount());
-            stmt.setInt(2, purchaseRequest.getId());
+
+            purchaseRequest.setUpdatedAt(Calendar.getInstance());
+            stmt.setTimestamp(2, new Timestamp(purchaseRequest.getUpdatedAt().getTimeInMillis()));
+
+            stmt.setInt(3, purchaseRequest.getId());
             stmt.execute();
         } catch (SQLException err) {
             err.printStackTrace();
@@ -167,12 +175,16 @@ public class PurchaseRequestDAO extends GenericDAO {
 
     public void updateDueDate(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET due_date_average = ?, updated_at = NOW() WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET due_date_average = ?, updated_at = ? WHERE id = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);
             stmt.setTimestamp(1, new Timestamp(purchaseRequest.getDueDateAverage().getTimeInMillis()));
-            stmt.setInt(2, purchaseRequest.getId());
+
+            purchaseRequest.setUpdatedAt(Calendar.getInstance());
+            stmt.setTimestamp(2, new Timestamp(purchaseRequest.getUpdatedAt().getTimeInMillis()));
+
+            stmt.setInt(3, purchaseRequest.getId());
             stmt.execute();
         } catch (SQLException err) {
             err.printStackTrace();
@@ -182,12 +194,16 @@ public class PurchaseRequestDAO extends GenericDAO {
 
     public void updateTotalAmount(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET total_amount = ?, updated_at = NOW() WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET total_amount = ?, updated_at = ? WHERE id = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);
             stmt.setDouble(1, purchaseRequest.getTotalAmount());
-            stmt.setInt(2, purchaseRequest.getId());
+
+            purchaseRequest.setUpdatedAt(Calendar.getInstance());
+            stmt.setTimestamp(2, new Timestamp(purchaseRequest.getUpdatedAt().getTimeInMillis()));
+
+            stmt.setInt(3, purchaseRequest.getId());
             stmt.execute();
         } catch (SQLException err) {
             err.printStackTrace();
@@ -203,13 +219,17 @@ public class PurchaseRequestDAO extends GenericDAO {
 
     public void updatePublish(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET stage = CAST(? as pr_stage), additional_data = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET stage = CAST(? as pr_stage), additional_data = ?, updated_at = ? WHERE id = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);
             stmt.setString(1, purchaseRequest.getStage().toString());
             stmt.setString(2, purchaseRequest.getAdditionalData());
-            stmt.setInt(3, purchaseRequest.getId());
+
+            purchaseRequest.setUpdatedAt(Calendar.getInstance());
+            stmt.setTimestamp(3, new Timestamp(purchaseRequest.getUpdatedAt().getTimeInMillis()));
+
+            stmt.setInt(4, purchaseRequest.getId());
             stmt.execute();
         } catch (SQLException err) {
             err.printStackTrace();
@@ -232,8 +252,8 @@ public class PurchaseRequestDAO extends GenericDAO {
 
         try {
             stmt = this.conn.prepareStatement(sql);
-            stmt.setInt(1, purchaseRequestId);
             stmt.setInt(2, buyerId);
+            stmt.setInt(1, purchaseRequestId);
             stmt.execute();
             this.conn.commit();
         } catch (SQLException err) {

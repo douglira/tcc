@@ -1,62 +1,91 @@
 package models.socket;
 
 import enums.NotificationStatus;
-import enums.NotificationTopic;
+import enums.NotificationResource;
 import models.User;
 
+import java.util.Calendar;
+
 public class Notification {
-	private User from = new User() ;
-	private User to = new User();
-	private NotificationTopic topic;
-	private String action;
-	private String content;
-	private NotificationStatus status;
+    private Integer id;
+    private User from;
+    private User to;
+    private Integer resourceId;
+    private NotificationResource resourceType;
+    private String content;
+    private NotificationStatus status;
+    private Calendar createdAt;
+    private Calendar updatedAt;
 
-	public User getFrom() {
-		return from;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public void setFrom(User from) {
-		this.from = from;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public User getTo() {
-		return to;
-	}
+    public User getFrom() {
+        return from;
+    }
 
-	public void setTo(User to) {
-		this.to = to;
-	}
+    public void setFrom(User from) {
+        this.from = from;
+    }
 
-	public NotificationTopic getTopic() {
-		return topic;
-	}
+    public User getTo() {
+        return to;
+    }
 
-	public void setTopic(NotificationTopic topic) {
-		this.topic = topic;
-	}
+    public void setTo(User to) {
+        this.to = to;
+    }
 
-	public String getAction() {
-		return action;
-	}
+    public Integer getResourceId() {
+        return resourceId;
+    }
 
-	public void setAction(String action) {
-		this.action = action;
-	}
+    public void setResourceId(Integer resourceId) {
+        this.resourceId = resourceId;
+    }
 
-	public String getContent() {
-		return content;
-	}
+    public NotificationResource getResourceType() {
+        return resourceType;
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    public void setResourceType(NotificationResource resourceType) {
+        this.resourceType = resourceType;
+    }
 
-	public NotificationStatus getStatus() {
-		return status;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public void setStatus(NotificationStatus status) {
-		this.status = status;
-	}
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public NotificationStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(NotificationStatus status) {
+        this.status = status;
+    }
+
+    public Calendar getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Calendar createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Calendar getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Calendar updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

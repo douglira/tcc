@@ -84,9 +84,9 @@ public class UserDAO extends GenericDAO {
             file.setType(rs.getString("type"));
             file.setSubtype(rs.getString("subtype"));
 
-//            Calendar createdAt = Calendar.getInstance();
-//            createdAt.setTime(rs.getTimestamp("file_created_at"));
-//            file.setCreatedAt(createdAt);
+            Calendar createdAt = Calendar.getInstance();
+            createdAt.setTime(rs.getTimestamp("file_created_at"));
+            file.setCreatedAt(createdAt);
 
             user.setAvatar(file);
         } catch (NullPointerException error) {
@@ -130,6 +130,35 @@ public class UserDAO extends GenericDAO {
                 } catch (SQLException errClose) {
                     errClose.printStackTrace();
                     System.out.println("UserDAO.findById [ERROR](2): " + errClose);
+                }
+            }
+        }
+        return user;
+    }
+
+    public User findByUsername(User user) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE username = ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setString(1, user.getUsername());
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                user = this.fetch(rs, user, null);
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            System.out.println("UserDAO.findByUsername [ERROR](1): " + sqlException);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException errClose) {
+                    errClose.printStackTrace();
+                    System.out.println("UserDAO.findByUsername [ERROR](2): " + errClose);
                 }
             }
         }
