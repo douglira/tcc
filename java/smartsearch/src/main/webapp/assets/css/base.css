@@ -31,37 +31,3 @@ body {
 .app-bg-secundary {
 	background-color: #6B84D9 !important;
 }
-
-header {
-	margin-bottom: 20px;
-}
-
-.header-btn_dropdown {
-	background-color: inherit !important;
-	margin-right: 10px !important;
-	border: 0 !important;
-	padding-left: 0 !important;
-}
-
-header form input::placeholder {
-	font-size: 12.5px !important;
-}
-
-.btn-notification {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background-color: inherit;
-	padding: 10px;
-	border: 0;
-	font-size: 24px;
-	cursor: pointer;
-	/*margin: 5px;*/
-	color: #999;
-	border-radius: 50%;
-	position: relative;
-}
-
-.btn-notification:hover {
-	background-color: #f1f1f1;
-}

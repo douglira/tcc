@@ -97,7 +97,7 @@
                                 aria-haspopup="true"
                                 data-toggle="dropdown">
                             <template v-if="purchaseRequest && purchaseRequest.listProducts.length">
-                                <span class="btn-cart-badge bg-danger">{{ purchaseRequest.listProducts.length }}</span>
+                                <span class="btn-badge-count bg-danger">{{ purchaseRequest.listProducts.length }}</span>
                             </template>
                             <i class="fas fa-shopping-cart"></i>
                         </button>
@@ -128,17 +128,54 @@
                             </template>
                             <template v-else>
                                 <div
-                                        style="font-size: 12px;"
-                                        class="p-md-3 p-lg-3 p-sm-3 alert alert-light text-center font-italic text-muted"
-                                        role="alert">
+                                    style="font-size: 12px;"
+                                    class="p-md-3 p-lg-3 p-sm-3 alert alert-light text-center font-italic text-muted"
+                                    role="alert">
                                     Nenhum pedido de compra criado...
                                 </div>
                             </template>
                         </div>
                     </div>
-                    <button class="btn-notification">
-                        <i class="far fa-bell"></i>
-                    </button>
+
+                    <div class="dropdown">
+                        <button
+                            type="button"
+                            id="btnHeaderNotification"
+                            aria-haspopup="true"
+                            data-toggle="dropdown"
+                            class="btn-notification dropdown-toggle">
+                            <template v-if="notifications && notifications.length">
+                                <span class="btn-badge-count bg-danger">{{ notifications.length }}</span>
+                            </template>
+                            <i class="far fa-bell"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-left" aria-labelledby="btnHeaderNotification">
+                            <template v-if="notifications && notifications.length">
+                                <ul class="list-group list-group-flush">
+                                    <a
+                                        v-for="(notification, index) in notifications"
+                                        :key="notification.id"
+                                        class="list-group-item list-group-item-action notification-item"
+                                        :href="getNotificationUrl(notification)">
+                                        <i v-if="getIconNotification" :class="['notification-icon', getIconNotification(notification)]"></i>
+                                        <span :class="[
+                                            'text-muted',
+                                             'notification-content',
+                                             notification.status === 'PENDING' && 'font-weight-bold',
+                                            ]">{{ notification.content }}</span>
+                                    </a>
+                                </ul>
+                            </template>
+                            <template v-else>
+                                <div
+                                    style="font-size: 12px;"
+                                    class="p-md-3 p-lg-3 p-sm-3 alert alert-light text-center font-italic text-muted"
+                                    role="alert">
+                                    Nenhuma notificação recente...
+                                </div>
+                            </template>
+                        </div>
+                    </div>
                 </template>
             </c:if>
 

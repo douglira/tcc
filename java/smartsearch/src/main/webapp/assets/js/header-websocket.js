@@ -28,12 +28,11 @@ const VueHeader = new Vue({
 				}
 		},
 		async loadNotifications() {
-			const response = await axios.get('/account/me/notifications');
-			console.log(response);
-			if (response.status === 200) {
-				this.notifications = response.data;
-			} else if (response.status === 503) {
-				console.log(response.data);
+      try {
+        const response = await axios.get('/account/me/notifications');
+        this.notifications = response.data;
+      } catch (err) {
+      	console.log(err.response.data);
 			}
 		},
 		initializeConnection() {
@@ -43,7 +42,7 @@ const VueHeader = new Vue({
       wsPurchaseRequest.onmessage = this.handlePurchaseRequestCreation
 		},
 		handleNotification(event) {
-			console.log(JSON.parse(event.data));
+			this.notifications = JSON.parse(event.data)
 		},
     handlePurchaseRequestCreation(event) {
 		  const purchaseRequest = JSON.parse(event.data);
@@ -53,6 +52,22 @@ const VueHeader = new Vue({
 			}
 
 		  this.purchaseRequest = purchaseRequest;
-    }
+    },
+    getNotificationUrl(notification) {
+			switch (notification.resourceType) {
+				case 'PURCHASE_REQUEST':
+					return `/account/quotes/suggest?pr=${notification.resourceId}`;
+				default:
+					return 'javascript:void(0)';
+			}
+		},
+		getIconNotification(notification) {
+			switch(notification.resourceType) {
+				case 'PURCHASE_REQUEST':
+					return 'fas fa-file-invoice-dollar';
+				default:
+					return null;
+			}
+		}
 	}
 });
