@@ -17,6 +17,7 @@ public class PurchaseRequest {
     private String additionalData;
     private PRStage stage;
     private Calendar dueDateAverage;
+    private boolean quotesVisibility;
     private int viewsCount;
     private double totalAmount;
     private Calendar createdAt;
@@ -85,6 +86,14 @@ public class PurchaseRequest {
 
     public void setDueDateAverage(Calendar dueDateAverage) {
         this.dueDateAverage = dueDateAverage;
+    }
+
+    public boolean getQuotesVisibility() {
+        return quotesVisibility;
+    }
+
+    public void setQuotesVisibility(boolean quotesVisibility) {
+        this.quotesVisibility = quotesVisibility;
     }
 
     public int getViewsCount() {

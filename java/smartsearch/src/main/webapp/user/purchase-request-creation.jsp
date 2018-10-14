@@ -101,6 +101,7 @@
     <div class="card border-light mb-sm-3 mb-md-3">
         <div class="bg-dark w-100 d-flex justify-content-center align-items-center">
             <span
+                id="popoverPropagationCount"
                 tabindex="0"
                 data-toggle="popover"
                 class="text-white pr-propagation-text">
@@ -151,6 +152,14 @@
                     </p>
                 </div>
                 <div style="flex: 1; margin: 20px 0;">
+                    <div class="form-group">
+                        <div class="form-check" style="margin-bottom: 20px">
+                            <input class="form-check-input" type="checkbox" v-model="prQuotesVisibility" id="quotesVisibility">
+                            <label class="form-check-label" for="quotesVisibility">
+                                Permitir que os fornecedores visualizem as cotações concorrentes
+                            </label>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label for="additionalData">Informações adicionais</label>
                         <textarea class="form-control" id="additionalData" aria-describedby="additionalDataInfo" rows="3" v-model="prAdditionalData"></textarea>

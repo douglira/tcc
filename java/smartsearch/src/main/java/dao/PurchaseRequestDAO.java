@@ -23,7 +23,7 @@ public class PurchaseRequestDAO extends GenericDAO {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String sql = "INSERT INTO " + TABLE_NAME + " (id, buyer_id, stage, additional_data, due_date_average, " +
-                "total_amount, views_count, propagation_count, created_at) VALUES (nextval('pr_sequence'), ?, CAST(? AS pr_stage), ?, ?, ?, ?, ?, ?)";
+                "total_amount, views_count, propagation_count, quotes_visibility, created_at) VALUES (nextval('pr_sequence'), ?, CAST(? AS pr_stage), ?, ?, ?, ?, ?, ?, ?)";
         try {
             stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             stmt.setInt(1, purchaseRequest.getBuyer().getId());
@@ -33,9 +33,10 @@ public class PurchaseRequestDAO extends GenericDAO {
             stmt.setDouble(5, purchaseRequest.getTotalAmount());
             stmt.setInt(6, purchaseRequest.getViewsCount());
             stmt.setInt(7, purchaseRequest.getPropagationCount());
+            stmt.setBoolean(8, purchaseRequest.getQuotesVisibility());
 
             purchaseRequest.setCreatedAt(Calendar.getInstance());
-            stmt.setTimestamp(8, new Timestamp(purchaseRequest.getCreatedAt().getTimeInMillis()));
+            stmt.setTimestamp(9, new Timestamp(purchaseRequest.getCreatedAt().getTimeInMillis()));
 
             stmt.execute();
 
@@ -59,6 +60,7 @@ public class PurchaseRequestDAO extends GenericDAO {
         purchaseRequest.setTotalAmount(rs.getDouble("total_amount"));
         purchaseRequest.setViewsCount(rs.getInt("views_count"));
         purchaseRequest.setPropagationCount(rs.getInt("propagation_count"));
+        purchaseRequest.setQuotesVisibility(rs.getBoolean("quotes_visibility"));
 
         Calendar dueDateAverage = Calendar.getInstance();
         dueDateAverage.setTime(rs.getTimestamp("due_date_average"));
@@ -219,17 +221,18 @@ public class PurchaseRequestDAO extends GenericDAO {
 
     public void updatePublish(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET stage = CAST(? as pr_stage), additional_data = ?, updated_at = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET stage = CAST(? as pr_stage), additional_data = ?, quotes_visibility = ?, updated_at = ? WHERE id = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);
             stmt.setString(1, purchaseRequest.getStage().toString());
             stmt.setString(2, purchaseRequest.getAdditionalData());
+            stmt.setBoolean(3, purchaseRequest.getQuotesVisibility());
 
             purchaseRequest.setUpdatedAt(Calendar.getInstance());
-            stmt.setTimestamp(3, new Timestamp(purchaseRequest.getUpdatedAt().getTimeInMillis()));
+            stmt.setTimestamp(4, new Timestamp(purchaseRequest.getUpdatedAt().getTimeInMillis()));
 
-            stmt.setInt(4, purchaseRequest.getId());
+            stmt.setInt(5, purchaseRequest.getId());
             stmt.execute();
         } catch (SQLException err) {
             err.printStackTrace();

@@ -115,6 +115,7 @@ public class PRCreationController extends HttpServlet {
         PurchaseRequest purchaseRequest = new PurchaseRequest();
         purchaseRequest.setBuyer(buyer);
         purchaseRequest.setStage(PRStage.CREATION);
+        purchaseRequest.setQuotesVisibility(false);
 
         ArrayList<PurchaseRequest> prs = new PurchaseRequestDAO(true).findByStageAndBuyer(purchaseRequest);
         if (prs == null || prs.isEmpty()) {

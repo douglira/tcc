@@ -14,6 +14,7 @@ const VuePRCreation = new Vue({
       username: null,
       purchaseRequest: null,
       prAdditionalData: '',
+      prQuotesVisibility: false,
       modalData: {
         productItemId: null,
         productItemTitle: '',
@@ -31,12 +32,14 @@ const VuePRCreation = new Vue({
   },
   methods: {
     onClickPublish() {
-      this.purchaseRequest.additionalData = this.prAdditionalData;
-
       $.post(
         '/account/purchase_request/publish',
         {
-          purchaseRequest: JSON.stringify(this.purchaseRequest),
+          purchaseRequest: JSON.stringify({
+            ...this.purchaseRequest,
+            additionalData: this.prAdditionalData,
+            quotesVisibility: this.prQuotesVisibility,
+          }),
         }
       )
         .done(() => {
@@ -97,7 +100,7 @@ const VuePRCreation = new Vue({
     },
     initPopover() {
       $(function () {
-        $('[data-toggle="popover"]').popover({
+        $('#popoverPropagationCount').popover({
           trigger: 'hover focus',
           placement: 'right',
           title: 'Abrangência',
