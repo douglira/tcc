@@ -53,7 +53,7 @@ public class PRAbortController extends HttpServlet {
         productListDao.initTransaction();
 
         productListDao.removeAll(purchaseRequest.getId());
-        new PurchaseRequestDAO(productListDao.getConnection()).destroy(purchaseRequest.getId(), purchaseRequest.getBuyer().getId());
+        new PurchaseRequestDAO(productListDao.getConnection()).destroyCreation(purchaseRequest.getId(), purchaseRequest.getBuyer().getId());
 
         purchaseRequest.setId(null);
         PurchaseRequestSocket.sendUpdatedPRCreation(user, purchaseRequest, null);

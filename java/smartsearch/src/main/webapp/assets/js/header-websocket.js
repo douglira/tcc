@@ -56,7 +56,7 @@ const VueHeader = new Vue({
     getNotificationUrl(notification) {
 			switch (notification.resourceType) {
 				case 'PURCHASE_REQUEST':
-					return `/account/quotes/suggest?pr=${notification.resourceId}`;
+					return `/account/purchase_request/suggest?pr=${notification.resourceId}`;
 				default:
 					return 'javascript:void(0)';
 			}

@@ -284,14 +284,14 @@ public class CategoryDAO extends GenericDAO {
 			stmt.execute();
 		} catch (Exception sqlException) {
 			sqlException.printStackTrace();
-			System.out.println("CategoryDAO.destroy [ERROR](1): " +  sqlException);
+			System.out.println("CategoryDAO.destroyCreation [ERROR](1): " +  sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
 					errClose.printStackTrace();
-					System.out.println("CategoryDAO.destroy [ERROR](2): " +  errClose);
+					System.out.println("CategoryDAO.destroyCreation [ERROR](2): " +  errClose);
 				}
 			}
 		}

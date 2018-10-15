@@ -81,7 +81,7 @@ public class PREditController extends HttpServlet {
         ArrayList<ProductList> products = new ProductListDAO(true).findByPurchaseRequest(purchaseRequestId);
         if (products.isEmpty()) {
             PurchaseRequest pr = new PurchaseRequest();
-            new PurchaseRequestDAO(productListDao.getConnection()).destroy(purchaseRequestId, user.getPerson().getId());
+            new PurchaseRequestDAO(productListDao.getConnection()).destroyCreation(purchaseRequestId, user.getPerson().getId());
 
             pr.setId(null);
             PurchaseRequestSocket.sendUpdatedPRCreation(user, pr, null);

@@ -249,9 +249,9 @@ public class PurchaseRequestDAO extends GenericDAO {
         }
     }
 
-    public void destroy(int purchaseRequestId, int buyerId) {
+    public void destroyCreation(int purchaseRequestId, int buyerId) {
         PreparedStatement stmt = null;
-        String sql = "DELETE FROM " + TABLE_NAME + " WHERE id = ? AND buyer_id = ?";
+        String sql = "DELETE FROM " + TABLE_NAME + " WHERE id = ? AND buyer_id = ? AND stage = CAST('CREATION' as pr_stage)";
 
         try {
             stmt = this.conn.prepareStatement(sql);
@@ -261,12 +261,12 @@ public class PurchaseRequestDAO extends GenericDAO {
             this.conn.commit();
         } catch (SQLException err) {
             err.printStackTrace();
-            System.out.println("PurchaseRequestDAO.destroy [ERROR](1): " + err);
+            System.out.println("PurchaseRequestDAO.destroyCreation [ERROR](1): " + err);
             try {
                 this.conn.rollback();
             } catch (SQLException error) {
                 error.printStackTrace();
-                System.out.println("PurchaseRequestDAO.destroy [ERROR](2): " + error);
+                System.out.println("PurchaseRequestDAO.destroyCreation [ERROR](2): " + error);
             }
         } finally {
             if (this.conn != null) {
@@ -274,7 +274,7 @@ public class PurchaseRequestDAO extends GenericDAO {
                     this.conn.close();
                 } catch (SQLException err) {
                     err.printStackTrace();
-                    System.out.println("PurchaseRequestDAO.destroy [ERROR](3): " + err);
+                    System.out.println("PurchaseRequestDAO.destroyCreation [ERROR](3): " + err);
                 }
             }
         }
