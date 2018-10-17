@@ -1,0 +1,40 @@
+.page-title {
+    flex: 1;
+    text-transform: uppercase;
+    font-size: 28px;
+}
+
+.pr-created_at {
+    font-size: 14px;
+    text-transform: initial !important;
+}
+
+.table-body {
+    height: auto !important;
+    max-height: 550px !important;
+    overflow-y: hidden !important;
+}
+
+.countdown {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    font-size: 18px;
+    font-weight: 500;
+}
+/*.pr-btn-delete {
+    font-size: 32px;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    border: 0;
+    background-color: inherit;
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+    margin-right: 20px;
+}
+
+.pr-btn-delete:hover {
+    transform: scale(1.2);
+}*/

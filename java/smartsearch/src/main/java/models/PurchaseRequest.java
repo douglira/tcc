@@ -24,6 +24,14 @@ public class PurchaseRequest {
     private Calendar updatedAt;
     private Calendar closedAt;
 
+    public PurchaseRequest() {
+
+    }
+
+    public PurchaseRequest(Integer id) {
+        this.id = id;
+    }
+
     public Integer getId() {
         return id;
     }

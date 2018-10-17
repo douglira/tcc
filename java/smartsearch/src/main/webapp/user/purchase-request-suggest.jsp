@@ -32,9 +32,42 @@
                     {{ formatFullDate(purchaseRequest.createdAt) }}
                 </small>
             </h1>
-            <button class="text-secondary pr-btn-delete" type="button" @click="deletePurchaseRequest">
-                <i class="fas fa-trash"></i>
-            </button>
+            <div v-if="countdown" class="countdown text-muted">
+                {{ countdown }}
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-light mb-sm-3 mb-md-3">
+        <div class="card-body d-flex flex-nowrap align-items-center">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Anúncio</th>
+                        <th scope="col" class="text-right">Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody class="table-body">
+                    <tr
+                        v-for="productList in purchaseRequest.listProducts"
+                        :key="productList.product.id">
+                        <th scope="row">{{ productList.product.id }}</th>
+                        <td>{{ productList.product.title }}</td>
+                        <td class="text-right">{{ productList.quantity }}</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th scope="row" colspan="2" ></th>
+                        <td class="text-success text-right font-weight-bold">
+                            <span class="text-dark text-uppercase">Total&colon;</span>
+                            &nbsp;
+                            {{ formatCurrency(purchaseRequest.totalAmount) }}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
 </div>

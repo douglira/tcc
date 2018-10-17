@@ -108,7 +108,7 @@ public class PRPublishController extends HttpServlet {
 
     private String getPurchaseRequestUrl(HttpServletRequest request, PurchaseRequest purchaseRequest) {
         String baseUrl = Helper.getBaseUrl(request);
-        return baseUrl + "/account/quotes/suggest?pr=" + String.valueOf(purchaseRequest.getId());
+        return baseUrl + "/account/purchase_request/suggest?pr=" + String.valueOf(purchaseRequest.getId());
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
