@@ -32,42 +32,152 @@
                     {{ formatFullDate(purchaseRequest.createdAt) }}
                 </small>
             </h1>
-            <div v-if="countdown" class="countdown text-muted">
+            <div v-if="countdown" class="countdown text-danger">
+                <span class="font-weight-bold text-dark">Expira em&colon;</span>
+                &nbsp;
                 {{ countdown }}
+            </div>
+            <div v-else class="countdown text-danger text-uppercase">
+                EXPIRADO!!
             </div>
         </div>
     </div>
 
     <div class="card border-light mb-sm-3 mb-md-3">
-        <div class="card-body d-flex flex-nowrap align-items-center">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th scope="col">ID</th>
-                        <th scope="col">Anúncio</th>
-                        <th scope="col" class="text-right">Quantidade</th>
-                    </tr>
-                </thead>
-                <tbody class="table-body">
-                    <tr
-                        v-for="productList in purchaseRequest.listProducts"
-                        :key="productList.product.id">
-                        <th scope="row">{{ productList.product.id }}</th>
-                        <td>{{ productList.product.title }}</td>
-                        <td class="text-right">{{ productList.quantity }}</td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th scope="row" colspan="2" ></th>
-                        <td class="text-success text-right font-weight-bold">
-                            <span class="text-dark text-uppercase">Total&colon;</span>
+        <div class="card-body d-flex flex-column flex-nowrap align-items-center">
+
+            <div class="list-group list-group-flush list-group-container">
+                <template v-for="productList in purchaseRequest.listProducts">
+                    <button
+                            :class="['list-group-item list-group-item-action list-item-row', productList.additionalSpec ? 'font-weight-bold list-item-row_tooltip' : '']"
+                            :style="productList.additionalSpec ? { cursor: 'pointer' } : null"
+                            type="button"
+                            data-toggle="collapse"
+                            :data-target="'#collapse' + productList.product.id"
+                            aria-expanded="true"
+                            :aria-controls="'collapse' + productList.product.id">
+                        <img :src="productList.product.thumbnail.urlPath" :alt="productList.product.thumbnail.name">
+                        <span style="flex: 1;">{{ productList.product.title }}</span>
+                        <span class="text-right">
+                            {{ productList.quantity }}
                             &nbsp;
-                            {{ formatCurrency(purchaseRequest.totalAmount) }}
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
+                            unidade(s)
+                        </span>
+                    </button>
+                    <div v-if="productList.additionalSpec" :id="'collapse' + productList.product.id" class="collapse" style="margin-bottom: 5px;" >
+                        <div class="card card-body">
+                            <strong>Especificações adicionais&colon;&nbsp;</strong>
+                            {{ productList.additionalSpec }}
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <div class="w-100 text-success text-right font-weight-bold" style="padding: 15px 20px">
+                <span class="text-dark text-uppercase">Total&colon;</span>
+                &nbsp;
+                {{ formatCurrency(purchaseRequest.totalAmount) }}
+            </div>
+            <div v-if="purchaseRequest.additionalData" class="card w-100">
+                <div class="card-body">
+                    <h2 style="font-size: 16px;" class="card-title">Informações gerais adicionais</h2>
+                    <div style="font-size: 14px;" class="card-text">{{ purchaseRequest.additionalData }}</div>
+                </div>
+            </div>
+            <hr>
+            <br>
+            <template v-if="purchaseRequest.stage === 'UNDER_QUOTATION'">
+                <template v-if="purchaseRequest.quotesVisibility">
+                    <template v-if="purchaseRequest.quotes && purchaseRequest.quotes.length">
+
+                    </template>
+                    <template v-else>
+                        <div class="card w-100 text-center text-white" style="background-color: #999">
+                            <div class="card-header text-uppercase font-weight-bold">
+                                Sobre cotações
+                            </div>
+                            <div class="card-body">
+                                <h2 style="font-size: 16px;" class="card-title">Nenhuma cotação enviada</h2>
+                                <p class="card-text">Seja o primeiro a enviar uma cotação para este pedido de compra.</p>
+                                <a href="#sendQuotations">
+                                    <i class="fas fa-comments text-white" style="font-size: 32px"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </template>
+                </template>
+                <template v-else>
+                    <div class="card w-100 text-center text-muted">
+                        <div class="card-header text-uppercase font-weight-bold">
+                            Sobre cotações
+                        </div>
+                        <div class="card-body">
+                            <h2 style="font-size: 16px;" class="card-title">Visualização indisponível</h2>
+                            <p class="card-text font-italic">As cotações para este pedido de compra são restritas. Visualização disponível apenas ao comprador.</p>
+                            <i class="far fa-eye-slash" style="font-size: 32px"></i>
+                        </div>
+                    </div>
+                </template>
+                <div id="sendQuotations" class="w-100" style="margin-top: 15px;">
+                    <div class="input-group">
+                        <input class="form-control form-control-lg" type="text" placeholder="Pesquisar em seu estoque...">
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-light text-secondary border">
+                                <i class="fas fa-search" style="font-size: 28px; padding: 5px; box-sizing: border-box;"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="card col-md-6 border-0">
+                            <div class="card-body">
+                                <div class="card-title font-weight-bold">Seus produtos</div>
+                                <div class="list-group">
+                                    <a
+                                        href="javascript:void(0)"
+                                        v-for="product in productsInventory"
+                                        @click="onSelectedProduct(product)"
+                                        class="list-group-item list-group-item-action">
+                                        {{ product.title }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card col-md-6 border-0">
+                            <div class="card-body">
+                                <div class="card-title font-weight-bold">Produtos selecionados</div>
+                                <div class="list-group"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <div class="form-check" style="margin: 20px 0;">
+                                <input class="form-check-input" type="checkbox" v-model="quoteCustomCost" id="customCostCheckbox">
+                                <label class="form-check-label" for="customCostCheckbox">
+                                    Editar custo total:
+                                </label>
+                            </div>
+                            <label for="costInput">Custo total</label>
+                            <input id="costInput" type="number" :disabled="!quoteCustomCost" class="form-control text-success" min="0.01" step="100">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="additionalData">Informações adicionais</label>
+                            <textarea class="form-control" id="additionalData" aria-describedby="additionalDataInfo" rows="4" v-model="quoteAdditionalData"></textarea>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-info btn-lg btn-block" style="padding: 30px auto !important;" @click="onClickPushQuotation">Lançar cotação</button>
+                </div>
+            </template>
+            <template v-else>
+
+            </template>
+
+
         </div>
     </div>
 </div>
@@ -75,7 +185,6 @@
 <script src="<%=request.getContextPath()%>/assets/libs/fontawesome/js/all.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="<%=request.getContextPath()%>/assets/libs/toast/toastr.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/axios/axios-dist.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/vuejs/vue-dist.js"></script>
 <script src="<%=request.getContextPath()%>/assets/js/purchase-request-suggest.js"></script>

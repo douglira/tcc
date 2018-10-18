@@ -193,4 +193,39 @@ public class ProductDAO extends GenericDAO {
 
         return product;
     }
+
+    public ArrayList<Product> pagination(int page, int perPage, int sellerId) {
+        int offset = (page - 1) * perPage;
+        ArrayList<Product> products = new ArrayList<Product>();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE status = CAST('ACTIVE' as status_entity) AND seller_id = ? OFFSET ? LIMIT ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, sellerId);
+            stmt.setInt(2, offset);
+            stmt.setInt(3, perPage);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Product product = this.fetch(rs, new Product());
+                products.add(product);
+            }
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("ProductDAO.pagination [ERROR](1): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException sqlException) {
+                    sqlException.printStackTrace();
+                    System.out.println("ProductDAO.pagination [ERROR](2): " + sqlException);
+                }
+            }
+        }
+
+        return products;
+    }
 }

@@ -9,10 +9,29 @@
     text-transform: initial !important;
 }
 
-.table-body {
-    height: auto !important;
-    max-height: 550px !important;
-    overflow-y: hidden !important;
+.list-group-container {
+    width: 100%;
+}
+
+.list-item-row {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+.list-item-row img {
+    padding: 5px;
+    margin-right: 5px;
+    height: auto;
+    width: auto;
+    max-height: 52px;
+    max-width: 52px;
+}
+
+.list-item-row span {
+    padding: 5px;
+    align-self: center;
 }
 
 .countdown {
@@ -21,7 +40,7 @@
     align-items: center;
     align-self: stretch;
     font-size: 18px;
-    font-weight: 500;
+    font-weight: lighter;
 }
 /*.pr-btn-delete {
     font-size: 32px;

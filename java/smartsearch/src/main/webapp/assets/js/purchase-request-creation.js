@@ -47,7 +47,14 @@ const VuePRCreation = new Vue({
           VueHeader.$data.purchaseRequest = null;
           this.purchaseRequest = null;
           window.location.replace('/');
-        });
+        })
+        .fail((response) => {
+          const msg = JSON.parse(response.responseText);
+
+          if (msg.content) {
+            this.showMessage(msg.content, msg.type);
+          }
+        })
     },
     onClickEditProduct(productList) {
       this.modalData = {
@@ -104,7 +111,7 @@ const VuePRCreation = new Vue({
           trigger: 'hover focus',
           placement: 'right',
           title: 'Abrangência',
-          content: `Este é a quantidade de fornecedores que possuem os items requisitados abaixo em estoque. 
+          content: `Esta é a quantidade de fornecedores que possuem os items requisitados abaixo em estoque. 
             Ao lançar este pedido de compra uma notificação será enviada a eles, portanto quanto 
             maior este número maior serão as chances de concluir um orçamento.`,
         });
@@ -126,6 +133,9 @@ const VuePRCreation = new Vue({
     async loadData() {
       const response = await axios.get('/account/purchase_request/edit');
       this.purchaseRequest = response.data;
+    },
+    showMessage(msg, type = 'success') {
+      toastr[type.toLowerCase()](msg);
     },
   },
 });

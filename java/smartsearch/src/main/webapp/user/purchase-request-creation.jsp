@@ -175,7 +175,6 @@
 <script src="<%=request.getContextPath()%>/assets/libs/fontawesome/js/all.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="<%=request.getContextPath()%>/assets/libs/toast/toastr.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/axios/axios-dist.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/vuejs/vue-dist.js"></script>
 <script src="<%=request.getContextPath()%>/assets/js/purchase-request-creation.js"></script>

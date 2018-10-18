@@ -11,27 +11,54 @@ const VueComponent = new Vue({
   mixins: [FormatterMixin],
   data() {
     return {
+      page: 1,
+      perPage: 15,
+      productsInventory: [],
       purchaseRequest: null,
       countdown: '',
+      quoteCustomCost: false,
+      quoteAdditionalData: '',
     };
   },
   async created() {
     await this.loadData();
-    this.initCountdown()
+    this.initCountdown();
+    $(function() {
+      $('.list-item-row_tooltip').tooltip({
+        placement: 'top',
+        trigger: 'hover',
+        title: 'Exibir',
+      })
+    })
   },
   methods: {
+    onClickPushQuotation() {
+
+    },
+    onSelectedProduct(product) {
+      console.log(product);
+    },
     showMessage(msg, type = 'success') {
       toastr[type.toLowerCase()](msg);
     },
+    async getProductsInventory() {
+      const { page, perPage } = this;
+      return axios.get(`/account/products?page=${page}&perPage=${perPage}`);
+    },
     async loadData() {
       const purchaseRequestId = window.location.search.split('?pr=')[1];
-      const response = await axios.get(`/account/purchase_request/suggest?pr=${purchaseRequestId || ''}`);
 
-      if (response.data.cause && response.data.cause === 'INVALID_PURCHASE_REQUEST_ID') {
-        return this.showMessage(response.data.content, response.data.type);
+      const [responsePurchaseRequest, responseProducts] = await Promise.all([
+        axios.get(`/account/purchase_request/suggest?pr=${purchaseRequestId || ''}`),
+        this.getProductsInventory(),
+      ]);
+
+      if (responsePurchaseRequest.data.cause && responsePurchaseRequest.data.cause === 'INVALID_PURCHASE_REQUEST_ID') {
+        return this.showMessage(responsePurchaseRequest.data.content, responsePurchaseRequest.data.type);
       }
 
-      this.purchaseRequest = response.data;
+      this.purchaseRequest = responsePurchaseRequest.data;
+      this.productsInventory = responseProducts.data;
     },
     initCountdown() {
       const countdownDate = (this.getDate(this.purchaseRequest.dueDateAverage)).getTime();
@@ -46,10 +73,10 @@ const VueComponent = new Vue({
 
         if (distance < 0) {
           clearInterval(countdownInterval);
-          this.countdown = 'EXPIRADO!';
+          this.countdown = '';
         }
 
-        this.countdown = `Expira em: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+        this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
       });
     }
   }

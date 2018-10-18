@@ -38,6 +38,8 @@ public class PRPublishController extends HttpServlet {
             PurchaseRequest purchaseRequest = gson.fromJson(request.getParameter("purchaseRequest"), PurchaseRequest.class);
 
             if (purchaseRequest.getPropagationCount() == 0) {
+                response.setStatus(400);
+                out = response.getWriter();
                 Helper.responseMessage(out, new Messenger("Abrangência zerada!", MessengerType.WARNING));
                 return;
             }

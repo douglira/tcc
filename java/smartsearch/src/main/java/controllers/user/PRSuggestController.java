@@ -6,16 +6,14 @@ import dao.ProductListDAO;
 import dao.PurchaseRequestDAO;
 import enums.MessengerType;
 import libs.Helper;
-import models.Messenger;
-import models.ProductItem;
-import models.ProductList;
-import models.PurchaseRequest;
+import models.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -28,13 +26,16 @@ public class PRSuggestController extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        HttpSession session = request.getSession();
+        Person person = (Person) session.getAttribute("loggedPerson");
+
         // Content Negotiation
         if (request.getHeader("Accept").contains("application/json")) {
             responseJson(request, response);
         } else {
             String purchaseRequestIdString = request.getParameter("pr");
 
-            if (!isInvalidRequest(purchaseRequestIdString)) {
+            if (!isInvalidRequest(purchaseRequestIdString, person.getId())) {
                 response.sendRedirect("/");
                 return;
             }
@@ -51,7 +52,7 @@ public class PRSuggestController extends HttpServlet {
         try {
             String purchaseRequestIdString = request.getParameter("pr");
 
-            if (!isInvalidRequest(purchaseRequestIdString)) {
+            if (!isInvalidRequest(purchaseRequestIdString, null)) {
                 Helper.responseMessage(out, new Messenger(("Não foi possível carregar os dados"), MessengerType.ERROR, "INVALID_PURCHASE_REQUEST_ID"));
                 return;
             }
@@ -79,7 +80,7 @@ public class PRSuggestController extends HttpServlet {
         }
     }
 
-    private boolean isInvalidRequest(String purchaseRequestIdString) {
+    private boolean isInvalidRequest(String purchaseRequestIdString, Integer buyerId) {
         boolean isValid = false;
 
         if (purchaseRequestIdString == null || purchaseRequestIdString.length() <= 4) {
@@ -93,6 +94,10 @@ public class PRSuggestController extends HttpServlet {
         PurchaseRequest pr = new PurchaseRequestDAO(true).findById(new PurchaseRequest(Integer.parseInt(purchaseRequestIdString)));
 
         if (pr == null) {
+            return isValid;
+        }
+
+        if (buyerId != null && pr.getBuyer().getId() == buyerId) {
             return isValid;
         }
 

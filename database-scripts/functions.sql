@@ -50,7 +50,6 @@ CREATE OR REPLACE FUNCTION get_pr_sellers(pr_id integer) RETURNS integer[]
 AS $$ 
 DECLARE
   pr_id ALIAS FOR $1;
-  ppg_count integer;
   ppg_duplicated integer[][];
   sellers_ids integer[];
   pi_count integer;
