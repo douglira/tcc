@@ -93,7 +93,7 @@
                     <template v-else>
                         <div class="card w-100 text-center text-white" style="background-color: #999">
                             <div class="card-header text-uppercase font-weight-bold">
-                                Sobre cotações
+                                Sob cotações
                             </div>
                             <div class="card-body">
                                 <h2 style="font-size: 16px;" class="card-title">Nenhuma cotação enviada</h2>
@@ -108,7 +108,7 @@
                 <template v-else>
                     <div class="card w-100 text-center text-muted">
                         <div class="card-header text-uppercase font-weight-bold">
-                            Sobre cotações
+                            Sob cotações
                         </div>
                         <div class="card-body">
                             <h2 style="font-size: 16px;" class="card-title">Visualização indisponível</h2>
@@ -127,25 +127,44 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="card col-md-6 border-0">
+                    <div class="row d-flex align-items-center">
+                        <div class="card col-md-5 border-0" style="align-self: flex-start;">
                             <div class="card-body">
                                 <div class="card-title font-weight-bold">Seus produtos</div>
                                 <div class="list-group">
+                                    <div v-for="product in productsInventory" class="custom-control custom-checkbox mb-3">
+                                        <input type="checkbox" :value="product" v-model="selectedProducts" class="custom-control-input" :id="'checkProduct' + product.id">
+                                        <label class="custom-control-label w-100" :for="'checkProduct' + product.id">
+                                            <span
+                                                class="list-group-item list-group-item-action border-0" style="padding-top: 0;">
+                                                {{ product.title }}
+                                            </span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="d-flex flex-column align-items-center justify-content-center">
+                                <span class="font-weight-bold">Qtd.</span>
+                                <input type="number" step="5" min="1" v-model="inputProductQuantity" class="input-product-quantity text-dark">
+                                <button type="button" class="button-product-quantity">
+                                    <i class="fas fa-plus-circle text-secondary" style="font-size: 28px; margin-top: 10px;"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card col-md-5 border-0" style="align-self: flex-start;">
+                            <div class="card-body">
+                                <div class="card-title font-weight-bold">Produtos selecionados</div>
+                                <div class="list-group">
                                     <a
                                         href="javascript:void(0)"
-                                        v-for="product in productsInventory"
-                                        @click="onSelectedProduct(product)"
+                                        v-for="product in productsQuote"
+                                        @click="onSelectRemoveProject(product)"
                                         class="list-group-item list-group-item-action">
                                         {{ product.title }}
                                     </a>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="card col-md-6 border-0">
-                            <div class="card-body">
-                                <div class="card-title font-weight-bold">Produtos selecionados</div>
-                                <div class="list-group"></div>
                             </div>
                         </div>
                     </div>

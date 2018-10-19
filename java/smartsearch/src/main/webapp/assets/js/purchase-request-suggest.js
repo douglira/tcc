@@ -13,12 +13,20 @@ const VueComponent = new Vue({
     return {
       page: 1,
       perPage: 15,
-      productsInventory: [],
-      purchaseRequest: null,
       countdown: '',
+      selectedProducts: [],
+      inputProductQuantity: null,
+      productsInventory: [],
+      productsQuote: [],
+      purchaseRequest: null,
       quoteCustomCost: false,
       quoteAdditionalData: '',
     };
+  },
+  watch: {
+    productsQuote(oldValues, newValues) {
+      console.log(newValues);
+    }
   },
   async created() {
     await this.loadData();
@@ -35,8 +43,19 @@ const VueComponent = new Vue({
     onClickPushQuotation() {
 
     },
-    onSelectedProduct(product) {
-      console.log(product);
+    onSelectAddProduct(product) {
+      const isSelected = this.productsQuote.find(prod => prod.id === product.id);
+
+      if (!isSelected) {
+        this.productsQuote.push(product);
+      }
+    },
+    onSelectRemoveProject(product) {
+      const isSelectedIndex = this.productsQuote.findIndex(prod => prod.id === product.id);
+
+      if (isSelectedIndex !== -1) {
+        this.productsQuote.splice(isSelectedIndex, 1);
+      }
     },
     showMessage(msg, type = 'success') {
       toastr[type.toLowerCase()](msg);

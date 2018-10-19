@@ -2,10 +2,7 @@ package dao;
 
 import models.Seller;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class SellerDAO extends GenericDAO {
@@ -83,13 +80,13 @@ public class SellerDAO extends GenericDAO {
     }
 
     public ArrayList<Seller> findByPurchaseRequest(int purchaseRequestId) {
-        PreparedStatement stmt = null;
+        CallableStatement stmt = null;
         ResultSet rs = null;
-        String sql = "SELECT * FROM sellers WHERE sellers.person_id = ANY((SELECT get_pr_sellers(?) as seller_ids)::integer[])";
+        String sql = "{CALL get_pr_sellers(?)}";
         ArrayList<Seller> sellers = new ArrayList<Seller>();
 
         try {
-            stmt = this.conn.prepareStatement(sql);
+            stmt = this.conn.prepareCall(sql);
             stmt.setInt(1, purchaseRequestId);
             rs = stmt.executeQuery();
 

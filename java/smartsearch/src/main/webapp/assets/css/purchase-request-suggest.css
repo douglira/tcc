@@ -42,6 +42,35 @@
     font-size: 18px;
     font-weight: lighter;
 }
+
+.list-selection-products {
+    height: 600px;
+    overflow-y: hidden;
+}
+
+.input-product-quantity {
+    border: 0;
+    background-color: #e1e1e1;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    width: 72px;
+    height: 38px;
+    border-radius: 5px;
+}
+
+.input-product-quantity::-webkit-outer-spin-button,
+.input-product-quantity::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+.button-product-quantity {
+    border: 0;
+    background-color: #ffffff;
+    align-self: stretch;
+    cursor: pointer;
+}
 /*.pr-btn-delete {
     font-size: 32px;
     -webkit-border-radius: 50%;
