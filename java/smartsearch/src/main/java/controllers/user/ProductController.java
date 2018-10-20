@@ -32,8 +32,18 @@ public class ProductController extends HttpServlet {
         try {
             String page = request.getParameter("page");
             String perPage = request.getParameter("perPage");
+            String searchTitle = request.getParameter("search");
             HttpSession session = request.getSession();
             Person person = (Person) session.getAttribute("loggedPerson");
+
+            if (searchTitle != null && searchTitle.length() > 2) {
+                ArrayList<Product> products = new ProductDAO(true)
+                        .searchByTitle(searchTitle, person.getId());
+
+                out.print(gson.toJson(products));
+                out.close();
+                return;
+            }
 
             if (validatePagination(page, perPage)) {
                 ArrayList<Product> products = new ProductDAO(true)

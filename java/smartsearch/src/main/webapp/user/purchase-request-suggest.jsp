@@ -119,9 +119,9 @@
                 </template>
                 <div id="sendQuotations" class="w-100" style="margin-top: 15px;">
                     <div class="input-group">
-                        <input class="form-control form-control-lg" type="text" placeholder="Pesquisar em seu estoque...">
+                        <input class="form-control form-control-lg" type="text" v-model="searchProduct" placeholder="Pesquisar em seu estoque...">
                         <div class="input-group-append">
-                            <button type="button" class="btn btn-light text-secondary border">
+                            <button type="button" class="btn btn-light text-secondary border" @click="onClickSearchProduct">
                                 <i class="fas fa-search" style="font-size: 28px; padding: 5px; box-sizing: border-box;"></i>
                             </button>
                         </div>
@@ -131,40 +131,50 @@
                         <div class="card col-md-5 border-0" style="align-self: flex-start;">
                             <div class="card-body">
                                 <div class="card-title font-weight-bold">Seus produtos</div>
-                                <div class="list-group">
-                                    <div v-for="product in productsInventory" class="custom-control custom-checkbox mb-3">
+                                <div class="list-group list-overflow">
+                                    <div v-for="product in productsInventory" class="custom-control custom-checkbox mb-3 list-item-inventory-product" :id="'listItemProduct' + product.id">
                                         <input type="checkbox" :value="product" v-model="selectedProducts" class="custom-control-input" :id="'checkProduct' + product.id">
-                                        <label class="custom-control-label w-100" :for="'checkProduct' + product.id">
+                                        <label class="d-flex flex-row align-items-start custom-control-label w-100" :for="'checkProduct' + product.id">
                                             <span
-                                                class="list-group-item list-group-item-action border-0" style="padding-top: 0;">
-                                                {{ product.title }}
+                                                class="list-group-item list-group-item-action border-0 list-item-product-title" style="padding-top: 0;">
+                                                {{ fixListProductTitle(product.title) }}
                                             </span>
+                                            <span class="badge badge-secondary badge-pill">{{ product.availableQuantity }}</span>
                                         </label>
                                     </div>
+                                    <a
+                                        @click="onClickLoadMoreProducts"
+                                        href="javascript:void(0)"
+                                        class="d-flex justify-content-center align-items-center list-group-item list-group-item-action border-0"
+                                        style="padding-top: 2px !important; padding-bottom: 2px !important;">
+                                        <i class="fas fa-angle-down" style="font-size: 28px; color: #999;"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="d-flex flex-column align-items-center justify-content-center">
                                 <span class="font-weight-bold">Qtd.</span>
-                                <input type="number" step="5" min="1" v-model="inputProductQuantity" class="input-product-quantity text-dark">
-                                <button type="button" class="button-product-quantity">
-                                    <i class="fas fa-plus-circle text-secondary" style="font-size: 28px; margin-top: 10px;"></i>
+                                <input type="number" step="5" min="1" v-model="inputProductQuantity" class="input-product-quantity text-dark" id="inputQuantity" @keydown="inputQuantityEnter">
+                                <button type="button" class="button-product-quantity" @click="onClickAddProduct">
+                                    <i class="fas fa-plus-circle text-secondary" style="font-size: 28px;"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="card col-md-5 border-0" style="align-self: flex-start;">
                             <div class="card-body">
                                 <div class="card-title font-weight-bold">Produtos selecionados</div>
-                                <div class="list-group">
+                                <div class="list-group list-overflow">
                                     <a
                                         href="javascript:void(0)"
                                         v-for="product in productsQuote"
-                                        @click="onSelectRemoveProject(product)"
-                                        class="list-group-item list-group-item-action">
+                                        @click="onClickRemoveProject(product)"
+                                        class="d-flex justify-content-between align-items-center list-group-item list-group-item-action list-item-selected-product">
                                         {{ product.title }}
+                                        <span class="badge badge-info badge-pill">{{ product.quantity }}</span>
                                     </a>
                                 </div>
+                                <div v-if="quoteTotalAmount" class="card-footer text-success text-right">{{ formatCurrency(getTotalAmount()) }}</div>
                             </div>
                         </div>
                     </div>
@@ -175,14 +185,8 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <div class="form-check" style="margin: 20px 0;">
-                                <input class="form-check-input" type="checkbox" v-model="quoteCustomCost" id="customCostCheckbox">
-                                <label class="form-check-label" for="customCostCheckbox">
-                                    Editar custo total:
-                                </label>
-                            </div>
-                            <label for="costInput">Custo total</label>
-                            <input id="costInput" type="number" :disabled="!quoteCustomCost" class="form-control text-success" min="0.01" step="100">
+                            <label for="costInput">Aplicar desconto (%)</label>
+                            <input id="costInput" type="number" v-model="quoteDiscount"  min="0.01" max="100" class="form-control">
                         </div>
                         <div class="form-group col-md-6">
                             <label for="additionalData">Informações adicionais</label>
@@ -204,6 +208,7 @@
 <script src="<%=request.getContextPath()%>/assets/libs/fontawesome/js/all.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="<%=request.getContextPath()%>/assets/libs/inputmask/dist/jquery.inputmask.bundle.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/axios/axios-dist.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/vuejs/vue-dist.js"></script>
 <script src="<%=request.getContextPath()%>/assets/js/purchase-request-suggest.js"></script>

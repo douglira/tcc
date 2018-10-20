@@ -71,13 +71,10 @@ public class NotificationSocket {
     }
 
     private static ArrayList<Notification> fetchLastNotifications(User user) {
-        int userId = user.getId();
-
-        if (userId == 0) {
+        if (user.getId() == 0) {
             user = new UserDAO(true).findByUsername(user);
-            userId = user.getId();
         }
 
-        return new NotificationDAO(true).findLastOnes(userId);
+        return new NotificationDAO(true).findLastOnes(user.getId());
     }
 }
