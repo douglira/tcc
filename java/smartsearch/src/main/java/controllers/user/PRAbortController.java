@@ -2,7 +2,7 @@ package controllers.user;
 
 import com.google.gson.Gson;
 import controllers.socket.PurchaseRequestSocket;
-import dao.ProductListDAO;
+import dao.PRProductListDAO;
 import dao.PurchaseRequestDAO;
 import enums.MessengerType;
 import libs.Helper;
@@ -49,11 +49,11 @@ public class PRAbortController extends HttpServlet {
     }
 
     private void purchaseRequestDelete(User user, PurchaseRequest purchaseRequest) throws SQLException {
-        ProductListDAO productListDao = new ProductListDAO(true);
-        productListDao.initTransaction();
+        PRProductListDAO PRProductListDao = new PRProductListDAO(true);
+        PRProductListDao.initTransaction();
 
-        productListDao.removeAll(purchaseRequest.getId());
-        new PurchaseRequestDAO(productListDao.getConnection()).destroyCreation(purchaseRequest.getId(), purchaseRequest.getBuyer().getId());
+        PRProductListDao.removeAll(purchaseRequest.getId());
+        new PurchaseRequestDAO(PRProductListDao.getConnection()).destroyCreation(purchaseRequest.getId(), purchaseRequest.getBuyer().getId());
 
         purchaseRequest.setId(null);
         PurchaseRequestSocket.sendUpdatedPRCreation(user, purchaseRequest, null);

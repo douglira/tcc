@@ -108,7 +108,7 @@ public class PRCreationController extends HttpServlet {
 
         PurchaseRequestDAO purchaseRequestDao = new PurchaseRequestDAO(true);
         purchaseRequestDao.initTransaction();
-        ProductListDAO productListDao = new ProductListDAO(purchaseRequestDao.getConnection());
+        PRProductListDAO PRProductListDao = new PRProductListDAO(purchaseRequestDao.getConnection());
 
         PurchaseRequest purchaseRequest = new PurchaseRequest();
         purchaseRequest.setBuyer(buyer);
@@ -128,20 +128,20 @@ public class PRCreationController extends HttpServlet {
         } else {
             purchaseRequest = prs.get(0);
 
-            if (!new ProductListDAO(true).validateProductInsertion(purchaseRequest.getId(), productList)) {
+            if (!new PRProductListDAO(true).validateProductInsertion(purchaseRequest.getId(), productList)) {
                 Helper.responseMessage(out, new Messenger("Produto já existente, altere sua quantidade ou remova-o.", MessengerType.WARNING));
                 return;
             }
-            ArrayList<ProductList> products = new ProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
+            ArrayList<ProductList> products = new PRProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
             products.add(productList);
             products.sort(ProductList::compareTo);
             purchaseRequest.setListProducts(products);
             purchaseRequest.calculateAmount();
 
         }
-        productListDao.attachPurchaseRequest(purchaseRequest.getId(), productList);
+        PRProductListDao.attachPurchaseRequest(purchaseRequest.getId(), productList);
 
-        ArrayList<Seller> sellers = new SellerDAO(productListDao.getConnection()).findByPurchaseRequest(purchaseRequest.getId());
+        ArrayList<Seller> sellers = new SellerDAO(PRProductListDao.getConnection()).findByPurchaseRequest(purchaseRequest.getId());
         purchaseRequest.setPropagationCount(sellers.size());
         purchaseRequest.calculateDueDateAverage(sellers);
         purchaseRequestDao.updatePropagation(purchaseRequest);
@@ -157,7 +157,7 @@ public class PRCreationController extends HttpServlet {
     }
 
     private void pushSocketPurchaseRequest(User user, PurchaseRequest purchaseRequest, String baseUrl) {
-        ArrayList<ProductList> products = new ProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
+        ArrayList<ProductList> products = new PRProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
         fetchPictures(products, baseUrl);
 
         purchaseRequest.setListProducts(products);

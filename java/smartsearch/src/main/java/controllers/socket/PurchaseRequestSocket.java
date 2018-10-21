@@ -1,7 +1,7 @@
 package controllers.socket;
 
 import dao.FileDAO;
-import dao.ProductListDAO;
+import dao.PRProductListDAO;
 import dao.PurchaseRequestDAO;
 import enums.PRStage;
 import models.*;
@@ -13,11 +13,9 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.stream.Collectors;
 
 @ServerEndpoint(value = "/account/purchase_request/{username}", encoders = PurchaseRequestEncoder.class, decoders = PurchaseRequestDecoder.class)
 public class PurchaseRequestSocket {
@@ -82,7 +80,7 @@ public class PurchaseRequestSocket {
         if (prs != null && !prs.isEmpty()) {
             purchaseRequest = prs.get(0);
 
-            ArrayList<ProductList> products = new ProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
+            ArrayList<ProductList> products = new PRProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
             products.forEach(productList -> {
                 synchronized (productList) {
                     ProductItem productItem = (ProductItem) productList.getProduct();

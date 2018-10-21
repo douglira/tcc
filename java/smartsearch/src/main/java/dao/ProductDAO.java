@@ -93,6 +93,36 @@ public class ProductDAO extends GenericDAO {
         return product;
     }
 
+    public Product findById(Product product) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, product.getId());
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                this.fetch(rs, product);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("ProductDAO.findById [ERROR](1): " + e);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException sqlException) {
+                    sqlException.printStackTrace();
+                    System.out.println("ProductDAO.findById [ERROR](2): " + sqlException);
+                }
+            }
+        }
+
+        return product;
+    }
+
     public ArrayList<Product> findByProductItem(int productItemId) {
         PreparedStatement stmt = null;
         ResultSet rs = null;

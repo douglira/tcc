@@ -6,6 +6,14 @@ public class Seller extends Person {
     private int quotesExpirationPeriod;
     private ArrayList<Product> inventary;
 
+    public Seller() {
+        super();
+    }
+
+    public Seller(int id) {
+        super(id);
+    }
+
     public int getQuotesExpirationPeriod() {
         return quotesExpirationPeriod;
     }

@@ -18,6 +18,10 @@ public class Person {
 
     }
 
+    public Person(int id) {
+        this.id = id;
+    }
+
     public Person(User user) {
         this.user = user;
     }

@@ -12,6 +12,14 @@ public class ProductRepresentation {
     protected Calendar createdAt;
     protected Calendar updatedAt;
 
+    public ProductRepresentation() {
+
+    }
+
+    public ProductRepresentation(Integer id) {
+        this.id = id;
+    }
+
     public Integer getId() {
         return id;
     }

@@ -18,6 +18,14 @@ public class ProductItem extends ProductRepresentation {
     @Expose(deserialize = false, serialize = false)
     public static final int MAX_PICTURES = 15;
 
+    public ProductItem() {
+        super();
+    }
+
+    public ProductItem(Integer id) {
+        super(id);
+    }
+
     public ArrayList<Product> getBasedProducts() {
         return basedProducts;
     }

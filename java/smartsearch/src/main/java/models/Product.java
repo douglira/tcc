@@ -2,6 +2,7 @@ package models;
 
 import java.util.Calendar;
 
+import com.google.gson.annotations.SerializedName;
 import enums.ProductSituation;
 import enums.Status;
 
@@ -14,6 +15,14 @@ public class Product extends ProductRepresentation {
 	private int availableQuantity;
 	private ProductSituation situation;
 	private Status status;
+
+	public  Product() {
+		super();
+	}
+
+	public Product(Integer id) {
+		super(id);
+	}
 
 	public Seller getSeller() {
 		return seller;

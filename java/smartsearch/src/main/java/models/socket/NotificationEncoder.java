@@ -18,13 +18,13 @@ public class NotificationEncoder implements Encoder.Text<ArrayList<Notification>
 	}
 
 	@Override
-	public void destroy() {
-
+	public String encode(ArrayList<Notification> notifications) throws EncodeException {
+		return gson.toJson(notifications);
 	}
 
 	@Override
-	public String encode(ArrayList<Notification> notifications) throws EncodeException {
-		return gson.toJson(notifications);
+	public void destroy() {
+
 	}
 
 }

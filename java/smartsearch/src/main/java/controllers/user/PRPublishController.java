@@ -64,13 +64,8 @@ public class PRPublishController extends HttpServlet {
                     getPurchaseRequestUrl(request, purchaseRequest));
             mailer.setMail(MailSMTPService.getInstance());
 
-            Runnable socketTask = () -> {
-                socketNotification(sellerUsers, purchaseRequest);
-            };
-            Runnable mailTask = () -> {
-                mailNotification(mailer, sellerUsers);
-            };
-
+            Runnable socketTask = () -> socketNotification(sellerUsers, purchaseRequest);
+            Runnable mailTask = () -> mailNotification(mailer, sellerUsers);
             new Thread(socketTask).start();
             new Thread(mailTask).start();
 

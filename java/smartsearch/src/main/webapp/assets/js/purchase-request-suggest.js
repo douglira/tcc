@@ -2,15 +2,18 @@ const FormatterMixin = {
   methods: {
     formatFullDate: Formatter.fullDate,
     formatCurrency: Formatter.currency,
+    formatDate: Formatter.date,
     getDate: Formatter.getDate,
   }
 };
 
 const VueComponent = new Vue({
   el: '#userPRSuggest',
+  name: 'VuePRSuggest',
   mixins: [FormatterMixin],
   data() {
     return {
+      loggedSeller: null,
       purchaseRequest: null,
       page: 1,
       perPage: 5,
@@ -28,12 +31,14 @@ const VueComponent = new Vue({
   async created() {
     await this.loadData();
     this.initCountdown();
-    $(function() {
+    $(() => {
       $('.list-item-row_tooltip').tooltip({
         placement: 'top',
         trigger: 'hover',
         title: 'Exibir',
       });
+
+      $('.list-item-inventory-product').on('click', () => $('#inputQuantity').focus());
     })
   },
   watch: {
@@ -48,7 +53,41 @@ const VueComponent = new Vue({
   },
   methods: {
     onClickPushQuotation() {
+      if (!this.productsQuote.length) return;
 
+      const quote = {
+        purchaseRequest: {
+          id: this.purchaseRequest.id,
+        },
+        customListProduct: this.productsQuote,
+        quoteAdditionalData: this.quoteAdditionalData,
+        discount: this.quoteDiscount,
+      }
+
+      $.post(
+        '/account/purchase_request/suggest',
+        {
+          quote: JSON.stringify(quote),
+        },
+      )
+        .done((res) => {
+          const msg = JSON.parse(res);
+
+          if (msg.content) {
+            this.showMessage(msg.content, msg.type);
+            this.productsQuote = [];
+            this.quoteDiscount = null;
+            this.quoteAdditionalData = '';
+            this.updateQuoteTotalAmount();
+          }
+        })
+        .fail((res) => {
+          const msg = JSON.parse(res.responseText);
+
+          if (msg.content) {
+            this.showMessage(msg.content, msg.type);
+          }
+        })
     },
     async onClickSearchProduct() {
       this.page = 1;
@@ -87,19 +126,21 @@ const VueComponent = new Vue({
         productInventory.availableQuantity -= this.inputProductQuantity;
         this.productsInventory.splice(productInventoryIndex, 1, productInventory);
 
-        const quoteProductIndex = quoteList.findIndex(p => p.id === selectedProd.id);
+        const quoteProductIndex = quoteList.findIndex(productList => productList.product.id === selectedProd.id);
 
         if (quoteProductIndex !== -1) {
           const quoteProduct = quoteList[quoteProductIndex];
-          quoteProduct.quantity += this.inputProductQuantity;
+          quoteProduct.quantity = Number.parseInt(quoteProduct.quantity, 10) + Number.parseInt(this.inputProductQuantity, 10);
           quoteList.splice(quoteProductIndex, 1, quoteProduct);
           return quoteList;
         }
 
         quoteList.push({
-          id: selectedProd.id,
-          title: selectedProd.title,
-          basePrice: selectedProd.basePrice,
+          product: {
+            id: selectedProd.id,
+            title: selectedProd.title,
+            basePrice: selectedProd.basePrice,
+          },
           quantity: this.inputProductQuantity,
         });
         return quoteList;
@@ -109,15 +150,15 @@ const VueComponent = new Vue({
       this.selectedProducts = [];
       this.updateQuoteTotalAmount();
     },
-    onClickRemoveProject(product) {
-      const isSelectedIndex = this.productsQuote.find(prod => prod.id === product.id);
+    onClickRemoveProject(prodList) {
+      const isSelectedIndex = this.productsQuote.findIndex(productList => productList.product.id === prodList.product.id);
 
       if (isSelectedIndex !== -1) {
-        const [removedProduct] = this.productsQuote.splice(isSelectedIndex, 1);
+        const [removedProductList] = this.productsQuote.splice(isSelectedIndex, 1);
 
-        const productInventoryIndex = this.productsInventory.findIndex(p => p.id === removedProduct.id);
+        const productInventoryIndex = this.productsInventory.findIndex(p => p.id === removedProductList.product.id);
         const productInventory = this.productsInventory[productInventoryIndex];
-        productInventory.availableQuantity += Number.parseInt(removedProduct.quantity, 10);
+        productInventory.availableQuantity = Number.parseInt(productInventory.availableQuantity, 10) + Number.parseInt(removedProductList.quantity, 10);
         this.productsInventory.splice(productInventoryIndex, 1, productInventory);
       }
       this.updateQuoteTotalAmount();
@@ -132,8 +173,8 @@ const VueComponent = new Vue({
     },
     updateQuoteTotalAmount() {
       if (this.productsQuote.length) {
-        this.quoteTotalAmount = this.productsQuote.reduce((totalAmount, product)=> {
-          return totalAmount + (product.basePrice * product.quantity);
+        this.quoteTotalAmount = this.productsQuote.reduce((totalAmount, productList)=> {
+          return totalAmount + (productList.product.basePrice * productList.quantity);
         }, 0);
         return;
       }
@@ -158,25 +199,6 @@ const VueComponent = new Vue({
 
       return productTitle.substr(0, blankSpaceIndex) + '...';
     },
-    async getProductsInventory({ page, perPage, searchTitle }) {
-      return axios.get(`/account/products?page=${page ? page : ''}&perPage=${perPage ? perPage : ''}&search=${searchTitle ? searchTitle : ''}`);
-    },
-    async loadData() {
-      const { page, perPage } = this;
-      const purchaseRequestId = window.location.search.split('?pr=')[1];
-
-      const [responsePurchaseRequest, responseProducts] = await Promise.all([
-        axios.get(`/account/purchase_request/suggest?pr=${purchaseRequestId || ''}`),
-        this.getProductsInventory({ page, perPage }),
-      ]);
-
-      if (responsePurchaseRequest.data.cause && responsePurchaseRequest.data.cause === 'INVALID_PURCHASE_REQUEST_ID') {
-        return this.showMessage(responsePurchaseRequest.data.content, responsePurchaseRequest.data.type);
-      }
-
-      this.purchaseRequest = responsePurchaseRequest.data;
-      this.productsInventory = responseProducts.data;
-    },
     initCountdown() {
       const countdownDate = (this.getDate(this.purchaseRequest.dueDateAverage)).getTime();
       const countdownInterval = setInterval(() => {
@@ -196,8 +218,37 @@ const VueComponent = new Vue({
         this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
       });
     },
+    async getProductsInventory({ page, perPage, searchTitle }) {
+      return axios.get(`/account/products?page=${page ? page : ''}&perPage=${perPage ? perPage : ''}&search=${searchTitle ? searchTitle : ''}`);
+    },
+    async loadData() {
+      const { page, perPage } = this;
+      const purchaseRequestId = window.location.search.split('?pr=')[1];
+
+      const [responseSeller, responsePurchaseRequest, responseProducts] = await Promise.all([
+        axios.get('/account/me/data'),
+        axios.get(`/account/purchase_request/suggest?pr=${purchaseRequestId || ''}`),
+        this.getProductsInventory({ page, perPage }),
+      ]);
+
+      if (responsePurchaseRequest.data.cause && responsePurchaseRequest.data.cause === 'INVALID_PURCHASE_REQUEST_ID') {
+        return this.showMessage(responsePurchaseRequest.data.content, responsePurchaseRequest.data.type);
+      }
+
+      this.purchaseRequest = responsePurchaseRequest.data;
+      this.productsInventory = responseProducts.data;
+      this.loggedSeller = responseSeller.data;
+      this.initWebsocket();
+    },
+    initWebsocket() {
+      const wsQuotes = new WebSocket(`ws://localhost:8080/account/purchase_request/${this.purchaseRequest.id}/quotes`);
+      wsQuotes.onmessage = this.handleQuotesUpdates
+    },
+    handleQuotesUpdates(event) {
+      this.purchaseRequest.quotes = JSON.parse(event.data);
+    },
     inputQuantityEnter(event) {
       event.keyCode === 13 && this.onClickAddProduct();
-    }
-  }
+    },
+  },
 });

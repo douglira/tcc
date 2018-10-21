@@ -1,3 +1,4 @@
+<%@ page import="models.Person" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 <html lang="pt-br">
@@ -18,6 +19,12 @@
 <body>
 
 <jsp:include page="/header.jsp"/>
+
+<%
+    Person person = (Person) (request.getSession()).getAttribute("loggedPerson");
+%>
+
+<input id="loggedSellerId" type="hidden" value="<%=person.getId()%>">
 
 <div id="userPRSuggest" class="container mb-sm-5 mb-md-5" v-if="purchaseRequest && purchaseRequest.id">
     <div class="card border-light mb-sm-3 mb-md-3">
@@ -88,7 +95,22 @@
             <template v-if="purchaseRequest.stage === 'UNDER_QUOTATION'">
                 <template v-if="purchaseRequest.quotesVisibility">
                     <template v-if="purchaseRequest.quotes && purchaseRequest.quotes.length">
-
+                        <div class="card w-100 text-center text-white" style="background-color: #999">
+                            <div class="card-header text-uppercase font-weight-bold">
+                                Sob cotações
+                            </div>
+                            <div class="card-body d-flex flex-column">
+                                <template v-for="quote in purchaseRequest.quotes">
+                                    <div :class="['quote-bubble shadow', quote.seller.id === loggedSeller.id ? 'align-self-end' : '']">
+                                        <div>
+                                            <p class="text-secondary font-weight-bold" style="margin-bottom: 3px; font-size: 15px;">Cotação: <span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></p>
+                                            <p class="text-muted font-italic" style="margin-bottom: 3px; font-size: 14px;">Desconto&colon;&nbsp;{{ quote.discount }}&percnt;</p>
+                                            <small class="text-monospace text-muted">Até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
                     </template>
                     <template v-else>
                         <div class="card w-100 text-center text-white" style="background-color: #999">
@@ -119,7 +141,7 @@
                 </template>
                 <div id="sendQuotations" class="w-100" style="margin-top: 15px;">
                     <div class="input-group">
-                        <input class="form-control form-control-lg" type="text" v-model="searchProduct" placeholder="Pesquisar em seu estoque...">
+                        <input class="form-control form-control-lg" type="search" v-model="searchProduct" placeholder="Pesquisar em seu estoque...">
                         <div class="input-group-append">
                             <button type="button" class="btn btn-light text-secondary border" @click="onClickSearchProduct">
                                 <i class="fas fa-search" style="font-size: 28px; padding: 5px; box-sizing: border-box;"></i>
@@ -167,11 +189,11 @@
                                 <div class="list-group list-overflow">
                                     <a
                                         href="javascript:void(0)"
-                                        v-for="product in productsQuote"
-                                        @click="onClickRemoveProject(product)"
+                                        v-for="productList in productsQuote"
+                                        @click="onClickRemoveProject(productList)"
                                         class="d-flex justify-content-between align-items-center list-group-item list-group-item-action list-item-selected-product">
-                                        {{ product.title }}
-                                        <span class="badge badge-info badge-pill">{{ product.quantity }}</span>
+                                        {{ productList.product.title }}
+                                        <span class="badge badge-info badge-pill">{{ productList.quantity }}</span>
                                     </a>
                                 </div>
                                 <div v-if="quoteTotalAmount" class="card-footer text-success text-right">{{ formatCurrency(getTotalAmount()) }}</div>

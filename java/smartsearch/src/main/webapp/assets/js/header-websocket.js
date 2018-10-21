@@ -1,5 +1,6 @@
 const VueHeader = new Vue({
 	el: '#appHeader',
+	name: 'VueHeader',
 	data() {
 		return {
 			purchaseRequest: null,

@@ -10,15 +10,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class ProductListDAO extends GenericDAO {
+public class PRProductListDAO extends GenericDAO {
     private static final String TABLE_NAME = "pr_products";
     private static final String TABLE_RELATION_PI = "product_items";
 
-    public ProductListDAO(boolean getConnection) {
+    public PRProductListDAO(boolean getConnection) {
         super(getConnection);
     }
 
-    public ProductListDAO(Connection conn) {
+    public PRProductListDAO(Connection conn) {
         super(conn);
     }
 
@@ -36,7 +36,7 @@ public class ProductListDAO extends GenericDAO {
             stmt.execute();
         } catch (SQLException err) {
             err.printStackTrace();
-            System.out.println("ProductListDAO.attachPurchaseRequest [ERROR]: " + err);
+            System.out.println("PRProductListDAO.attachPurchaseRequest [ERROR]: " + err);
         }
     }
 
@@ -72,14 +72,14 @@ public class ProductListDAO extends GenericDAO {
             isValid = !stmt.executeQuery().next();
         } catch (SQLException err) {
             err.printStackTrace();
-            System.out.println("ProductListDAO.validateProductInsertion [ERROR](1): " + err);
+            System.out.println("PRProductListDAO.validateProductInsertion [ERROR](1): " + err);
         } finally {
             if (this.conn != null) {
                 try {
                     this.conn.close();
                 } catch (SQLException err) {
                     err.printStackTrace();
-                    System.out.println("ProductListDAO.validateProductInsertion [ERROR](2): " + err);
+                    System.out.println("PRProductListDAO.validateProductInsertion [ERROR](2): " + err);
                 }
             }
         }
@@ -108,14 +108,14 @@ public class ProductListDAO extends GenericDAO {
             }
         } catch (SQLException err) {
             err.printStackTrace();
-            System.out.println("ProductListDAO.findByPurchaseRequest [ERROR](1): " + err);
+            System.out.println("PRProductListDAO.findByPurchaseRequest [ERROR](1): " + err);
         } finally {
             if (this.conn != null) {
                 try {
                     this.conn.close();
                 } catch (SQLException err) {
                     err.printStackTrace();
-                    System.out.println("ProductListDAO.findByPurchaseRequest [ERROR](2): " + err);
+                    System.out.println("PRProductListDAO.findByPurchaseRequest [ERROR](2): " + err);
                 }
             }
         }
@@ -138,7 +138,7 @@ public class ProductListDAO extends GenericDAO {
             this.conn.commit();
         } catch (SQLException err) {
             err.printStackTrace();
-            System.out.println("ProductListDAO.updateQuantityAndSpec [ERROR](1): " + err);
+            System.out.println("PRProductListDAO.updateQuantityAndSpec [ERROR](1): " + err);
         }
     }
 
@@ -154,7 +154,7 @@ public class ProductListDAO extends GenericDAO {
             this.conn.commit();
         } catch (SQLException err) {
             err.printStackTrace();
-            System.out.println("ProductListDAO.remove [ERROR]: " + err);
+            System.out.println("PRProductListDAO.remove [ERROR]: " + err);
         }
     }
 
@@ -168,7 +168,7 @@ public class ProductListDAO extends GenericDAO {
             stmt.execute();
         } catch(SQLException err) {
             err.printStackTrace();
-            System.out.println("ProductListDAO.removeAll [ERROR]: " + err);
+            System.out.println("PRProductListDAO.removeAll [ERROR]: " + err);
         }
     }
 }
