@@ -1,7 +1,10 @@
 package controllers.socket;
 
 import dao.NotificationDAO;
+import dao.PersonDAO;
 import dao.UserDAO;
+import enums.NotificationStatus;
+import models.Person;
 import models.User;
 import models.socket.Notification;
 import models.socket.NotificationDecoder;
@@ -32,10 +35,12 @@ public class NotificationSocket {
     }
 
     @OnMessage
-    public void onMessage(Session session, ArrayList<Notification> notification) throws IOException {
-//		notification.setFrom(users.get(session.getId()));
-//		System.out.println("Socket onMessage[Notification]: " + notification);
-//		sendNotification(notification);
+    public void onMessage(Session session, ArrayList<Notification> notifications) throws IOException {
+        if (notifications != null && !notifications.isEmpty()) {
+            Notification notification = notifications.get(0);
+            notification.setStatus(NotificationStatus.VIEWED);
+            new NotificationDAO(true).updateStatus(notification);
+        }
     }
 
     @OnClose
@@ -45,7 +50,7 @@ public class NotificationSocket {
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        // Do error handling here
+        System.out.println("NotificationSocket ERROR: " + throwable.getMessage());
     }
 
     public static void pushLastNotifications(User user) {
@@ -75,6 +80,22 @@ public class NotificationSocket {
             user = new UserDAO(true).findByUsername(user);
         }
 
-        return new NotificationDAO(true).findLastOnes(user.getId());
+        ArrayList<Notification> notifications = new NotificationDAO(true).findLastOnes(user.getId());
+
+        notifications.forEach(notification -> {
+            synchronized (notification) {
+                if (notification.getFrom() != null) {
+                    User userFrom = new UserDAO(true).findById(notification.getFrom());
+                    Person person = new Person();
+                    person.setUser(userFrom);
+                    person = new PersonDAO(true).findByUser(person);
+                    person.setUser(null);
+                    userFrom.setPerson(person);
+                    notification.setFrom(userFrom);
+                }
+            }
+        });
+
+        return notifications;
     }
 }

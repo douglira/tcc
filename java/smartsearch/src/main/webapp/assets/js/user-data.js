@@ -13,10 +13,12 @@ new Vue({
 		async loadProvinceCodes() {
 			const [personResponse, ufsResponse] = [
 				await axios.get('/account/me/data'),
-				await axios.get('https://servicodados.ibge.gov.br/api/v1/localidades/estados'),
+				// await axios.get('https://servicodados.ibge.gov.br/api/v1/localidades/estados'),
+        await axios.get('http://www.geonames.org/childrenJSON?geonameId=3469034&callback=listPlaces&style=long&noCacheIE=1540136223992'),
 			];
 			this.person = { user: {}, address: { id: null, postalCode: null }, ...personResponse.data};
-			this.ufs = ufsResponse.data;
+			this.ufs = JSON.parse(ufsResponse.data.substring(ufsResponse.data.indexOf('(') + 1, ufsResponse.data.lastIndexOf(')'))).geonames
+				.map(geo => ({ nome: geo.name, sigla: geo.adminCodes1.ISO3166_2 }));
 		},
 		async searchByCep() {
 			// UMC Cep - 08780911 Nº 200

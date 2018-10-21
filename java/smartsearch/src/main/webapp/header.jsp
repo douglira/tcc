@@ -156,6 +156,7 @@
                                         v-for="(notification, index) in notifications"
                                         :key="notification.id"
                                         class="list-group-item list-group-item-action notification-item"
+                                        @click="onClickNotification($event, notification)"
                                         :href="getNotificationUrl(notification)">
                                         <i v-if="getIconNotification" :class="['notification-icon', getIconNotification(notification)]"></i>
                                         <span :class="[

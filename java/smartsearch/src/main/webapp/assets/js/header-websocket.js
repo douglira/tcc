@@ -5,8 +5,10 @@ const VueHeader = new Vue({
 		return {
 			purchaseRequest: null,
       notifications: [],
-			username: '',
-		}
+      username: '',
+			wsNotify: null,
+      wsPurchaseRequest: null,
+    }
 	},
 	async created() {
     const username = document.getElementById('inputHeaderUsername').value;
@@ -37,10 +39,11 @@ const VueHeader = new Vue({
 			}
 		},
 		initializeConnection() {
-			const wsNotify = new WebSocket(`ws://localhost:8080/notify/${this.username}`);
-			wsNotify.onmessage = this.handleNotification;
-			const wsPurchaseRequest = new WebSocket(`ws://localhost:8080/account/purchase_request/${this.username}`);
-      wsPurchaseRequest.onmessage = this.handlePurchaseRequestCreation
+			this.wsNotify = new WebSocket(`ws://localhost:8080/notify/${this.username}`);
+			this.wsNotify.onmessage = this.handleNotification;
+
+			this.wsPurchaseRequest = new WebSocket(`ws://localhost:8080/account/purchase_request/${this.username}`);
+      this.wsPurchaseRequest.onmessage = this.handlePurchaseRequestCreation
 		},
 		handleNotification(event) {
 			this.notifications = JSON.parse(event.data)
@@ -58,6 +61,8 @@ const VueHeader = new Vue({
 			switch (notification.resourceType) {
 				case 'PURCHASE_REQUEST':
 					return `/account/purchase_request/suggest?pr=${notification.resourceId}`;
+				case 'QUOTE':
+					return `/account/purchase_request/quote?q=${notification.resourceId}`;
 				default:
 					return 'javascript:void(0)';
 			}
@@ -66,9 +71,24 @@ const VueHeader = new Vue({
 			switch(notification.resourceType) {
 				case 'PURCHASE_REQUEST':
 					return 'fas fa-file-invoice-dollar';
+				case 'QUOTE':
+					return 'fas fa-hand-holding-usd';
 				default:
 					return null;
 			}
+		},
+    onClickNotification(event, notification) {
+			event.preventDefault();
+			const href = $(event.target).closest('a').get(0).href;
+
+      if (notification.status !== 'PENDING') {
+        window.location.replace(href);
+        return;
+			}
+
+			this.wsNotify.send(JSON.stringify([notification]));
+
+			window.location.replace(href);
 		}
-	}
+	},
 });

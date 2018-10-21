@@ -18,7 +18,7 @@ public class ResetPassword extends MailerService {
 		this.template = "mailResetPass";
 		this.context.put("shortName", "SmartSearch");
 		
-		this.mail.sendHTML(this.from, this.to, this.subject, this.template, this.context);
+		this.mail.sendHTML(this);
 	}
 
 }

@@ -142,4 +142,28 @@ public class NotificationDAO extends GenericDAO {
         }
         return notifications;
     }
+
+    public void updateStatus(Notification notification) {
+        PreparedStatement stmt = null;
+        String sql = "UPDATE " + TABLE_NAME + " SET status = CAST(? as notification_status) WHERE id = ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setString(1, notification.getStatus().toString());
+            stmt.setInt(2, notification.getId());
+            stmt.execute();
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("NotificationDAO.updateStatus [ERROR](1): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException err) {
+                    err.printStackTrace();
+                    System.out.println("NotificationDAO.updateStatus [ERROR](2): " + err);
+                }
+            }
+        }
+    }
 }

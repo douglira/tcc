@@ -11,6 +11,7 @@ import java.util.Calendar;
 
 public class UserDAO extends GenericDAO {
     private static final String TABLE_NAME = "users";
+    private static final String TABLE_RELATION_PERSON = "people";
 
     public UserDAO(boolean getConnection) {
         super(getConnection);
@@ -52,7 +53,7 @@ public class UserDAO extends GenericDAO {
 
     private User fetch(ResultSet rs, User user, String scope) throws SQLException {
 
-        if (scope.equals("full")) {
+        if (scope !=null && scope.equals("full")) {
             user.setPassword(rs.getString("password"));
 
             try {
@@ -76,7 +77,7 @@ public class UserDAO extends GenericDAO {
         try {
             File file = new File();
 
-            file.setId(rs.getInt("file_avatar_id"));
+            file.setId(rs.getInt("avatar_id"));
             file.setName(rs.getString("name"));
             file.setFilename(rs.getString("filename"));
             file.setSize(rs.getDouble("size"));
@@ -89,8 +90,10 @@ public class UserDAO extends GenericDAO {
             file.setCreatedAt(createdAt);
 
             user.setAvatar(file);
-        } catch (NullPointerException error) {
-
+        } catch (NullPointerException | SQLException error) {
+            if (error instanceof SQLException) {
+//                ((SQLException) error).printStackTrace();
+            }
         }
 
         user.setId(rs.getInt("id"));
@@ -118,7 +121,7 @@ public class UserDAO extends GenericDAO {
             rs = stmt.executeQuery();
 
             if (rs.next()) {
-               user = this.fetch(rs, user, null);
+                user = this.fetch(rs, user, null);
             }
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
@@ -358,5 +361,36 @@ public class UserDAO extends GenericDAO {
             sqlError.printStackTrace();
             System.out.println("UserDAO.updateDisplayName [ERROR](2): " + sqlError);
         }
+    }
+
+    public User findByPerson(int personId) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT " + TABLE_NAME + ".* FROM " + TABLE_NAME + " INNER JOIN " + TABLE_RELATION_PERSON + " ON "
+                + TABLE_NAME + ".id = " + TABLE_RELATION_PERSON + ".user_id WHERE " + TABLE_RELATION_PERSON + ".id = ?";
+        User user = null;
+
+        try {
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, personId);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                user = this.fetch(rs, new User(), null);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("UserDAO.findByPerson [ERROR](1): " + e);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException sqlException) {
+                    sqlException.printStackTrace();
+                    System.out.println("UserDAO.findByPerson [ERROR](2): " + sqlException);
+                }
+            }
+        }
+        return user;
     }
 }

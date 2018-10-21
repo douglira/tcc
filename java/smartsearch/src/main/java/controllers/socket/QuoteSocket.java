@@ -28,7 +28,7 @@ public class QuoteSocket {
     }
 
     @OnMessage
-    public void onMessage(String message, Session session) {
+    public void onMessage(ArrayList<Quote> quotes, Session session) {
 
     }
 

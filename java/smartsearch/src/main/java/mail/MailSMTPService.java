@@ -57,7 +57,7 @@ public class MailSMTPService extends Mailer {
 	}
 
 	@Override
-	protected void sendHTML(String from, String to, String subject, String templateName, Properties context) {
+	protected void sendHTML(MailerService mailer) {
 		Session session = Session.getInstance(this.propsConfig, new Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(USER, PASS);
@@ -72,23 +72,23 @@ public class MailSMTPService extends Mailer {
 			message.addHeader("Date", formattedDate);
 			
 			try {
-				message.setFrom(new InternetAddress(from, context.getProperty("shortName")));				
+				message.setFrom(new InternetAddress(mailer.getFrom(), mailer.getContext().getProperty("shortName")));
 			} catch (Exception e) {
-				message.setFrom(new InternetAddress(from));
+				message.setFrom(new InternetAddress(mailer.getFrom()));
 			}
 			
-			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-			message.setSubject(subject);
+			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(mailer.getTo()));
+			message.setSubject(mailer.getSubject());
 			
 			VelocityContext ctx = new VelocityContext();
 			
-			context.forEach((key, value) -> ctx.put((String) key, value));
+			mailer.getContext().forEach((key, value) -> ctx.put((String) key, value));
 						
 			StringWriter writerHtml = new StringWriter();
 			StringWriter writerText = new StringWriter();
 			
-			Template templateHtml = this.ve.getTemplate("/templates/mail/" + templateName + ".vm");
-			Template templateText = this.ve.getTemplate("/templates/mail/" + templateName + "-text.vm");
+			Template templateHtml = this.ve.getTemplate("/templates/mail/" + mailer.getTemplate() + ".vm");
+			Template templateText = this.ve.getTemplate("/templates/mail/" + mailer.getTemplate() + "-text.vm");
 
 			templateHtml.merge(ctx, writerHtml);
 			templateText.merge(ctx, writerText);

@@ -20,12 +20,6 @@
 
 <jsp:include page="/header.jsp"/>
 
-<%
-    Person person = (Person) (request.getSession()).getAttribute("loggedPerson");
-%>
-
-<input id="loggedSellerId" type="hidden" value="<%=person.getId()%>">
-
 <div id="userPRSuggest" class="container mb-sm-5 mb-md-5" v-if="purchaseRequest && purchaseRequest.id">
     <div class="card border-light mb-sm-3 mb-md-3">
         <div class="card-body d-flex flex-nowrap align-items-center">

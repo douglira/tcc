@@ -1,13 +1,16 @@
 package controllers.user;
 
 import com.google.gson.Gson;
+import controllers.socket.NotificationSocket;
 import controllers.socket.QuoteSocket;
 import dao.*;
-import enums.MessengerType;
-import enums.PRStage;
-import enums.QuoteStatus;
+import enums.*;
 import libs.Helper;
+import mail.MailSMTPService;
+import mail.MailerService;
+import mail.NewSuggestedQuote;
 import models.*;
+import models.socket.Notification;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -66,9 +70,11 @@ public class PRSuggestController extends HttpServlet {
                 return;
             }
 
-            quote.calculateTotalAmount();
             Seller seller = new SellerDAO(true).findById(new Seller(person.getId()));
+            seller.setCorporateName(person.getCorporateName());
             quote.setSeller(seller);
+
+            quote.calculateTotalAmount();
             quote.setStatus(QuoteStatus.UNDER_REVIEW);
             quote.processExpirationDate();
             quote.setCreatedAt(Calendar.getInstance());
@@ -84,8 +90,11 @@ public class PRSuggestController extends HttpServlet {
             quoteProductListDao.closeTransaction();
             quoteProductListDao.closeConnection();
 
+
             Runnable socketQuotes = () -> QuoteSocket.sendUpdatedQuotes(quote.getPurchaseRequest().getId());
             new Thread(socketQuotes).start();
+
+            sendNotificationsToBuyer(user, quote, getQuotesUrl(request, quote));
 
             response.setStatus(200);
             PrintWriter out = response.getWriter();
@@ -156,6 +165,40 @@ public class PRSuggestController extends HttpServlet {
             System.out.println("PRSuggestController.doPost [ERROR]: " + error);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
+    }
+
+    private void sendNotificationsToBuyer(User sellerUser, Quote quote, String urlQuote) {
+        User buyerUser = new UserDAO(true).findByPerson(quote.getPurchaseRequest().getBuyer().getId());
+
+        final MailerService mailer = new NewSuggestedQuote(
+                quote.getSeller().getCorporateName(),
+                quote.getPurchaseRequest().getId(),
+                quote.getTotalAmount(),
+                urlQuote
+        );
+        mailer.setTo(buyerUser.getEmail());
+        mailer.setMail(MailSMTPService.getInstance());
+
+        Runnable mailTask = (mailer::send);
+
+        Notification notification = new Notification();
+        notification.setFrom(sellerUser);
+        notification.setTo(buyerUser);
+        notification.setResourceId(quote.getId());
+        notification.setResourceType(NotificationResource.QUOTE);
+        notification.setStatus(NotificationStatus.PENDING);
+        notification.setContent("Cotação de " + NumberFormat.getCurrencyInstance().format(quote.getTotalAmount()) + " recebida");
+        new NotificationDAO(true).create(notification);
+
+        Runnable socketNotification = () -> NotificationSocket.pushLastNotifications(buyerUser);
+
+        new Thread(mailTask).start();
+        new Thread(socketNotification).start();
+    }
+
+    private String getQuotesUrl(HttpServletRequest request, Quote quote) {
+        String baseUrl = Helper.getBaseUrl(request);
+        return baseUrl + "/account/purchase_request/quote?q=" + quote.getId();
     }
 
     private boolean isValidRequest(String purchaseRequestIdString, Integer buyerId) {
