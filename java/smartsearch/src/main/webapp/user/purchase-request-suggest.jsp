@@ -89,20 +89,57 @@
             <template v-if="purchaseRequest.stage === 'UNDER_QUOTATION'">
                 <template v-if="purchaseRequest.quotesVisibility">
                     <template v-if="purchaseRequest.quotes && purchaseRequest.quotes.length">
-                        <div class="card w-100 text-center text-white" style="background-color: #999">
+                        <div class="card w-100 text-center text-muted">
                             <div class="card-header text-uppercase font-weight-bold">
                                 Sob cotações
                             </div>
-                            <div class="card-body d-flex flex-column">
-                                <template v-for="quote in purchaseRequest.quotes">
-                                    <div :class="['quote-bubble shadow', quote.seller.id === loggedSeller.id ? 'align-self-end' : '']">
-                                        <div>
-                                            <p class="text-secondary font-weight-bold" style="margin-bottom: 3px; font-size: 15px;">Cotação: <span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></p>
-                                            <p class="text-muted font-italic" style="margin-bottom: 3px; font-size: 14px;">Desconto&colon;&nbsp;{{ quote.discount }}&percnt;</p>
-                                            <small class="text-monospace text-muted">Até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small>
+                            <div class="card-body d-flex flex-column align-items-center" style="padding: 15px;">
+                                <h2 style="font-size: 16px;" class="card-title">Visualização disponível</h2>
+                                <p class="card-text font-italic">Cotações em aberto.</p>
+                                <a href="#sendQuotations">
+                                    <i class="fas fa-comments text-muted" style="font-size: 32px"></i>
+                                </a>
+                                <div class="list-group list-group-flush" style="width: 100%; margin-top: 15px;">
+                                    <template v-for="quote in purchaseRequest.quotes">
+                                        <a
+                                                class="list-group-item list-group-item-action flex-row justify-content-start bg-light"
+                                                :style="quote.seller.id === loggedSeller.id ? { cursor: 'pointer' } : null"
+                                                data-toggle="collapse"
+                                                :data-target="'#collapse' + quote.id"
+                                                aria-expanded="true"
+                                                :aria-controls="'collapse' + quote.id"
+                                                href="javascript:void(0)">
+                                            <div :class="['d-flex flex-row w-100', quote.seller.id === loggedSeller.id ? 'justify-content-end' : 'justify-content-start']">
+                                                <div class="d-flex flex-column w-50">
+                                                    <div class="d-flex flex-row w-100 justify-content-between">
+                                                        <strong class="text-secondary" style="margin-bottom: 3px; font-size: 15px;">Cotação: <span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></strong>
+                                                        <small class="text-monospace text-muted">Criado em&colon;&nbsp;{{ formatDatetime(quote.createdAt) }}</small>
+                                                    </div>
+                                                    <div v-if="quote.seller.id === loggedSeller.id" class="d-flex flex-row w-100 justify-content-center align-items-center"><i>- Você -</i></div>
+                                                    <br v-else>
+                                                    <div class="d-flex flex-row w-100 justify-content-between align-items-center">
+                                                        <i class="text-muted" style="margin: 3px 0; font-size: 14px;">Desconto&colon;&nbsp;{{ quote.discount }}&percnt;</i>
+                                                        <i><small class="text-monospace text-muted">Até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small></i>
+                                                    </div>
+                                                    <i
+                                                            v-if="quote.customListProduct && quote.customListProduct.length"
+                                                            class="fas fa-angle-down text-muted d-flex w-100 justify-content-center align-items-center"
+                                                            style="font-size: 28px;"></i>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div v-if="quote.customListProduct && quote.customListProduct.length" :id="'collapse' + quote.id" class="collapse" style="margin-bottom: 5px;" >
+                                            <ul class="list-group">
+                                                <li
+                                                        v-for="listProduct in quote.customListProduct"
+                                                        class="list-group-item d-flex justify-content-between align-items-center">
+                                                    {{ listProduct.product.title }}
+                                                    <span class="badge badge-info badge-pill">{{ listProduct.quantity }}</span>
+                                                </li>
+                                            </ul>
                                         </div>
-                                    </div>
-                                </template>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                     </template>
@@ -128,8 +165,42 @@
                         </div>
                         <div class="card-body">
                             <h2 style="font-size: 16px;" class="card-title">Visualização indisponível</h2>
-                            <p class="card-text font-italic">As cotações para este pedido de compra são restritas. Visualização disponível apenas ao comprador.</p>
+                            <p class="card-text font-italic">As cotações para este pedido de compra são restritas apenas ao comprador, podendo visualizar somente suas próprias cotações abaixo.</p>
                             <i class="far fa-eye-slash" style="font-size: 32px"></i>
+                            <div class="d-flex flex-row flex justify-content-center w-100" style="padding: 15px;">
+                                <div class="list-group list-group-flush" style="width: 100%; max-width: 720px">
+                                    <template v-for="quote in purchaseRequest.quotes">
+                                        <a
+                                                class="list-group-item list-group-item-action flex-column align-items-start bg-light"
+                                                style="cursor: pointer;"
+                                                href="javascript:void(0)"
+                                                data-toggle="collapse"
+                                                :data-target="'#collapse' + quote.id"
+                                                aria-expanded="true"
+                                                :aria-controls="'collapse' + quote.id">
+                                            <div class="d-flex flex-row w-100 justify-content-between">
+                                                <strong class="text-secondary" style="margin-bottom: 3px; font-size: 15px;">Cotação: <span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></strong>
+                                                <small class="text-monospace text-muted">Criado em&colon;&nbsp;{{ formatDatetime(quote.createdAt) }}</small>
+                                            </div>
+                                            <div class="d-flex flex-row w-100 justify-content-between align-items-center">
+                                                <i class="text-muted" style="margin: 3px 0; font-size: 14px;">Desconto&colon;&nbsp;{{ quote.discount }}&percnt;</i>
+                                                <i><small class="text-monospace text-muted">Até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small></i>
+                                            </div>
+                                            <i class="fas fa-angle-down text-muted d-flex w-100 justify-content-center align-items-center" style="font-size: 28px;"></i>
+                                        </a>
+                                        <div :id="'collapse' + quote.id" class="collapse" style="margin-bottom: 5px;" >
+                                            <ul class="list-group">
+                                                <li
+                                                        v-for="listProduct in quote.customListProduct"
+                                                        class="list-group-item d-flex justify-content-between align-items-center">
+                                                    {{ listProduct.product.title }}
+                                                    <span class="badge badge-info badge-pill">{{ listProduct.quantity }}</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </template>

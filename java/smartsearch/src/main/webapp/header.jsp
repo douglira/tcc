@@ -7,6 +7,7 @@
 %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/header.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/assets/libs/toast/toastr.min.css">
 <header id="appHeader" class="header">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="/">LOGOTIPO</a>
@@ -144,8 +145,8 @@
                             aria-haspopup="true"
                             data-toggle="dropdown"
                             class="btn-notification dropdown-toggle">
-                            <template v-if="notifications && notifications.length">
-                                <span class="btn-badge-count bg-danger">{{ notifications.length }}</span>
+                            <template v-if="pendingNotificationsCount">
+                                <span class="btn-badge-count bg-danger">{{ pendingNotificationsCount }}</span>
                             </template>
                             <i class="far fa-bell"></i>
                         </button>
@@ -190,11 +191,11 @@
     </nav>
 </header>
 <script src="<%=request.getContextPath() %>/assets/libs/helper.js"></script>
+<script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
+<script src="<%=request.getContextPath()%>/assets/libs/toast/toastr.min.js"></script>
 <c:if test="<%=user != null && user.getRole() == UserRoles.COMMON%>">
     <input type="hidden" id="inputHeaderUsername" value="<%= user.getUsername() %>"/>
     <script src="<%=request.getContextPath()%>/assets/libs/fontawesome/js/all.js"></script>
-    <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
-    <script src="<%=request.getContextPath()%>/assets/libs/toast/toastr.min.js"></script>
     <script src="<%=request.getContextPath()%>/assets/libs/axios/axios-dist.min.js"></script>
     <script src="<%=request.getContextPath() %>/assets/libs/vuejs/vue-dist.js"></script>
     <script src="<%=request.getContextPath() %>/assets/js/header-websocket.js"></script>

@@ -98,4 +98,4 @@ new Vue({
 			toastr[topic](msg);
 		}
 	}
-})
+});

@@ -16,7 +16,15 @@ public class Category {
 	private Calendar createdAt;
 	private Calendar updatedAt;
 
-	public Integer getId() {
+	public Category() {
+
+	}
+
+	public Category(int id) {
+		this.id = id;
+	}
+
+    public Integer getId() {
 		return id;
 	}
 

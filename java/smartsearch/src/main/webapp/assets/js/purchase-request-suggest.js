@@ -3,13 +3,14 @@ const FormatterMixin = {
     formatFullDate: Formatter.fullDate,
     formatCurrency: Formatter.currency,
     formatDate: Formatter.date,
+    formatDatetime: Formatter.datetime,
     getDate: Formatter.getDate,
   }
 };
 
 const VueComponent = new Vue({
   el: '#userPRSuggest',
-  name: 'VuePRSuggest',
+  name: 'PurchaseRequestSuggest',
   mixins: [FormatterMixin],
   data() {
     return {
@@ -241,7 +242,7 @@ const VueComponent = new Vue({
       this.initWebsocket();
     },
     initWebsocket() {
-      const wsQuotes = new WebSocket(`ws://localhost:8080/account/purchase_request/${this.purchaseRequest.id}/quotes`);
+      const wsQuotes = new WebSocket(`ws://localhost:8080/account/seller/${VueHeader.$data.username}/purchase_request/${this.purchaseRequest.id}/quotes`);
       wsQuotes.onmessage = this.handleQuotesUpdates
     },
     handleQuotesUpdates(event) {

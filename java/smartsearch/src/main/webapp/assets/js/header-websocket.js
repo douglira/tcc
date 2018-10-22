@@ -1,6 +1,6 @@
 const VueHeader = new Vue({
 	el: '#appHeader',
-	name: 'VueHeader',
+	name: 'Header',
 	data() {
 		return {
 			purchaseRequest: null,
@@ -18,6 +18,11 @@ const VueHeader = new Vue({
       this.initializeConnection();
       await this.loadPurchaseRequest();
     }
+	},
+	computed: {
+		pendingNotificationsCount() {
+      return this.notifications.filter(n => n.status === 'PENDING').length
+		}
 	},
 	methods: {
 		async loadPurchaseRequest() {

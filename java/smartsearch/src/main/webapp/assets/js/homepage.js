@@ -8,6 +8,7 @@ let formatterMixin = {
 
 new Vue({
   el: '#homepageContainer',
+  name: 'Homepage',
   mixins: [formatterMixin],
   data() {
     return {
@@ -33,7 +34,7 @@ new Vue({
             window.location.replace('/signin');
           }
 
-          if (status === 400 && msg.cause === 'PRODUCT_AVAILABLE') {
+          if (status === 400 && msg.cause === 'ERROR_MISSING_ADDRESS') {
             this.showMessage(msg.content, msg.type);
           }
         })

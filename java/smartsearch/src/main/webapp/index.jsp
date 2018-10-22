@@ -47,20 +47,19 @@
             </div>
         </template>
         <template v-else>
-            <div class="alert alert-light mt-sm-3 mt-md-3 text-center w-100">
-                <span class="text-muted w-100">Nenhum produto cadastrado no momento</span>
+            <div class="d-flex w-100 justify-content-center align-items-center">
+                <i class="fas fa-spinner fa-pulse text-info" style="font-size: 48px;"></i>
             </div>
         </template>
     </div>
 </div>
 
+</body>
 <script src="<%=request.getContextPath()%>/assets/libs/fontawesome/js/all.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/popper-1.14.4.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/bootstrap.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/axios/axios-dist.min.js"></script>
-<script src="<%=request.getContextPath()%>/assets/libs/toast/toastr.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/vuejs/vue-dist.js"></script>
 <script src="<%=request.getContextPath()%>/assets/js/homepage.js"></script>
-</body>
 </html>

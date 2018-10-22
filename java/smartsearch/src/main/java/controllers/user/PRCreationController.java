@@ -35,6 +35,13 @@ public class PRCreationController extends HttpServlet {
 
             user.setPerson(person);
 
+            if (missingAddressRegister(user)) {
+                response.setStatus(400);
+                out = response.getWriter();
+                Helper.responseMessage(out, new Messenger("Cadastre seu endereço para criar um pedido de compra", MessengerType.WARNING, "ERROR_MISSING_ADDRESS"));
+                return;
+            }
+
             String productItemId = request.getParameter("productItemId");
             String productItemQuantity = request.getParameter("productItemQuantity");
             String productItemAdditionalSpec = request.getParameter("productItemAdditionalSpec");
@@ -45,12 +52,6 @@ public class PRCreationController extends HttpServlet {
             }
             ProductItem productItem = new ProductItem();
             productItem.setId(Integer.parseInt(productItemId));
-
-            if (isInvalidSellerPurchase(productItem, person)) {
-                response.setStatus(400);
-                Helper.responseMessage(response.getWriter(), new Messenger("Produto ainda disponível em seu estoque!", MessengerType.WARNING, "PRODUCT_AVAILABLE"));
-                return;
-            }
 
             updateViewsCount(Integer.parseInt(productItemId), Helper.getBaseUrl(request));
 
@@ -72,9 +73,10 @@ public class PRCreationController extends HttpServlet {
         }
     }
 
-    private boolean isInvalidSellerPurchase(ProductItem productItem, Person person) {
-        Product product = new ProductDAO(true).findByProductItemAndSeller(productItem.getId(), person.getId());
-        return product != null && product.getAvailableQuantity() > 0;
+    private boolean missingAddressRegister(User user) {
+        Address address = new AddressDAO(true).findByPerson(user.getPerson().getId());
+
+        return address == null;
     }
 
     private void updateViewsCount(int productItemId , String baseUrl) {

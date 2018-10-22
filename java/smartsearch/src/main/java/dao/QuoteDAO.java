@@ -97,14 +97,46 @@ public class QuoteDAO extends GenericDAO {
             }
         } catch (SQLException err) {
             err.printStackTrace();
-            System.out.println("QuoteDAO.create [ERROR](1): " + err);
+            System.out.println("QuoteDAO.findByPurchaseRequest [ERROR](1): " + err);
         } finally {
             if (this.conn != null) {
                 try {
                     this.conn.close();
                 } catch (SQLException err) {
                     err.printStackTrace();
-                    System.out.println("QuoteDAO.create [ERROR](2): " + err);
+                    System.out.println("QuoteDAO.findByPurchaseRequest [ERROR](2): " + err);
+                }
+            }
+        }
+        return quotes;
+    }
+
+    public ArrayList<Quote> findRestrictQuotes(int purchaseRequestId, int sellerId) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE purchase_request_id = ? AND seller_id = ?";
+        ArrayList<Quote> quotes = new ArrayList<Quote>();
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, purchaseRequestId);
+            stmt.setInt(2, sellerId);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Quote quote = this.fetch(rs, new Quote());
+                quotes.add(quote);
+            }
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("QuoteDAO.findRestrictQuotes [ERROR](1): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException err) {
+                    err.printStackTrace();
+                    System.out.println("QuoteDAO.findRestrictQuotes [ERROR](2): " + err);
                 }
             }
         }

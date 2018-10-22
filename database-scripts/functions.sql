@@ -65,8 +65,10 @@ BEGIN
   IF pi_count > 0 THEN
   
     FOR rec_pr IN (
-      SELECT pr_products.product_item_id, pr_products.quantity 
+      SELECT purchase_requests.buyer_id, pr_products.product_item_id, pr_products.quantity 
       FROM pr_products
+      INNER JOIN purchase_requests
+      ON purchase_requests.id = pr_products.purchase_request_id
       WHERE pr_products.purchase_request_id = pr_id
     ) LOOP
       SELECT ARRAY(
@@ -84,6 +86,7 @@ BEGIN
         AND users.status = CAST('ACTIVE' as status_entity) 
         AND products.product_item_id = rec_pr.product_item_id
         AND products.available_quantity >= rec_pr.quantity
+        AND rec_pr.buyer_id <> sellers.person_id
       ) INTO sellers_ids;
 
       SELECT ppg_duplicated || sellers_ids INTO ppg_duplicated;
