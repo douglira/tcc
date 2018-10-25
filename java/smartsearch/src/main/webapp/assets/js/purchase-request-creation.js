@@ -8,27 +8,46 @@ let formatterMixin = {
 
 const VuePRCreation = new Vue({
   el: '#userPRCreation',
+  name: 'PRCreation',
   mixins: [formatterMixin],
   data() {
     return {
-      username: null,
       purchaseRequest: null,
-      prAdditionalData: '',
       prQuotesVisibility: false,
+      prDueDate: null,
+      prAdditionalData: '',
       modalData: {
         productItemId: null,
         productItemTitle: '',
         quantity: null,
         additionalSpec: null,
       },
+      invalidPublish: true,
     }
   },
   async created() {
-    const username = document.getElementById('inputHeaderUsername').value;
-    this.username = username;
     await this.loadData();
     this.wsPurchaseRequestUpdate();
     this.initPopover();
+  },
+  watch: {
+    prDueDate() {
+      const now = moment(new Date());
+      const dueDate = moment(new Date(this.prDueDate));
+
+      const days = dueDate.diff(now, 'days');
+      if (days > 90) {
+        this.invalidPublish = true;
+        this.showMessage('Expiração máxima: 90 dias', 'error');
+      }
+
+      if (days < 0) {
+        this.invalidPublish = true;
+        this.showMessage('Data de expiração inválida', 'error');
+      }
+
+      this.invalidPublish = false;
+    }
   },
   methods: {
     onClickPublish() {
@@ -40,10 +59,10 @@ const VuePRCreation = new Vue({
             additionalData: this.prAdditionalData,
             quotesVisibility: this.prQuotesVisibility,
           }),
+          prDueDate: this.prDueDate,
         }
       )
         .done(() => {
-          console.log('Deu certo!');
           VueHeader.$data.purchaseRequest = null;
           this.purchaseRequest = null;
           window.location.replace('/');
@@ -56,19 +75,19 @@ const VuePRCreation = new Vue({
           }
         })
     },
-    onClickEditProduct(productList) {
+    onClickEditProduct(purchaseItem) {
       this.modalData = {
-        productItemId: productList.product.id,
-        productItemTitle: productList.product.title,
-        quantity: productList.quantity,
-        additionalSpec: productList.additionalSpec,
+        productItemId: purchaseItem.product.id,
+        productItemTitle: purchaseItem.product.title,
+        quantity: purchaseItem.quantity,
+        additionalSpec: purchaseItem.additionalSpec,
       };
       $('#modalProductItemEdit').modal('show');
     },
-    onClickRemoveProduct(productList) {
+    onClickRemoveProduct(purchaseItem) {
       this.modalData = {
-        productItemId: productList.product.id,
-        productItemTitle: productList.product.title,
+        productItemId: purchaseItem.product.id,
+        productItemTitle: purchaseItem.product.title,
       };
       $('#modalProductItemRemove').modal('show');
     },
@@ -95,7 +114,7 @@ const VuePRCreation = new Vue({
         {
           purchaseRequestId: this.purchaseRequest.id,
           productItemId: this.modalData.productItemId,
-          productList: JSON.stringify(payload),
+          purchaseItem: JSON.stringify(payload),
         }
       )
         .always(() => {
@@ -118,7 +137,7 @@ const VuePRCreation = new Vue({
       });
     },
     wsPurchaseRequestUpdate() {
-      const wsPurchaseRequest = new WebSocket(`ws://localhost:8080/account/purchase_request/${this.username}`);
+      const wsPurchaseRequest = new WebSocket(`ws://localhost:8080/account/purchase_request/${VueHeader.$data.username}`);
       wsPurchaseRequest.onmessage = (event) => {
         const purchaseRequest = JSON.parse(event.data);
 

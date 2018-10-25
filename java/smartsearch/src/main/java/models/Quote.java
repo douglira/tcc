@@ -9,7 +9,7 @@ public class Quote {
     private int id;
     private PurchaseRequest purchaseRequest;
     private Seller seller;
-    private ArrayList<ProductList> customListProduct;
+    private ArrayList<Item> customListProduct;
     private Shipping shipping;
     private String additionalData;
     private QuoteStatus status;
@@ -51,11 +51,11 @@ public class Quote {
         this.seller = seller;
     }
 
-    public ArrayList<ProductList> getCustomListProduct() {
+    public ArrayList<Item> getCustomListProduct() {
         return customListProduct;
     }
 
-    public void setCustomListProduct(ArrayList<ProductList> customListProduct) {
+    public void setCustomListProduct(ArrayList<Item> customListProduct) {
         this.customListProduct = customListProduct;
     }
 
@@ -125,7 +125,7 @@ public class Quote {
 
     public void calculateTotalAmount() {
         this.totalAmount = this.customListProduct.stream()
-                .mapToDouble(ProductList::getSubtotalAmount)
+                .mapToDouble(Item::getSubtotalAmount)
                 .sum();
 
         if (this.discount > 0) {

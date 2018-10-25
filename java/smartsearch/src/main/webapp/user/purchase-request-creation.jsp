@@ -115,26 +115,26 @@
         <div class="card-body">
             <ul class="list-group list-group-flush">
                 <li
-                    v-for="productList in purchaseRequest.listProducts"
-                    :key="productList.product.id"
+                    v-for="item in purchaseRequest.listProducts"
+                    :key="item.product.id"
                     class="list-group-item pr-item">
                     <img
                         class="pr-item-thumbnail"
-                        :src="productList.product.thumbnail.urlPath"
-                        :alt="productList.product.thumbnail.name">
+                        :src="item.product.thumbnail.urlPath"
+                        :alt="item.product.thumbnail.name">
                     <div class="pr-item-title">
-                        <span class="text-muted">{{ productList.product.title }}</span>
-                        <span class="text-success pr-item-price">{{ formatCurrency(productList.product.basePrice) }}</span>
+                        <span class="text-muted">{{ item.product.title }}</span>
+                        <span class="text-success pr-item-price">{{ formatCurrency(item.product.basePrice) }}</span>
                     </div>
                     <p class="pr-item-quantity text-secondary">
                         Qtd.
                         &nbsp;
-                        <strong>{{ productList.quantity }}</strong>
+                        <strong>{{ item.quantity }}</strong>
                     </p>
-                    <button type="button" class="text-secondary pr-item-actions" @click="onClickEditProduct(productList)">
+                    <button type="button" class="text-secondary pr-item-actions" @click="onClickEditProduct(item)">
                         <i class="far fa-edit"></i>
                     </button>
-                    <button type="button" class="text-danger pr-item-actions" @click="onClickRemoveProduct(productList)">
+                    <button type="button" class="text-danger pr-item-actions" @click="onClickRemoveProduct(item)">
                         <i class="fas fa-times"></i>
                     </button>
                 </li>
@@ -161,13 +161,17 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="expirationDate">Data de expiração</label>
+                        <input type="date" class="form-control" id="expirationDate" v-model="prDueDate"/>
+                    </div>
+                    <div class="form-group">
                         <label for="additionalData">Informações adicionais</label>
                         <textarea class="form-control" id="additionalData" aria-describedby="additionalDataInfo" rows="3" v-model="prAdditionalData"></textarea>
                         <small id="additionalDataInfo" class="form-text text-muted">Ex: envio, transportadora, negociação...</small>
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn btn-info btn-lg btn-block btn-publish" @click="onClickPublish">Publicar pedido</button>
+            <button type="button" :disabled="invalidPublish" class="btn btn-info btn-lg btn-block btn-publish" @click="onClickPublish">Publicar pedido</button>
         </div>
     </div>
 </div>
@@ -176,6 +180,7 @@
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/axios/axios-dist.min.js"></script>
+<script src="<%=request.getContextPath()%>/assets/libs/moment.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/vuejs/vue-dist.js"></script>
 <script src="<%=request.getContextPath()%>/assets/js/purchase-request-creation.js"></script>
 </body>

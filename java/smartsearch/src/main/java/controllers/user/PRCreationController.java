@@ -1,7 +1,7 @@
 package controllers.user;
 
 import com.google.gson.Gson;
-import controllers.socket.PurchaseRequestSocket;
+import controllers.socket.PRCreationSocket;
 import dao.*;
 import database.elasticsearch.ElasticsearchFacade;
 import enums.MessengerType;
@@ -55,17 +55,17 @@ public class PRCreationController extends HttpServlet {
 
             updateViewsCount(Integer.parseInt(productItemId), Helper.getBaseUrl(request));
 
-            ProductList productList = new ProductList();
-            productList.setAdditionalSpec(productItemAdditionalSpec);
-            productList.setProduct(productItem);
+            Item item = new Item();
+            item.setAdditionalSpec(productItemAdditionalSpec);
+            item.setProduct(productItem);
 
             if (productItemQuantity != null && productItemQuantity.length() > 0) {
-                productList.setQuantity(Integer.parseInt(productItemQuantity));
+                item.setQuantity(Integer.parseInt(productItemQuantity));
             } else {
-                productList.setQuantity(0);
+                item.setQuantity(0);
             }
 
-            addProductItem(out, Helper.getBaseUrl(request), user, productList);
+            addProductItem(out, Helper.getBaseUrl(request), user, item);
         } catch (Exception error) {
             error.printStackTrace();
             System.out.println("PRCreationController.doPost [ERROR]: " + error);
@@ -92,25 +92,25 @@ public class PRCreationController extends HttpServlet {
         new ElasticsearchFacade().indexProductItem(productItem);
     }
 
-    private void addProductItem(PrintWriter out, String baseUrl, User user, ProductList productList) throws SQLException {
+    private void addProductItem(PrintWriter out, String baseUrl, User user, Item item) throws SQLException {
         Gson gJson = new Gson();
 
         Buyer buyer = new Buyer();
         buyer.setId(user.getPerson().getId());
 
-        ProductItem productItem = (ProductItem) productList.getProduct();
+        ProductItem productItem = (ProductItem) item.getProduct();
         productItem = new ProductItemDAO(true).findById(productItem);
 
         if (productItem == null) {
             Helper.responseMessage(out, new Messenger("Produto não encontrado.", MessengerType.WARNING));
             return;
         }
-        productList.setProduct(productItem);
-        productList.calculateAmount();
+        item.setProduct(productItem);
+        item.calculateAmount();
 
         PurchaseRequestDAO purchaseRequestDao = new PurchaseRequestDAO(true);
         purchaseRequestDao.initTransaction();
-        PRProductListDAO PRProductListDao = new PRProductListDAO(purchaseRequestDao.getConnection());
+        PurchaseItemDAO PurchaseItemDao = new PurchaseItemDAO(purchaseRequestDao.getConnection());
 
         PurchaseRequest purchaseRequest = new PurchaseRequest();
         purchaseRequest.setBuyer(buyer);
@@ -122,30 +122,29 @@ public class PRCreationController extends HttpServlet {
 
             purchaseRequest.setViewsCount(0);
             purchaseRequest.setPropagationCount(0);
-            purchaseRequest.addListProduct(productList);
+            purchaseRequest.addListProduct(item);
             purchaseRequest.calculateAmount();
-            purchaseRequest.setDueDateAverage(Calendar.getInstance());
+            purchaseRequest.setDueDate(Calendar.getInstance());
 
             purchaseRequest = purchaseRequestDao.create(purchaseRequest);
         } else {
             purchaseRequest = prs.get(0);
 
-            if (!new PRProductListDAO(true).validateProductInsertion(purchaseRequest.getId(), productList)) {
+            if (!new PurchaseItemDAO(true).validateProductInsertion(purchaseRequest.getId(), item)) {
                 Helper.responseMessage(out, new Messenger("Produto já existente, altere sua quantidade ou remova-o.", MessengerType.WARNING));
                 return;
             }
-            ArrayList<ProductList> products = new PRProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
-            products.add(productList);
-            products.sort(ProductList::compareTo);
+            ArrayList<Item> products = new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId());
+            products.add(item);
+            products.sort(Item::compareTo);
             purchaseRequest.setListProducts(products);
             purchaseRequest.calculateAmount();
 
         }
-        PRProductListDao.attachPurchaseRequest(purchaseRequest.getId(), productList);
+        PurchaseItemDao.attachPurchaseRequest(purchaseRequest.getId(), item);
 
-        ArrayList<Seller> sellers = new SellerDAO(PRProductListDao.getConnection()).findByPurchaseRequest(purchaseRequest.getId());
+        ArrayList<Seller> sellers = new SellerDAO(PurchaseItemDao.getConnection()).findByPurchaseRequest(purchaseRequest.getId());
         purchaseRequest.setPropagationCount(sellers.size());
-        purchaseRequest.calculateDueDateAverage(sellers);
         purchaseRequestDao.updatePropagation(purchaseRequest);
         purchaseRequestDao.updateDueDate(purchaseRequest);
 
@@ -159,19 +158,19 @@ public class PRCreationController extends HttpServlet {
     }
 
     private void pushSocketPurchaseRequest(User user, PurchaseRequest purchaseRequest, String baseUrl) {
-        ArrayList<ProductList> products = new PRProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
+        ArrayList<Item> products = new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId());
         fetchPictures(products, baseUrl);
 
         purchaseRequest.setListProducts(products);
 
         user.setPerson(null);
-        PurchaseRequestSocket.sendUpdatedPRCreation(user, purchaseRequest, baseUrl);
+        PRCreationSocket.sendUpdatedPRCreation(user, purchaseRequest, baseUrl);
     }
 
-    private void fetchPictures(ArrayList<ProductList> products, String baseUrl) {
-        products.forEach(productList -> {
-            synchronized (productList) {
-                ProductItem productItem = (ProductItem) productList.getProduct();
+    private void fetchPictures(ArrayList<Item> products, String baseUrl) {
+        products.forEach(item -> {
+            synchronized (item) {
+                ProductItem productItem = (ProductItem) item.getProduct();
                 productItem.setPictures(new FileDAO(true).getProductItemPictures(productItem.getId()));
                 productItem.setDefaultThumbnail(baseUrl);
             }

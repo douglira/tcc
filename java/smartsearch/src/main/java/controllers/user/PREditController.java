@@ -1,9 +1,9 @@
 package controllers.user;
 
 import com.google.gson.Gson;
-import controllers.socket.PurchaseRequestSocket;
+import controllers.socket.PRCreationSocket;
 import dao.FileDAO;
-import dao.PRProductListDAO;
+import dao.PurchaseItemDAO;
 import dao.PurchaseRequestDAO;
 import dao.SellerDAO;
 import enums.MessengerType;
@@ -42,8 +42,8 @@ public class PREditController extends HttpServlet {
 
             if (action.equals("update")) {
 
-                ProductList productList = gJson.fromJson(request.getParameter("productList"), ProductList.class);
-                updatePurchaseRequestItem(user, purchaseRequestId, productItemId, productList, Helper.getBaseUrl(request));
+                Item item = gJson.fromJson(request.getParameter("purchaseItem"), Item.class);
+                updatePurchaseRequestItem(user, purchaseRequestId, productItemId, item, Helper.getBaseUrl(request));
             } else if (action.equals("remove")) {
                 removePurchaseRequestItem(user, purchaseRequestId, productItemId, Helper.getBaseUrl(request));
             }
@@ -56,58 +56,57 @@ public class PREditController extends HttpServlet {
         }
     }
 
-    private void updatePurchaseRequestItem(User user, int purchaseRequestId, int productItemId, ProductList productList, String baseUrl) throws SQLException {
-        if (productList.getQuantity() <= 0) {
+    private void updatePurchaseRequestItem(User user, int purchaseRequestId, int productItemId, Item item, String baseUrl) throws SQLException {
+        if (item.getQuantity() <= 0) {
             return;
         }
 
         ProductItem productItem = new ProductItem();
         productItem.setId(productItemId);
-        productList.setProduct(productItem);
+        item.setProduct(productItem);
 
-        PRProductListDAO PRProductListDao = new PRProductListDAO(true);
-        PRProductListDao.initTransaction();
-        productList.calculateAmount();
-        PRProductListDao.updateQuantityAndSpec(purchaseRequestId, productList);
+        PurchaseItemDAO PurchaseItemDao = new PurchaseItemDAO(true);
+        PurchaseItemDao.initTransaction();
+        item.calculateAmount();
+        PurchaseItemDao.updateQuantityAndSpec(purchaseRequestId, item);
 
-        updatePurchaseRequestData(user, purchaseRequestId, PRProductListDao, baseUrl);
+        updatePurchaseRequestData(user, purchaseRequestId, PurchaseItemDao, baseUrl);
     }
 
     private void removePurchaseRequestItem(User user, int purchaseRequestId, int productItemId, String baseUrl) throws SQLException {
-        PRProductListDAO PRProductListDao = new PRProductListDAO(true);
-        PRProductListDao.initTransaction();
-        PRProductListDao.remove(purchaseRequestId, productItemId);
+        PurchaseItemDAO PurchaseItemDao = new PurchaseItemDAO(true);
+        PurchaseItemDao.initTransaction();
+        PurchaseItemDao.remove(purchaseRequestId, productItemId);
 
-        ArrayList<ProductList> products = new PRProductListDAO(true).findByPurchaseRequest(purchaseRequestId);
+        ArrayList<Item> products = new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequestId);
         if (products.isEmpty()) {
             PurchaseRequest pr = new PurchaseRequest();
-            new PurchaseRequestDAO(PRProductListDao.getConnection()).destroyCreation(purchaseRequestId, user.getPerson().getId());
+            new PurchaseRequestDAO(PurchaseItemDao.getConnection()).destroyCreation(purchaseRequestId, user.getPerson().getId());
 
             pr.setId(null);
-            PurchaseRequestSocket.sendUpdatedPRCreation(user, pr, null);
+            PRCreationSocket.sendUpdatedPRCreation(user, pr, null);
             return;
         }
 
-        updatePurchaseRequestData(user, purchaseRequestId, PRProductListDao, baseUrl);
+        updatePurchaseRequestData(user, purchaseRequestId, PurchaseItemDao, baseUrl);
     }
 
-    private void updatePurchaseRequestData(User user, int purchaseRequestId, PRProductListDAO PRProductListDao, String baseUrl) throws SQLException {
+    private void updatePurchaseRequestData(User user, int purchaseRequestId, PurchaseItemDAO PurchaseItemDao, String baseUrl) throws SQLException {
         PurchaseRequest purchaseRequest = new PurchaseRequest();
         purchaseRequest.setId(purchaseRequestId);
 
         purchaseRequest = new PurchaseRequestDAO(true).findById(purchaseRequest);
-        ArrayList<ProductList> products = new PRProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
+        ArrayList<Item> products = new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId());
 
-        products.sort(ProductList::compareTo);
+        products.sort(Item::compareTo);
         purchaseRequest.setListProducts(products);
         purchaseRequest.calculateAmount();
 
-        PurchaseRequestDAO purchaseRequestDao = new PurchaseRequestDAO(PRProductListDao.getConnection());
+        PurchaseRequestDAO purchaseRequestDao = new PurchaseRequestDAO(PurchaseItemDao.getConnection());
         purchaseRequestDao.updateTotalAmount(purchaseRequest);
-        ArrayList<Seller> sellers = new SellerDAO(PRProductListDao.getConnection()).findByPurchaseRequest(purchaseRequest.getId());
+        ArrayList<Seller> sellers = new SellerDAO(PurchaseItemDao.getConnection()).findByPurchaseRequest(purchaseRequest.getId());
 
         purchaseRequest.setPropagationCount(sellers.size());
-        purchaseRequest.calculateDueDateAverage(sellers);
 
         purchaseRequestDao.updatePropagation(purchaseRequest);
         purchaseRequestDao.updateDueDate(purchaseRequest);
@@ -115,7 +114,7 @@ public class PREditController extends HttpServlet {
         purchaseRequestDao.closeTransaction();
         purchaseRequestDao.closeConnection();
 
-        PurchaseRequestSocket.sendUpdatedPRCreation(user, null, baseUrl);
+        PRCreationSocket.sendUpdatedPRCreation(user, null, baseUrl);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -138,16 +137,16 @@ public class PREditController extends HttpServlet {
             if (prs != null && !prs.isEmpty()) {
                 purchaseRequest = prs.get(0);
 
-                ArrayList<ProductList> products = new PRProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
-                products.forEach(productList -> {
-                    synchronized (productList) {
-                        ProductItem productItem = (ProductItem) productList.getProduct();
+                ArrayList<Item> products = new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId());
+                products.forEach(item -> {
+                    synchronized (item) {
+                        ProductItem productItem = (ProductItem) item.getProduct();
                         productItem.setPictures(new FileDAO(true).getProductItemPictures(productItem.getId()));
                         productItem.setDefaultThumbnail(Helper.getBaseUrl(request));
                     }
                 });
 
-                products.sort(ProductList::compareTo);
+                products.sort(Item::compareTo);
                 purchaseRequest.setListProducts(products);
                 purchaseRequest.calculateAmount();
             } else {

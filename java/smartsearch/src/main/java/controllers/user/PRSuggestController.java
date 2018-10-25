@@ -2,7 +2,7 @@ package controllers.user;
 
 import com.google.gson.Gson;
 import controllers.socket.NotificationSocket;
-import controllers.socket.QuoteSocket;
+import controllers.socket.QuoteNotifierSocket;
 import dao.*;
 import enums.*;
 import libs.Helper;
@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "PRSuggestController", urlPatterns = "/account/purchase_request/suggest")
 public class PRSuggestController extends HttpServlet {
@@ -48,25 +49,30 @@ public class PRSuggestController extends HttpServlet {
 
             quote.setPurchaseRequest(new PurchaseRequestDAO(true).findById(quote.getPurchaseRequest()));
 
-            if (!quote.getPurchaseRequest().getStage().equals(PRStage.UNDER_QUOTATION)) {
+            if (!validateExpiration(quote.getPurchaseRequest())) {
                 Helper.responseMessage(outError, new Messenger("Este pedido de compras não se encontra sob cotação", MessengerType.WARNING));
                 return;
             }
 
-            quote.getPurchaseRequest().setListProducts(new PRProductListDAO(true).findByPurchaseRequest(quote.getPurchaseRequest().getId()));
+            if (!validateSuggestedQuotes(quote.getPurchaseRequest().getId(), person.getId())) {
+                Helper.responseMessage(outError, new Messenger("Limite de cotações sobre análise excedido. Aguarde um posicionamento do comprador", MessengerType.WARNING));
+                return;
+            }
 
-            quote.getCustomListProduct().forEach(productList -> {
-                productList.setProduct(new ProductDAO(true).findById(new Product(productList.getProduct().getId())));
-                productList.calculateAmount();
+            quote.getPurchaseRequest().setListProducts(new PurchaseItemDAO(true).findByPurchaseRequest(quote.getPurchaseRequest().getId()));
+
+            quote.getCustomListProduct().forEach(quoteItem -> {
+                quoteItem.setProduct(new ProductDAO(true).findById(new Product(quoteItem.getProduct().getId())));
+                quoteItem.calculateAmount();
             });
 
-            ProductList productList = quote.getCustomListProduct().stream()
-                    .filter(prodList -> prodList.getQuantity() > ((Product) prodList.getProduct()).getAvailableQuantity())
+            Item item = quote.getCustomListProduct().stream()
+                    .filter(quoteItem -> quoteItem.getQuantity() > ((Product) quoteItem.getProduct()).getAvailableQuantity())
                     .findFirst()
                     .orElse(null);
 
-            if (productList != null) {
-                Helper.responseMessage(outError, new Messenger("Quantidade indisponível. PRODUTO: " + productList.getProduct().getTitle(), MessengerType.ERROR));
+            if (item != null) {
+                Helper.responseMessage(outError, new Messenger("Quantidade indisponível. PRODUTO: " + item.getProduct().getTitle(), MessengerType.ERROR));
                 return;
             }
 
@@ -83,35 +89,14 @@ public class PRSuggestController extends HttpServlet {
             quoteDao.initTransaction();
             quoteDao.create(quote);
 
-            QuoteProductListDAO quoteProductListDao = new QuoteProductListDAO(quoteDao.getConnection());
+            QuotationItemDAO quotationItemDao = new QuotationItemDAO(quoteDao.getConnection());
 
-            quote.getCustomListProduct().forEach(prodList -> quoteProductListDao.attachQuote(quote.getId(), prodList));
+            quote.getCustomListProduct().forEach(prodList -> quotationItemDao.attachQuote(quote.getId(), prodList));
 
-            quoteProductListDao.closeTransaction();
-            quoteProductListDao.closeConnection();
+            quotationItemDao.closeTransaction();
+            quotationItemDao.closeConnection();
 
-            Runnable socketQuotes = null;
-            if (quote.getPurchaseRequest().getQuotesVisibility()) {
-                ArrayList<Quote> quotes = new QuoteDAO(true).findByPurchaseRequest(quote.getPurchaseRequest().getId());
-                quotes.forEach(q -> {
-                    if (q.getSeller().getId() == seller.getId()) {
-                        q.setCustomListProduct(new QuoteProductListDAO(true).findByQuote(q.getId()));
-                    }
-                });
-                socketQuotes = () -> QuoteSocket.sendUpdatedQuotes(quote.getPurchaseRequest(), quotes);
-            } else {
-                ArrayList<Quote> restrictQuotes = new QuoteDAO(true).findRestrictQuotes(quote.getPurchaseRequest().getId(), quote.getSeller().getId());
-                restrictQuotes.forEach(restrictQuote -> restrictQuote.setCustomListProduct(new QuoteProductListDAO(true).findByQuote(restrictQuote.getId())));
-                socketQuotes = () -> {
-                    try {
-                        QuoteSocket.sendUpdatedRestrictQuotes(user, quote.getPurchaseRequest(), restrictQuotes);
-                    } catch (Throwable throwable) {
-                        throwable.printStackTrace();
-                    }
-                };
-            }
-
-            new Thread(socketQuotes).start();
+            QuoteNotifierSocket.notifyUpdatedQuotes(quote.getPurchaseRequest());
             sendNotificationsToBuyer(user, quote, getQuotesUrl(request, quote));
 
             response.setStatus(200);
@@ -155,6 +140,27 @@ public class PRSuggestController extends HttpServlet {
         new Thread(socketNotification).start();
     }
 
+    private boolean validateSuggestedQuotes(Integer purchaseRequestId, Integer sellerId) {
+        ArrayList<Quote> quotes = new QuoteDAO(true).findByPurchaseRequest(purchaseRequestId);
+        ArrayList<Quote> sellerQuotes = quotes.stream()
+                .filter(quote -> sellerId.equals(quote.getSeller().getId()) && quote.getStatus().equals(QuoteStatus.UNDER_REVIEW))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        return sellerQuotes.size() < 3;
+    }
+
+    private boolean validateExpiration(PurchaseRequest purchaseRequest) {
+        if (!purchaseRequest.getStage().equals(PRStage.UNDER_QUOTATION)) {
+            return false;
+        }
+
+        if (purchaseRequest.getDueDate().getTimeInMillis() < Calendar.getInstance().getTimeInMillis()) {
+            return false;
+        }
+
+        return true;
+    }
+
     private String getQuotesUrl(HttpServletRequest request, Quote quote) {
         String baseUrl = Helper.getBaseUrl(request);
         return baseUrl + "/account/purchase_request/quote?q=" + quote.getId();
@@ -196,29 +202,29 @@ public class PRSuggestController extends HttpServlet {
             }
 
             PurchaseRequest purchaseRequest = new PurchaseRequestDAO(true).findById(new PurchaseRequest(Integer.parseInt(purchaseRequestIdString)));
-            ArrayList<ProductList> prProducts = new PRProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
+            ArrayList<Item> prProducts = new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId());
 
-            prProducts.forEach(prProduct -> {
-                synchronized (prProduct) {
-                    ProductItem productItem = (ProductItem) prProduct.getProduct();
+            prProducts.forEach(item -> {
+                synchronized (item) {
+                    ProductItem productItem = (ProductItem) item.getProduct();
                     productItem.setPictures(new FileDAO(true).getProductItemPictures(productItem.getId()));
                     productItem.setDefaultThumbnail(Helper.getBaseUrl(request));
                 }
             });
-            prProducts.sort(ProductList::compareTo);
+            prProducts.sort(Item::compareTo);
             purchaseRequest.setListProducts(prProducts);
 
             if (purchaseRequest.getQuotesVisibility()) {
                 ArrayList<Quote> quotes = new QuoteDAO(true).findByPurchaseRequest(purchaseRequest.getId());
                 quotes.forEach(quote -> {
                     if (person.getId() == quote.getSeller().getId()) {
-                        quote.setCustomListProduct(new QuoteProductListDAO(true).findByQuote(quote.getId()));
+                        quote.setCustomListProduct(new QuotationItemDAO(true).findByQuote(quote.getId()));
                     }
                 });
                 purchaseRequest.setQuotes(quotes);
             } else {
                 ArrayList<Quote> restrictQuotes = new QuoteDAO(true).findRestrictQuotes(purchaseRequest.getId(), person.getId());
-                restrictQuotes.forEach(restrictQuote -> restrictQuote.setCustomListProduct(new QuoteProductListDAO(true).findByQuote(restrictQuote.getId())));
+                restrictQuotes.forEach(restrictQuote -> restrictQuote.setCustomListProduct(new QuotationItemDAO(true).findByQuote(restrictQuote.getId())));
                 purchaseRequest.setQuotes(restrictQuotes);
             }
 

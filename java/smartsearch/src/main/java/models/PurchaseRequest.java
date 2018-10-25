@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 public class PurchaseRequest {
     private Integer id;
     private Buyer buyer;
-    private ArrayList<ProductList> listProducts = new ArrayList<ProductList>();
+    private ArrayList<Item> listProducts = new ArrayList<Item>();
     private ArrayList<Quote> quotes;
     private int propagationCount;
     private String additionalData;
     private PRStage stage;
-    private Calendar dueDateAverage;
+    private Calendar dueDate;
     private boolean quotesVisibility;
     private int viewsCount;
     private double totalAmount;
@@ -48,11 +48,11 @@ public class PurchaseRequest {
         this.buyer = buyer;
     }
 
-    public ArrayList<ProductList> getListProducts() {
+    public ArrayList<Item> getListProducts() {
         return listProducts;
     }
 
-    public void setListProducts(ArrayList<ProductList> listProducts) {
+    public void setListProducts(ArrayList<Item> listProducts) {
         this.listProducts = listProducts;
     }
 
@@ -88,12 +88,12 @@ public class PurchaseRequest {
         this.stage = stage;
     }
 
-    public Calendar getDueDateAverage() {
-        return dueDateAverage;
+    public Calendar getDueDate() {
+        return dueDate;
     }
 
-    public void setDueDateAverage(Calendar dueDateAverage) {
-        this.dueDateAverage = dueDateAverage;
+    public void setDueDate(Calendar dueDate) {
+        this.dueDate = dueDate;
     }
 
     public boolean getQuotesVisibility() {
@@ -144,38 +144,12 @@ public class PurchaseRequest {
         this.closedAt = closedAt;
     }
 
-    public void addListProduct(ProductList productList) {
-        this.listProducts.add(productList);
+    public void addListProduct(Item item) {
+        this.listProducts.add(item);
     }
 
     public void calculateAmount() {
-        this.totalAmount = this.listProducts.stream().mapToDouble(ProductList::getSubtotalAmount).sum();
-    }
-
-    public void calculateDueDateAverage(ArrayList<Seller> sellers) {
-        if (sellers == null || sellers.isEmpty()) {
-            this.dueDateAverage = Calendar.getInstance();
-            return;
-        }
-
-        List<Integer> days = sellers
-                .stream()
-                .mapToInt(Seller::getQuotesExpirationPeriod)
-                .sorted()
-                .boxed()
-                .collect(Collectors.toList());
-
-        int index;
-        if (days.size() == 1) {
-            index = 0;
-        } else {
-            index = ((int) Math.ceil(days.size() / 2)) - 1;
-        }
-        int daysResult = days.get(index);
-
-        Calendar dueDateAverage = Calendar.getInstance();
-        dueDateAverage.add(Calendar.DAY_OF_YEAR, daysResult);
-        this.dueDateAverage = dueDateAverage;
+        this.totalAmount = this.listProducts.stream().mapToDouble(Item::getSubtotalAmount).sum();
     }
 
     @Override

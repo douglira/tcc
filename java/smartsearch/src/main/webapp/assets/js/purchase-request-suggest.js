@@ -201,7 +201,7 @@ const VueComponent = new Vue({
       return productTitle.substr(0, blankSpaceIndex) + '...';
     },
     initCountdown() {
-      const countdownDate = (this.getDate(this.purchaseRequest.dueDateAverage)).getTime();
+      const countdownDate = (this.getDate(this.purchaseRequest.dueDate)).getTime();
       const countdownInterval = setInterval(() => {
         const now = new Date().getTime();
         const distance = countdownDate - now;
@@ -222,9 +222,9 @@ const VueComponent = new Vue({
     async getProductsInventory({ page, perPage, searchTitle }) {
       return axios.get(`/account/products?page=${page ? page : ''}&perPage=${perPage ? perPage : ''}&search=${searchTitle ? searchTitle : ''}`);
     },
-    async loadData() {
+    async loadData(purchaseRequestId) {
       const { page, perPage } = this;
-      const purchaseRequestId = window.location.search.split('?pr=')[1];
+      purchaseRequestId = window.location.search.split('?pr=')[1];
 
       const [responseSeller, responsePurchaseRequest, responseProducts] = await Promise.all([
         axios.get('/account/me/data'),
@@ -242,11 +242,12 @@ const VueComponent = new Vue({
       this.initWebsocket();
     },
     initWebsocket() {
-      const wsQuotes = new WebSocket(`ws://localhost:8080/account/seller/${VueHeader.$data.username}/purchase_request/${this.purchaseRequest.id}/quotes`);
+      const wsQuotes = new WebSocket(`ws://localhost:8080/account/purchase_request/${this.purchaseRequest.id}/quotes`);
       wsQuotes.onmessage = this.handleQuotesUpdates
     },
-    handleQuotesUpdates(event) {
-      this.purchaseRequest.quotes = JSON.parse(event.data);
+    async handleQuotesUpdates(event) {
+      const purchaseRequest = JSON.parse(event.data);
+      await this.loadData(purchaseRequest.id);
     },
     inputQuantityEnter(event) {
       event.keyCode === 13 && this.onClickAddProduct();

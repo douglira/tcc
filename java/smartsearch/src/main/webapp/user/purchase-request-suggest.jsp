@@ -34,7 +34,7 @@
                 </small>
             </h1>
             <div v-if="countdown" class="countdown text-danger">
-                <span class="font-weight-bold text-dark">Expira em&colon;</span>
+                <span class="font-weight-bold text-muted">Expira em&colon;</span>
                 &nbsp;
                 {{ countdown }}
             </div>
@@ -48,27 +48,27 @@
         <div class="card-body d-flex flex-column flex-nowrap align-items-center">
 
             <div class="list-group list-group-flush list-group-container">
-                <template v-for="productList in purchaseRequest.listProducts">
+                <template v-for="item in purchaseRequest.listProducts">
                     <button
-                            :class="['list-group-item list-group-item-action list-item-row', productList.additionalSpec ? 'font-weight-bold list-item-row_tooltip' : '']"
-                            :style="productList.additionalSpec ? { cursor: 'pointer' } : null"
+                            :class="['list-group-item list-group-item-action list-item-row', item.additionalSpec ? 'font-weight-bold list-item-row_tooltip' : '']"
+                            :style="item.additionalSpec ? { cursor: 'pointer' } : null"
                             type="button"
                             data-toggle="collapse"
-                            :data-target="'#collapse' + productList.product.id"
+                            :data-target="'#collapse' + item.product.id"
                             aria-expanded="true"
-                            :aria-controls="'collapse' + productList.product.id">
-                        <img :src="productList.product.thumbnail.urlPath" :alt="productList.product.thumbnail.name">
-                        <span style="flex: 1;">{{ productList.product.title }}</span>
+                            :aria-controls="'collapse' + item.product.id">
+                        <img :src="item.product.thumbnail.urlPath" :alt="item.product.thumbnail.name">
+                        <span style="flex: 1;">{{ item.product.title }}</span>
                         <span class="text-right">
-                            {{ productList.quantity }}
+                            {{ item.quantity }}
                             &nbsp;
                             unidade(s)
                         </span>
                     </button>
-                    <div v-if="productList.additionalSpec" :id="'collapse' + productList.product.id" class="collapse" style="margin-bottom: 5px;" >
+                    <div v-if="item.additionalSpec" :id="'collapse' + item.product.id" class="collapse" style="margin-bottom: 5px;" >
                         <div class="card card-body">
                             <strong>Especificações adicionais&colon;&nbsp;</strong>
-                            {{ productList.additionalSpec }}
+                            {{ item.additionalSpec }}
                         </div>
                     </div>
                 </template>
@@ -144,7 +144,7 @@
                         </div>
                     </template>
                     <template v-else>
-                        <div class="card w-100 text-center text-white" style="background-color: #999">
+                        <div class="card w-100 text-center text-muted">
                             <div class="card-header text-uppercase font-weight-bold">
                                 Sob cotações
                             </div>
@@ -152,7 +152,7 @@
                                 <h2 style="font-size: 16px;" class="card-title">Nenhuma cotação enviada</h2>
                                 <p class="card-text">Seja o primeiro a enviar uma cotação para este pedido de compra.</p>
                                 <a href="#sendQuotations">
-                                    <i class="fas fa-comments text-white" style="font-size: 32px"></i>
+                                    <i class="fas fa-comments text-muted" style="font-size: 32px"></i>
                                 </a>
                             </div>
                         </div>
@@ -254,11 +254,11 @@
                                 <div class="list-group list-overflow">
                                     <a
                                         href="javascript:void(0)"
-                                        v-for="productList in productsQuote"
-                                        @click="onClickRemoveProject(productList)"
+                                        v-for="item in productsQuote"
+                                        @click="onClickRemoveProject(item)"
                                         class="d-flex justify-content-between align-items-center list-group-item list-group-item-action list-item-selected-product">
-                                        {{ productList.product.title }}
-                                        <span class="badge badge-info badge-pill">{{ productList.quantity }}</span>
+                                        {{ item.product.title }}
+                                        <span class="badge badge-info badge-pill">{{ item.quantity }}</span>
                                     </a>
                                 </div>
                                 <div v-if="quoteTotalAmount" class="card-footer text-success text-right">{{ formatCurrency(getTotalAmount()) }}</div>

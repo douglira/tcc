@@ -16,7 +16,7 @@ public class ProductItem extends ProductRepresentation {
     private Status status;
 
     @Expose(deserialize = false, serialize = false)
-    public static final int MAX_PICTURES = 15;
+    public static final int MAX_PICTURES = 5;
 
     public ProductItem() {
         super();

@@ -22,14 +22,14 @@ public class PurchaseRequestDAO extends GenericDAO {
     public PurchaseRequest create(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        String sql = "INSERT INTO " + TABLE_NAME + " (id, buyer_id, stage, additional_data, due_date_average, " +
+        String sql = "INSERT INTO " + TABLE_NAME + " (id, buyer_id, stage, additional_data, due_date, " +
                 "total_amount, views_count, propagation_count, quotes_visibility, created_at) VALUES (nextval('pr_sequence'), ?, CAST(? AS pr_stage), ?, ?, ?, ?, ?, ?, ?)";
         try {
             stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             stmt.setInt(1, purchaseRequest.getBuyer().getId());
             stmt.setString(2, purchaseRequest.getStage().toString());
             stmt.setString(3, purchaseRequest.getAdditionalData());
-            stmt.setTimestamp(4, new Timestamp(purchaseRequest.getDueDateAverage().getTimeInMillis()));
+            stmt.setTimestamp(4, new Timestamp(purchaseRequest.getDueDate().getTimeInMillis()));
             stmt.setDouble(5, purchaseRequest.getTotalAmount());
             stmt.setInt(6, purchaseRequest.getViewsCount());
             stmt.setInt(7, purchaseRequest.getPropagationCount());
@@ -63,8 +63,8 @@ public class PurchaseRequestDAO extends GenericDAO {
         purchaseRequest.setQuotesVisibility(rs.getBoolean("quotes_visibility"));
 
         Calendar dueDateAverage = Calendar.getInstance();
-        dueDateAverage.setTime(rs.getTimestamp("due_date_average"));
-        purchaseRequest.setDueDateAverage(dueDateAverage);
+        dueDateAverage.setTime(rs.getTimestamp("due_date"));
+        purchaseRequest.setDueDate(dueDateAverage);
 
         Calendar createdAt = Calendar.getInstance();
         createdAt.setTime(rs.getTimestamp("created_at"));
@@ -177,11 +177,11 @@ public class PurchaseRequestDAO extends GenericDAO {
 
     public void updateDueDate(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET due_date_average = ?, updated_at = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET due_date = ?, updated_at = ? WHERE id = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);
-            stmt.setTimestamp(1, new Timestamp(purchaseRequest.getDueDateAverage().getTimeInMillis()));
+            stmt.setTimestamp(1, new Timestamp(purchaseRequest.getDueDate().getTimeInMillis()));
 
             purchaseRequest.setUpdatedAt(Calendar.getInstance());
             stmt.setTimestamp(2, new Timestamp(purchaseRequest.getUpdatedAt().getTimeInMillis()));
@@ -221,18 +221,19 @@ public class PurchaseRequestDAO extends GenericDAO {
 
     public void updatePublish(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET stage = CAST(? as pr_stage), additional_data = ?, quotes_visibility = ?, updated_at = ? WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET stage = CAST(? as pr_stage), additional_data = ?, quotes_visibility = ?, due_date = ?, updated_at = ? WHERE id = ?";
 
         try {
             stmt = this.conn.prepareStatement(sql);
             stmt.setString(1, purchaseRequest.getStage().toString());
             stmt.setString(2, purchaseRequest.getAdditionalData());
             stmt.setBoolean(3, purchaseRequest.getQuotesVisibility());
+            stmt.setTimestamp(4, new Timestamp(purchaseRequest.getDueDate().getTimeInMillis()));
 
             purchaseRequest.setUpdatedAt(Calendar.getInstance());
-            stmt.setTimestamp(4, new Timestamp(purchaseRequest.getUpdatedAt().getTimeInMillis()));
+            stmt.setTimestamp(5, new Timestamp(purchaseRequest.getUpdatedAt().getTimeInMillis()));
 
-            stmt.setInt(5, purchaseRequest.getId());
+            stmt.setInt(6, purchaseRequest.getId());
             stmt.execute();
         } catch (SQLException err) {
             err.printStackTrace();

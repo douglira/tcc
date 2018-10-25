@@ -2,15 +2,15 @@ package models;
 
 import java.util.Objects;
 
-public class ProductList implements Comparable{
+public class Item implements Comparable{
 	private ProductRepresentation product;
 	private String additionalSpec;
 	private int quantity;
 	private double subtotalAmount;
 
-	public ProductList() {}
+	public Item() {}
 
-	public ProductList(ProductRepresentation product) {
+	public Item(ProductRepresentation product) {
 		this.product = product;
 	}
 
@@ -50,7 +50,7 @@ public class ProductList implements Comparable{
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		ProductList that = (ProductList) o;
+		Item that = (Item) o;
 		return Objects.equals(product.getId(), that.product.getId());
 	}
 
@@ -61,7 +61,7 @@ public class ProductList implements Comparable{
 
 	@Override
 	public int compareTo(Object o) {
-		ProductList pl = (ProductList) o;
+		Item pl = (Item) o;
 		return pl.getProduct().getId().compareTo(pl.getProduct().getId());
 	}
 }

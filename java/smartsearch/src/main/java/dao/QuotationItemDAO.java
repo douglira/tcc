@@ -3,8 +3,8 @@ package dao;
 import enums.ProductSituation;
 import enums.Status;
 import models.Category;
+import models.Item;
 import models.Product;
-import models.ProductList;
 import models.Seller;
 
 import java.sql.Connection;
@@ -14,41 +14,41 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class QuoteProductListDAO extends GenericDAO {
+public class QuotationItemDAO extends GenericDAO {
     private static final String TABLE_NAME = "quote_products";
     private static final String TABLE_RELATION_PRODUCT = "products";
 
-    public QuoteProductListDAO(boolean getConnection) {
+    public QuotationItemDAO(boolean getConnection) {
         super(getConnection);
     }
 
-    public QuoteProductListDAO(Connection conn) {
+    public QuotationItemDAO(Connection conn) {
         super(conn);
     }
 
-    public void attachQuote(int quoteId, ProductList productList) {
+    public void attachQuote(int quoteId, Item item) {
         PreparedStatement stmt = null;
         String sql = "INSERT INTO " + TABLE_NAME + " (quote_id, product_id, quantity) VALUES (?, ?, ?)";
 
         try {
             stmt = this.conn.prepareStatement(sql);
             stmt.setInt(1, quoteId);
-            stmt.setInt(2, productList.getProduct().getId());
-            stmt.setInt(3, productList.getQuantity());
+            stmt.setInt(2, item.getProduct().getId());
+            stmt.setInt(3, item.getQuantity());
             stmt.execute();
         } catch (SQLException err) {
             err.printStackTrace();
-            System.out.println("QuoteProductListDAO.attachQuote [ERROR](1): " + err);
+            System.out.println("QuotationItemDAO.attachQuote [ERROR](1): " + err);
             try {
                 this.conn.rollback();
             } catch (SQLException sqlErr) {
                 sqlErr.printStackTrace();
-                System.out.println("QuoteProductListDAO.attachQuote [ERROR](2): " + sqlErr);
+                System.out.println("QuotationItemDAO.attachQuote [ERROR](2): " + sqlErr);
             }
         }
     }
 
-    private ProductList fetchWithProduct(ResultSet rs, ProductList productList) throws SQLException {
+    private Item fetchWithProduct(ResultSet rs, Item item) throws SQLException {
         Product product = new Product();
         product.setId(rs.getInt("product_id"));
         product.setSeller(new Seller(rs.getInt("seller_id")));
@@ -73,17 +73,17 @@ public class QuoteProductListDAO extends GenericDAO {
 
         }
 
-        productList.setProduct(product);
-        productList.setQuantity(rs.getInt("quantity"));
-        return productList;
+        item.setProduct(product);
+        item.setQuantity(rs.getInt("quantity"));
+        return item;
     }
 
-    public ArrayList<ProductList> findByQuote(int quoteId) {
+    public ArrayList<Item> findByQuote(int quoteId) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
         String sql = "SELECT * FROM " + TABLE_NAME + " INNER JOIN " + TABLE_RELATION_PRODUCT + " ON " +
                 TABLE_NAME + ".product_id = " + TABLE_RELATION_PRODUCT + ".id WHERE " + TABLE_NAME + ".quote_id = ?";
-        ArrayList<ProductList> products = new ArrayList<ProductList>();
+        ArrayList<Item> products = new ArrayList<Item>();
 
         try {
             stmt = this.conn.prepareStatement(sql);
@@ -91,20 +91,20 @@ public class QuoteProductListDAO extends GenericDAO {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                ProductList productList = this.fetchWithProduct(rs, new ProductList());
+                Item item = this.fetchWithProduct(rs, new Item());
 
-                products.add(productList);
+                products.add(item);
             }
         } catch (SQLException err) {
             err.printStackTrace();
-            System.out.println("QuoteProductListDAO.findByQuote [ERROR](1): " + err);
+            System.out.println("QuotationItemDAO.findByQuote [ERROR](1): " + err);
         } finally {
             if (this.conn != null) {
                 try {
                     this.conn.close();
                 } catch (SQLException err) {
                     err.printStackTrace();
-                    System.out.println("QuoteProductListDAO.findByQuote [ERROR](2): " + err);
+                    System.out.println("QuotationItemDAO.findByQuote [ERROR](2): " + err);
                 }
             }
         }

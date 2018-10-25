@@ -25,7 +25,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 @WebServlet(name = "PRPublishController", urlPatterns = {"/account/purchase_request/publish", "/account/purchase_request/details"})
 public class PRPublishController extends HttpServlet {
@@ -36,6 +41,7 @@ public class PRPublishController extends HttpServlet {
 
         try {
             PurchaseRequest purchaseRequest = gson.fromJson(request.getParameter("purchaseRequest"), PurchaseRequest.class);
+            String prDueDate = request.getParameter("prDueDate");
 
             if (purchaseRequest.getPropagationCount() == 0) {
                 response.setStatus(400);
@@ -43,6 +49,14 @@ public class PRPublishController extends HttpServlet {
                 Helper.responseMessage(out, new Messenger("Abrangência zerada!", MessengerType.WARNING));
                 return;
             }
+
+            if (validateDueDate(purchaseRequest, prDueDate)) {
+                response.setStatus(400);
+                out = response.getWriter();
+                Helper.responseMessage(out, new Messenger("Data de expiração inválida", MessengerType.WARNING));
+                return;
+            }
+
             purchaseRequest.setStage(PRStage.UNDER_QUOTATION);
             new PurchaseRequestDAO(true).updatePublish(purchaseRequest);
 
@@ -75,6 +89,20 @@ public class PRPublishController extends HttpServlet {
             System.out.println("PRPublishController.doPost [ERROR]: " + err);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
+    }
+
+    private boolean validateDueDate(PurchaseRequest purchaseRequest, String prDueDate) throws ParseException {
+        Date dueDate = new SimpleDateFormat("yyyy-MM-dd").parse(prDueDate);
+        Date now = new Date();
+
+        long diff = dueDate.getTime() - now.getTime();
+        long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+
+        Calendar dueDateCalendar = Calendar.getInstance();
+        dueDateCalendar.setTime(dueDate);
+        purchaseRequest.setDueDate(dueDateCalendar);
+
+        return days > 90;
     }
 
     private void socketNotification(ArrayList<User> sellerUsers, PurchaseRequest purchaseRequest) {

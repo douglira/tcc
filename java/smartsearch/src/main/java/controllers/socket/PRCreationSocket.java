@@ -1,7 +1,7 @@
 package controllers.socket;
 
 import dao.FileDAO;
-import dao.PRProductListDAO;
+import dao.PurchaseItemDAO;
 import dao.PurchaseRequestDAO;
 import enums.PRStage;
 import models.*;
@@ -18,10 +18,10 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @ServerEndpoint(value = "/account/purchase_request/{username}", encoders = PurchaseRequestEncoder.class, decoders = PurchaseRequestDecoder.class)
-public class PurchaseRequestSocket {
+public class PRCreationSocket {
 
     private Session session;
-    private static Set<PurchaseRequestSocket> endpoints = new CopyOnWriteArraySet<>();
+    private static Set<PRCreationSocket> endpoints = new CopyOnWriteArraySet<>();
     private static HashMap<String, String> users = new HashMap<>();
 
     @OnOpen
@@ -42,19 +42,19 @@ public class PurchaseRequestSocket {
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        System.out.println("PurchaseRequestSocket error on connect: " + throwable.getMessage());
+        System.out.println("PRCreationSocket error on connect: " + throwable.getMessage());
     }
 
     public static void sendUpdatedPRCreation(User user, PurchaseRequest purchaseRequest, String baseUrl) {
         if (purchaseRequest == null) {
-            purchaseRequest = PurchaseRequestSocket.getPurchaseRequest(user, baseUrl);
+            purchaseRequest = PRCreationSocket.getPurchaseRequest(user, baseUrl);
         }
 
         PurchaseRequest prPayload = purchaseRequest;
 
         endpoints.forEach(endpoint -> {
             synchronized (endpoint) {
-                String username = PurchaseRequestSocket.users.get(endpoint.session.getId());
+                String username = PRCreationSocket.users.get(endpoint.session.getId());
 
                 if (username.equals(user.getUsername())) {
                     try {
@@ -80,16 +80,16 @@ public class PurchaseRequestSocket {
         if (prs != null && !prs.isEmpty()) {
             purchaseRequest = prs.get(0);
 
-            ArrayList<ProductList> products = new PRProductListDAO(true).findByPurchaseRequest(purchaseRequest.getId());
-            products.forEach(productList -> {
-                synchronized (productList) {
-                    ProductItem productItem = (ProductItem) productList.getProduct();
+            ArrayList<Item> products = new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId());
+            products.forEach(purchaseItem -> {
+                synchronized (purchaseItem) {
+                    ProductItem productItem = (ProductItem) purchaseItem.getProduct();
                     productItem.setPictures(new FileDAO(true).getProductItemPictures(productItem.getId()));
                     productItem.setDefaultThumbnail(baseUrl);
                 }
             });
 
-            products.sort(ProductList::compareTo);
+            products.sort(Item::compareTo);
             purchaseRequest.setListProducts(products);
             purchaseRequest.calculateAmount();
         }

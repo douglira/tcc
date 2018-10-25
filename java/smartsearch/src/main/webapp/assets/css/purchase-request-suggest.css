@@ -51,12 +51,12 @@
 
 .input-product-quantity {
     border: 0;
-    background-color: #e1e1e1;
+    background-color: #e9e9e9;
     padding: 5px 10px;
     box-sizing: border-box;
     width: 72px;
     height: 38px;
-    border-radius: 5px;
+    border-radius: 3px;
 }
 
 .input-product-quantity::-webkit-outer-spin-button,
