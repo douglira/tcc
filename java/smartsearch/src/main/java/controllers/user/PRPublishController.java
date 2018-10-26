@@ -41,19 +41,18 @@ public class PRPublishController extends HttpServlet {
 
         try {
             PurchaseRequest purchaseRequest = gson.fromJson(request.getParameter("purchaseRequest"), PurchaseRequest.class);
-            String prDueDate = request.getParameter("prDueDate");
 
-            if (purchaseRequest.getPropagationCount() == 0) {
+            if (validateDueDate(purchaseRequest)) {
                 response.setStatus(400);
                 out = response.getWriter();
-                Helper.responseMessage(out, new Messenger("Abrangência zerada!", MessengerType.WARNING));
+                Helper.responseMessage(out, new Messenger("Data de expiração inválida", MessengerType.ERROR));
                 return;
             }
 
-            if (validateDueDate(purchaseRequest, prDueDate)) {
+            if ((new PurchaseRequestDAO(true).findById(new PurchaseRequest(purchaseRequest.getId()))).getPropagationCount() == 0) {
                 response.setStatus(400);
                 out = response.getWriter();
-                Helper.responseMessage(out, new Messenger("Data de expiração inválida", MessengerType.WARNING));
+                Helper.responseMessage(out, new Messenger("Abrangência zerada!", MessengerType.ERROR));
                 return;
             }
 
@@ -91,8 +90,8 @@ public class PRPublishController extends HttpServlet {
         }
     }
 
-    private boolean validateDueDate(PurchaseRequest purchaseRequest, String prDueDate) throws ParseException {
-        Date dueDate = new SimpleDateFormat("yyyy-MM-dd").parse(prDueDate);
+    private boolean validateDueDate(PurchaseRequest purchaseRequest) throws ParseException {
+        Date dueDate = purchaseRequest.getDueDate().getTime();
         Date now = new Date();
 
         long diff = dueDate.getTime() - now.getTime();
@@ -102,7 +101,7 @@ public class PRPublishController extends HttpServlet {
         dueDateCalendar.setTime(dueDate);
         purchaseRequest.setDueDate(dueDateCalendar);
 
-        return days > 90;
+        return days > 90 || days <= 0;
     }
 
     private void socketNotification(ArrayList<User> sellerUsers, PurchaseRequest purchaseRequest) {

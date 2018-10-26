@@ -280,4 +280,30 @@ public class PurchaseRequestDAO extends GenericDAO {
             }
         }
     }
+
+    public void updateExpired(PurchaseRequest purchaseRequest) {
+        PreparedStatement stmt = null;
+        String sql = "UPDATE " + TABLE_NAME + " SET stage = CAST(? as pr_stage), closed_at = ?, updated_at = ? WHERE id = ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setString(1, purchaseRequest.getStage().toString());
+            stmt.setTimestamp(2, new Timestamp(purchaseRequest.getClosedAt().getTimeInMillis()));
+            stmt.setTimestamp(3, new Timestamp(purchaseRequest.getUpdatedAt().getTimeInMillis()));
+            stmt.setInt(4, purchaseRequest.getId());
+            stmt.execute();
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("PurchaseRequest.updateExpired [ERROR](1): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    System.out.println("PurchaseRequest.updateExpired [ERROR](2): " + e);
+                }
+            }
+        }
+    }
 }

@@ -132,9 +132,4 @@ public class Quote {
             this.totalAmount *= (1 - (this.discount / 100));
         }
     }
-
-    public void processExpirationDate() {
-        this.expirationDate = Calendar.getInstance();
-        this.expirationDate.add(Calendar.DAY_OF_YEAR, this.seller.getQuotesExpirationPeriod());
-    }
 }

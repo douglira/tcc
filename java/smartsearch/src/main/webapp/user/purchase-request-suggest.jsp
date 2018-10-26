@@ -265,28 +265,28 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-md-6"></div>
-                        <div class="col-md-6"></div>
-                    </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label for="costInput">Aplicar desconto (%)</label>
-                            <input id="costInput" type="number" v-model="quoteDiscount"  min="0.01" max="100" class="form-control">
+                            <div class="form-group">
+                                <label for="costInput">Aplicar desconto (%)</label>
+                                <input id="costInput" type="number" v-model="quoteDiscount"  min="0.01" max="100" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="expirationDate">Prazo da cotação</label>
+                                <input id="expirationDate" type="date" v-model="quoteExpirationDate" class="form-control">
+                            </div>
                         </div>
                         <div class="form-group col-md-6">
                             <label for="additionalData">Informações adicionais</label>
-                            <textarea class="form-control" id="additionalData" aria-describedby="additionalDataInfo" rows="4" v-model="quoteAdditionalData"></textarea>
+                            <textarea class="form-control" id="additionalData" aria-describedby="additionalDataInfo" rows="5" v-model="quoteAdditionalData"></textarea>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-info btn-lg btn-block" style="padding: 30px auto !important;" @click="onClickPushQuotation">Lançar cotação</button>
+                    <button :disabled="invalidQuote" type="button" class="btn btn-info btn-lg btn-block" style="padding: 30px auto !important;" @click="onClickPushQuotation">Lançar cotação</button>
                 </div>
             </template>
             <template v-else>
 
             </template>
-
 
         </div>
     </div>
@@ -297,6 +297,7 @@
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/inputmask/dist/jquery.inputmask.bundle.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/axios/axios-dist.min.js"></script>
+<script src="<%=request.getContextPath()%>/assets/libs/moment.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/vuejs/vue-dist.js"></script>
 <script src="<%=request.getContextPath()%>/assets/js/purchase-request-suggest.js"></script>
 </body>

@@ -21,6 +21,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.stream.Collectors;
@@ -49,8 +50,13 @@ public class PRSuggestController extends HttpServlet {
 
             quote.setPurchaseRequest(new PurchaseRequestDAO(true).findById(quote.getPurchaseRequest()));
 
-            if (!validateExpiration(quote.getPurchaseRequest())) {
-                Helper.responseMessage(outError, new Messenger("Este pedido de compras não se encontra sob cotação", MessengerType.WARNING));
+            if (validatePRExpiration(quote.getPurchaseRequest())) {
+                Helper.responseMessage(outError, new Messenger("Este pedido de compra não se encontra sob cotação", MessengerType.WARNING));
+                return;
+            }
+
+            if (validateQuoteExpirationInput(quote)) {
+                Helper.responseMessage(outError, new Messenger("Data de expiração da cotação inválida", MessengerType.ERROR));
                 return;
             }
 
@@ -82,7 +88,6 @@ public class PRSuggestController extends HttpServlet {
 
             quote.calculateTotalAmount();
             quote.setStatus(QuoteStatus.UNDER_REVIEW);
-            quote.processExpirationDate();
             quote.setCreatedAt(Calendar.getInstance());
 
             QuoteDAO quoteDao = new QuoteDAO(true);
@@ -149,16 +154,25 @@ public class PRSuggestController extends HttpServlet {
         return sellerQuotes.size() < 3;
     }
 
-    private boolean validateExpiration(PurchaseRequest purchaseRequest) {
+    private boolean validateQuoteExpirationInput(Quote quote) {
+        long now = Calendar.getInstance().getTimeInMillis();
+        long quoteExpiration = quote.getExpirationDate().getTimeInMillis();
+        long prExpiration = quote.getPurchaseRequest().getDueDate().getTimeInMillis();
+
+        return quoteExpiration < now || quoteExpiration > prExpiration;
+    }
+
+    private boolean validatePRExpiration(PurchaseRequest purchaseRequest) {
         if (!purchaseRequest.getStage().equals(PRStage.UNDER_QUOTATION)) {
-            return false;
+            return true;
         }
 
         if (purchaseRequest.getDueDate().getTimeInMillis() < Calendar.getInstance().getTimeInMillis()) {
-            return false;
+            new PurchaseRequestDAO(true).updateExpired(purchaseRequest);
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private String getQuotesUrl(HttpServletRequest request, Quote quote) {

@@ -3,6 +3,7 @@ let formatterMixin = {
     formatDatetime: Formatter.datetime,
     formatFullDate: Formatter.fullDate,
     formatCurrency: Formatter.currency,
+    getCalendar: Formatter.getCalendar,
   },
 };
 
@@ -14,7 +15,7 @@ const VuePRCreation = new Vue({
     return {
       purchaseRequest: null,
       prQuotesVisibility: false,
-      prDueDate: null,
+      prDueDate: '',
       prAdditionalData: '',
       modalData: {
         productItemId: null,
@@ -32,20 +33,31 @@ const VuePRCreation = new Vue({
   },
   watch: {
     prDueDate() {
+      if (!this.prDueDate) {
+        this.invalidPublish = true;
+        return;
+      }
+      const inputDueDate = $('#expirationDate');
+
       const now = moment(new Date());
       const dueDate = moment(new Date(this.prDueDate));
 
       const days = dueDate.diff(now, 'days');
       if (days > 90) {
         this.invalidPublish = true;
-        this.showMessage('Expiração máxima: 90 dias', 'error');
+        inputDueDate.addClass('border border-primary');
+        this.showMessage('Expiração máxima: 90 dias', 'error', { preventDuplicates: true });
       }
 
       if (days < 0) {
         this.invalidPublish = true;
-        this.showMessage('Data de expiração inválida', 'error');
+        inputDueDate.addClass('border border-primary');
+        this.showMessage('Data de expiração inválida', 'error', { preventDuplicates: true });
       }
 
+      if (inputDueDate.hasClass('border border-primary')) {
+        inputDueDate.removeClass('border border-primary');
+      }
       this.invalidPublish = false;
     }
   },
@@ -58,8 +70,8 @@ const VuePRCreation = new Vue({
             ...this.purchaseRequest,
             additionalData: this.prAdditionalData,
             quotesVisibility: this.prQuotesVisibility,
+            dueDate: this.getCalendar(new Date(this.prDueDate)),
           }),
-          prDueDate: this.prDueDate,
         }
       )
         .done(() => {
@@ -153,7 +165,8 @@ const VuePRCreation = new Vue({
       const response = await axios.get('/account/purchase_request/edit');
       this.purchaseRequest = response.data;
     },
-    showMessage(msg, type = 'success') {
+    showMessage(msg, type = 'success', options) {
+      toastr.options = options;
       toastr[type.toLowerCase()](msg);
     },
   },

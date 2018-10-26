@@ -5,6 +5,7 @@ const FormatterMixin = {
     formatDate: Formatter.date,
     formatDatetime: Formatter.datetime,
     getDate: Formatter.getDate,
+    getCalendar: Formatter.getCalendar,
   }
 };
 
@@ -24,9 +25,11 @@ const VueComponent = new Vue({
       inputProductQuantity: null,
       productsInventory: [],
       productsQuote: [],
+      quoteExpirationDate: '',
       quoteDiscount: null,
       quoteTotalAmount: null,
       quoteAdditionalData: '',
+      invalidQuote: true,
     };
   },
   async created() {
@@ -50,7 +53,31 @@ const VueComponent = new Vue({
         const response = await this.getProductsInventory({ page: this.page, perPage: this.perPage });
         this.productsInventory = response.data;
       }
-    }
+    },
+    quoteExpirationDate() {
+      if (!this.quoteExpirationDate) {
+        this.invalidQuote = true;
+        return;
+      }
+      const inputExpiration = $('#expirationDate');
+
+      const now = moment(new Date());
+      const prDueDate = moment(this.getDate(this.purchaseRequest.dueDate));
+      const quoteExpiration = moment(new Date(this.quoteExpirationDate));
+
+      const isValid = quoteExpiration.isBetween(now, prDueDate);
+      if (isValid) {
+        if (inputExpiration.hasClass('border border-danger')) {
+          inputExpiration.removeClass('border border-danger');
+        }
+        this.invalidQuote = false;
+        return;
+      }
+
+      this.invalidQuote = true;
+      this.showMessage('Data de expiração inválida', 'error', { preventDuplicates: true });
+      inputExpiration.addClass('border border-danger');
+    },
   },
   methods: {
     onClickPushQuotation() {
@@ -63,7 +90,8 @@ const VueComponent = new Vue({
         customListProduct: this.productsQuote,
         quoteAdditionalData: this.quoteAdditionalData,
         discount: this.quoteDiscount,
-      }
+        expirationDate: this.getCalendar(new Date(this.quoteExpirationDate)),
+      };
 
       $.post(
         '/account/purchase_request/suggest',
@@ -174,7 +202,7 @@ const VueComponent = new Vue({
     },
     updateQuoteTotalAmount() {
       if (this.productsQuote.length) {
-        this.quoteTotalAmount = this.productsQuote.reduce((totalAmount, productList)=> {
+        this.quoteTotalAmount = this.productsQuote.reduce((totalAmount, productList) => {
           return totalAmount + (productList.product.basePrice * productList.quantity);
         }, 0);
         return;
@@ -188,7 +216,8 @@ const VueComponent = new Vue({
 
       this.productsInventory = [...this.productsInventory, ...responseProducts.data];
     },
-    showMessage(msg, type = 'success') {
+    showMessage(msg, type = 'success', options) {
+      toastr.options = options;
       toastr[type.toLowerCase()](msg);
     },
     fixListProductTitle(productTitle) {

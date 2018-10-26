@@ -1,4 +1,14 @@
 const Formatter = {
+  getCalendar(date) {
+    return {
+      year: date.getUTCFullYear(),
+      month: date.getUTCMonth(),
+      dayOfMonth: date.getUTCDate(),
+      hourOfDay: date.getUTCHours(),
+      minute: date.getUTCMinutes(),
+      second: date.getUTCSeconds(),
+    };
+  },
   getDate(calendar) {
     return new Date(
       calendar.year,
