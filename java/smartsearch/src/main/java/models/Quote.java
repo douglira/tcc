@@ -10,7 +10,6 @@ public class Quote {
     private PurchaseRequest purchaseRequest;
     private Seller seller;
     private ArrayList<Item> customListProduct;
-    private Shipping shipping;
     private String additionalData;
     private QuoteStatus status;
     private double discount;
@@ -57,14 +56,6 @@ public class Quote {
 
     public void setCustomListProduct(ArrayList<Item> customListProduct) {
         this.customListProduct = customListProduct;
-    }
-
-    public Shipping getShipping() {
-        return shipping;
-    }
-
-    public void setShipping(Shipping shipping) {
-        this.shipping = shipping;
     }
 
     public String getAdditionalData() {

@@ -148,10 +148,6 @@ public class PurchaseRequest {
         this.listProducts.add(item);
     }
 
-    public void calculateAmount() {
-        this.totalAmount = this.listProducts.stream().mapToDouble(Item::getSubtotalAmount).sum();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -163,5 +159,9 @@ public class PurchaseRequest {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public void calculateAmount() {
+        this.totalAmount = this.listProducts.stream().mapToDouble(Item::getSubtotalAmount).sum();
     }
 }

@@ -12,7 +12,6 @@ public class ProductItem extends ProductRepresentation {
     private double minPrice;
     private int viewsCount;
     private int relevance;
-
     private Status status;
 
     @Expose(deserialize = false, serialize = false)
