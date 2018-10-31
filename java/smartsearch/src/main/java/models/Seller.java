@@ -3,7 +3,8 @@ package models;
 import java.util.ArrayList;
 
 public class Seller extends Person {
-    private int quotesExpirationPeriod;
+    private int positiveSalesCount;
+    private int negativeSalesCount;
     private ArrayList<Product> inventary;
 
     public Seller() {
@@ -14,12 +15,20 @@ public class Seller extends Person {
         super(id);
     }
 
-    public int getQuotesExpirationPeriod() {
-        return quotesExpirationPeriod;
+    public int getPositiveSalesCount() {
+        return positiveSalesCount;
     }
 
-    public void setQuotesExpirationPeriod(int quotesExpirationPeriod) {
-        this.quotesExpirationPeriod = quotesExpirationPeriod;
+    public void setPositiveSalesCount(int positiveSalesCount) {
+        this.positiveSalesCount = positiveSalesCount;
+    }
+
+    public int getNegativeSalesCount() {
+        return negativeSalesCount;
+    }
+
+    public void setNegativeSalesCount(int negativeSalesCount) {
+        this.negativeSalesCount = negativeSalesCount;
     }
 
     public ArrayList<Product> getInventary() {

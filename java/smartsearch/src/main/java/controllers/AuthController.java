@@ -121,7 +121,6 @@ public class AuthController extends HttpServlet {
 
             Seller seller = new Seller();
             seller.setId(person.getId());
-            seller.setQuotesExpirationPeriod(30); // Default: 30 days
 
             SellerDAO sellerDao = new SellerDAO(buyerDao.getConnection());
             sellerDao.create(seller);

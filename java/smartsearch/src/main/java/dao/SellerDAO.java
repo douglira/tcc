@@ -4,6 +4,7 @@ import models.Seller;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class SellerDAO extends GenericDAO {
     private final static String TABLE_NAME = "sellers";
@@ -18,13 +19,14 @@ public class SellerDAO extends GenericDAO {
 
     public void create(Seller seller) {
         PreparedStatement stmt = null;
-        String sql = "INSERT INTO " + TABLE_NAME + " (person_id, quotes_expiration_period, "
-                + "created_at) VALUES (?, ?, NOW())";
+        String sql = "INSERT INTO " + TABLE_NAME + " (person_id, "
+                + "positive_sales_count, negative_sales_count, created_at) VALUES (?, ?, ?, NOW())";
 
         try {
             stmt = this.conn.prepareStatement(sql);
             stmt.setInt(1, seller.getId());
-            stmt.setInt(2, seller.getQuotesExpirationPeriod());
+            stmt.setInt(2, seller.getPositiveSalesCount());
+            stmt.setInt(3, seller.getNegativeSalesCount());
             stmt.execute();
 
             this.conn.commit();
@@ -49,6 +51,18 @@ public class SellerDAO extends GenericDAO {
         }
     }
 
+    private Seller fetch(ResultSet rs, Seller seller) throws SQLException {
+        seller.setId(rs.getInt("person_id"));
+        seller.setPositiveSalesCount(rs.getInt("positive_sales_count"));
+        seller.setNegativeSalesCount(rs.getInt("negative_sales_count"));
+
+        Calendar createdAt = Calendar.getInstance();
+        createdAt.setTime(rs.getTimestamp("created_at"));
+        seller.setCreatedAt(createdAt);
+
+        return seller;
+    }
+
     public Seller findById(Seller seller) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -60,7 +74,7 @@ public class SellerDAO extends GenericDAO {
             rs = stmt.executeQuery();
 
             if (rs.next()) {
-                seller.setQuotesExpirationPeriod(rs.getInt("quotes_expiration_period"));
+                this.fetch(rs, seller);
             }
         } catch (SQLException error) {
             error.printStackTrace();
@@ -91,9 +105,7 @@ public class SellerDAO extends GenericDAO {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Seller seller = new Seller();
-                seller.setId(rs.getInt("person_id"));
-                seller.setQuotesExpirationPeriod(rs.getInt("quotes_expiration_period"));
+                Seller seller = this.fetch(rs, new Seller());
 
                 sellers.add(seller);
             }
