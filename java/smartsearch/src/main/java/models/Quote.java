@@ -7,9 +7,10 @@ import java.util.Calendar;
 
 public class Quote {
     private int id;
-    private PurchaseRequest purchaseRequest;
     private Seller seller;
+    private PurchaseRequest purchaseRequest;
     private ArrayList<Item> customListProduct;
+    private ArrayList<Shipment> shipmentOptions;
     private String additionalData;
     private QuoteStatus status;
     private double discount;
@@ -34,14 +35,6 @@ public class Quote {
         this.id = id;
     }
 
-    public PurchaseRequest getPurchaseRequest() {
-        return purchaseRequest;
-    }
-
-    public void setPurchaseRequest(PurchaseRequest purchaseRequest) {
-        this.purchaseRequest = purchaseRequest;
-    }
-
     public Seller getSeller() {
         return seller;
     }
@@ -50,12 +43,28 @@ public class Quote {
         this.seller = seller;
     }
 
+    public PurchaseRequest getPurchaseRequest() {
+        return purchaseRequest;
+    }
+
+    public void setPurchaseRequest(PurchaseRequest purchaseRequest) {
+        this.purchaseRequest = purchaseRequest;
+    }
+
     public ArrayList<Item> getCustomListProduct() {
         return customListProduct;
     }
 
     public void setCustomListProduct(ArrayList<Item> customListProduct) {
         this.customListProduct = customListProduct;
+    }
+
+    public ArrayList<Shipment> getShipmentOptions() {
+        return shipmentOptions;
+    }
+
+    public void setShipmentOptions(ArrayList<Shipment> shipmentOptions) {
+        this.shipmentOptions = shipmentOptions;
     }
 
     public String getAdditionalData() {

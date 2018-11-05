@@ -1,5 +1,5 @@
 package enums;
 
 public enum NotificationResource {
-	ORDER, PAYMENT, QUOTE, PURCHASE_REQUEST;
+	ORDER, PAYMENT, QUOTE, PURCHASE_REQUEST, SHIPMENT
 }

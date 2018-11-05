@@ -21,6 +21,38 @@
 <jsp:include page="/header.jsp"/>
 
 <div id="userPRSuggest" class="container mb-sm-5 mb-md-5" v-if="purchaseRequest && purchaseRequest.id">
+
+    <div id="shipmentOptionsModal" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="shipmentEstimatedTime">Prazo estimado de entrega</label>
+                        <input id="shipmentEstimatedTime" type="date" class="form-control">
+                    </div>
+                    <template v-if="selectedShipmentOption === 'CUSTOM'">
+                        <div class="form-group">
+                            <label for="shipmentCost">Custo de envio</label>
+                            <input id="shipmentCost" type="number" min="0.01" class="form-control">
+                        </div>
+                    </template>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" @click="onClickAddShipmentOption">Adicionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <div class="card border-light mb-sm-3 mb-md-3">
         <div class="card-body d-flex flex-nowrap align-items-center">
             <h1 class="text-muted page-title">
@@ -111,15 +143,16 @@
                                                 href="javascript:void(0)">
                                             <div :class="['d-flex flex-row w-100', quote.seller.id === loggedSeller.id ? 'justify-content-end' : 'justify-content-start']">
                                                 <div class="d-flex flex-column w-50">
+                                                    <span class="text-muted text-uppercase font-italic">{{ getDisplayQuoteStatus(quote.status) }}</span>
                                                     <div class="d-flex flex-row w-100 justify-content-between">
-                                                        <strong class="text-secondary" style="margin-bottom: 3px; font-size: 15px;">Cotação: <span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></strong>
+                                                        <strong class="text-secondary" style="margin-bottom: 3px; font-size: 15px;">Cotação:&nbsp;<span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></strong>
                                                         <small class="text-monospace text-muted">Criado em&colon;&nbsp;{{ formatDatetime(quote.createdAt) }}</small>
                                                     </div>
-                                                    <div v-if="quote.seller.id === loggedSeller.id" class="d-flex flex-row w-100 justify-content-center align-items-center"><i>- Você -</i></div>
+                                                    <div v-if="quote.seller.id === loggedSeller.id" class="d-flex flex-row w-100 justify-content-center align-items-center"><i>- VOCÊ -</i></div>
                                                     <br v-else>
                                                     <div class="d-flex flex-row w-100 justify-content-between align-items-center">
                                                         <i class="text-muted" style="margin: 3px 0; font-size: 14px;">Desconto&colon;&nbsp;{{ quote.discount }}&percnt;</i>
-                                                        <i><small class="text-monospace text-muted">Até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small></i>
+                                                        <i><small class="text-monospace text-muted">Válida até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small></i>
                                                     </div>
                                                     <i
                                                             v-if="quote.customListProduct && quote.customListProduct.length"
@@ -178,13 +211,14 @@
                                                 :data-target="'#collapse' + quote.id"
                                                 aria-expanded="true"
                                                 :aria-controls="'collapse' + quote.id">
+                                            <span class="text-muted text-uppercase font-italic">{{ getDisplayQuoteStatus(quote.status) }}</span>
                                             <div class="d-flex flex-row w-100 justify-content-between">
-                                                <strong class="text-secondary" style="margin-bottom: 3px; font-size: 15px;">Cotação: <span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></strong>
+                                                <strong class="text-secondary" style="margin-bottom: 3px; font-size: 15px;">Cotação:&nbsp;<span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></strong>
                                                 <small class="text-monospace text-muted">Criado em&colon;&nbsp;{{ formatDatetime(quote.createdAt) }}</small>
                                             </div>
                                             <div class="d-flex flex-row w-100 justify-content-between align-items-center">
                                                 <i class="text-muted" style="margin: 3px 0; font-size: 14px;">Desconto&colon;&nbsp;{{ quote.discount }}&percnt;</i>
-                                                <i><small class="text-monospace text-muted">Até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small></i>
+                                                <i><small class="text-monospace text-muted">Válida até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small></i>
                                             </div>
                                             <i class="fas fa-angle-down text-muted d-flex w-100 justify-content-center align-items-center" style="font-size: 28px;"></i>
                                         </a>
@@ -281,11 +315,55 @@
                             <textarea class="form-control" id="additionalData" aria-describedby="additionalDataInfo" rows="5" v-model="quoteAdditionalData"></textarea>
                         </div>
                     </div>
+                    <hr>
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label class="font-weight-bold" for="shipmentOptions">Envio</label>
+                            <select class="form-control" id="shipmentOptions" @change="onChangeShippingOption">
+                                <option :value="null">Selecione</option>
+                                <option v-for="shipmentOption in shipmentOptionsSelect" :value="shipmentOption.value">{{ shipmentOption.text }}</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-9">
+                            <label class="font-weight-bold" style="margin-left: 15px;">Métodos de envio</label>
+                            <template v-if="quoteShipmentOptions.length">
+                                <ul class="list-group list-group-flush">
+                                    <li class="d-flex justify-content-between align-items-center list-group-item w-100" v-for="(shipmentOption, shipmentOptionIndex) in quoteShipmentOptions">
+
+                                        <template v-if="shipmentOption.method === 'CUSTOM'">
+                                            <div class="d-flex flex-column">
+                                                <i>Frete customizado</i>
+                                                <small>Prazo de entrega:&nbsp;{{ formatDate(shipmentOption.estimatedTime) }}</small>
+                                                <small>Custo:&nbsp;<span class="text-success">{{ formatCurrency(shipmentOption.cost) }}</span></small>
+                                            </div>
+                                        </template>
+
+                                        <template v-if="shipmentOption.method === 'FREE'">
+                                            <div class="d-flex flex-column">
+                                                <i>Frete grátis</i>
+                                                <small>Prazo de entrega:&nbsp;{{ formatDate(shipmentOption.estimatedTime) }}</small>
+                                            </div>
+                                        </template>
+
+                                        <template v-if="shipmentOption.method === 'LOCAL_PICK_UP'">
+                                            <i>Retirada no local</i>
+                                        </template>
+                                        <button type="button" class="close" aria-label="Close" @click="onClickRemoveShipmentOption(shipmentOptionIndex)">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </template>
+                            <template v-else>
+                                <div class="text-muted font-italic" style="margin-left: 15px;">Adicione ao menos um método de envio</div>
+                            </template>
+                        </div>
+                    </div>
                     <button :disabled="invalidQuote" type="button" class="btn btn-info btn-lg btn-block" style="padding: 30px auto !important;" @click="onClickPushQuotation">Lançar cotação</button>
                 </div>
             </template>
             <template v-else>
-
+                <%--Esse pedido nao se encontra mais sob cotação--%>
             </template>
 
         </div>

@@ -7,7 +7,7 @@ import java.util.Calendar;
 public class Order {
     private Integer id;
     private Quote quote;
-    private Shipping shipping;
+    private Shipment shipment;
     private OrderStatus status;
     private Double totalAmount;
     private Calendar createdAt;
@@ -33,12 +33,12 @@ public class Order {
         this.quote = quote;
     }
 
-    public Shipping getShipping() {
-        return shipping;
+    public Shipment getShipment() {
+        return shipment;
     }
 
-    public void setShipping(Shipping shipping) {
-        this.shipping = shipping;
+    public void setShipment(Shipment shipment) {
+        this.shipment = shipment;
     }
 
     public OrderStatus getStatus() {

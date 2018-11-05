@@ -29,7 +29,14 @@ const VueComponent = new Vue({
       quoteDiscount: null,
       quoteTotalAmount: null,
       quoteAdditionalData: '',
+      quoteShipmentOptions: [],
       invalidQuote: true,
+      shipmentOptionsSelect: [
+        {text: 'Customizado', value: 'CUSTOM'},
+        {text: 'Frete grátis', value: 'FREE'},
+        {text: 'Retirada no local', value: 'LOCAL_PICK_UP'},
+      ],
+      selectedShipmentOption: null,
     };
   },
   async created() {
@@ -50,7 +57,7 @@ const VueComponent = new Vue({
       if (!this.searchProduct) {
         this.page = 1;
         this.perPage = 5;
-        const response = await this.getProductsInventory({ page: this.page, perPage: this.perPage });
+        const response = await this.getProductsInventory({page: this.page, perPage: this.perPage});
         this.productsInventory = response.data;
       }
     },
@@ -81,7 +88,15 @@ const VueComponent = new Vue({
   },
   methods: {
     onClickPushQuotation() {
-      if (!this.productsQuote.length) return;
+      if (!this.productsQuote.length) {
+        this.showMessage('Nenhum item selecionado', 'error', { preventDuplicates: true });
+        return
+      };
+
+      if (!this.quoteShipmentOptions.length) {
+        this.showMessage('Adicione ao menos um método de envio', 'error', { preventDuplicates: true });
+        return;
+      }
 
       const quote = {
         purchaseRequest: {
@@ -123,9 +138,9 @@ const VueComponent = new Vue({
       this.perPage = 5;
       if (!this.searchProduct) return;
 
-      const { searchProduct: searchTitle } = this;
+      const {searchProduct: searchTitle} = this;
 
-      const responseSearchProducts = await this.getProductsInventory({ searchTitle });
+      const responseSearchProducts = await this.getProductsInventory({searchTitle});
 
       this.productsInventory = responseSearchProducts.data;
     },
@@ -192,6 +207,82 @@ const VueComponent = new Vue({
       }
       this.updateQuoteTotalAmount();
     },
+    onChangeShippingOption(event) {
+      const shipmentOptionValue = event.target.value;
+
+      if (!shipmentOptionValue) return;
+
+      if (
+        this.quoteShipmentOptions.map(ship => ship.method)
+          .includes(shipmentOptionValue)
+      ) {
+        return;
+      }
+
+      const shipmentOption = this.shipmentOptionsSelect.find(ship => ship.value === shipmentOptionValue);
+
+      if (!shipmentOption) return;
+
+      this.selectedShipmentOption = shipmentOption.value;
+
+      switch(shipmentOption.value) {
+        case 'FREE': {
+          const customIndex = this.quoteShipmentOptions.findIndex(ship => ship.method === 'CUSTOM');
+
+          if (customIndex !== -1) {
+            this.quoteShipmentOptions.splice(customIndex, 1);
+          }
+
+          $('#shipmentOptionsModal .modal-title').text(shipmentOption.text);
+          $('#shipmentOptionsModal').modal('toggle');
+          break;
+        }
+        case 'LOCAL_PICK_UP': {
+          this.quoteShipmentOptions.push({
+            method: shipmentOption.value,
+            cost: 0,
+          });
+          break;
+        }
+        case 'CUSTOM': {
+          const freeIndex = this.quoteShipmentOptions.findIndex(ship => ship.method === 'FREE');
+
+          if (freeIndex !== -1) {
+            this.quoteShipmentOptions.splice(freeIndex, 1);
+          }
+
+          $('#shipmentOptionsModal .modal-title').text(shipmentOption.text);
+          $('#shipmentOptionsModal').modal('toggle');
+          break;
+        }
+        default:
+          throw new Error('Invalid shipment option selected.');
+      }
+    },
+    onClickAddShipmentOption() {
+      const shipmentOptionMethod = this.selectedShipmentOption;
+      const shipmentEstimatedDate = $('#shipmentEstimatedTime').val();
+      const shipmentCost = $('#shipmentCost').val();
+
+      if (shipmentOptionMethod === 'FREE' && shipmentEstimatedDate) {
+        this.quoteShipmentOptions.push({
+          method: shipmentOptionMethod,
+          estimatedTime: this.getCalendar(new Date(shipmentEstimatedDate)),
+          cost: 0,
+        });
+      }
+
+      if (shipmentOptionMethod === 'CUSTOM' && shipmentEstimatedDate && shipmentCost) {
+        this.quoteShipmentOptions.push({
+          method: shipmentOptionMethod,
+          estimatedTime: this.getCalendar(new Date(shipmentEstimatedDate)),
+          cost: shipmentCost,
+        });
+      }
+    },
+    onClickRemoveShipmentOption(shipmentOptionIndex) {
+      this.quoteShipmentOptions.splice(shipmentOptionIndex, 1);
+    },
     getTotalAmount() {
       if (this.quoteDiscount) {
         const discount = 1 - (this.quoteDiscount / 100);
@@ -199,6 +290,20 @@ const VueComponent = new Vue({
       }
 
       return this.quoteTotalAmount;
+    },
+    getDisplayQuoteStatus(status) {
+      switch (status) {
+        case 'UNDER_REVIEW':
+          return 'Em análise';
+        case 'ACCEPTED':
+          return 'Aceito';
+        case 'DECLINED':
+          return 'Negado';
+        case 'EXPIRED':
+          return 'Expirado';
+        default:
+          throw new Error('Unknown quote status condition.');
+      }
     },
     updateQuoteTotalAmount() {
       if (this.productsQuote.length) {
@@ -212,7 +317,7 @@ const VueComponent = new Vue({
     },
     async onClickLoadMoreProducts() {
       this.page = this.page + 1;
-      const responseProducts = await this.getProductsInventory({ page: this.page, perPage: this.perPage });
+      const responseProducts = await this.getProductsInventory({page: this.page, perPage: this.perPage});
 
       this.productsInventory = [...this.productsInventory, ...responseProducts.data];
     },
@@ -248,17 +353,17 @@ const VueComponent = new Vue({
         this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
       });
     },
-    async getProductsInventory({ page, perPage, searchTitle }) {
+    async getProductsInventory({page, perPage, searchTitle}) {
       return axios.get(`/account/products?page=${page ? page : ''}&perPage=${perPage ? perPage : ''}&search=${searchTitle ? searchTitle : ''}`);
     },
     async loadData(purchaseRequestId) {
-      const { page, perPage } = this;
+      const {page, perPage} = this;
       purchaseRequestId = window.location.search.split('?pr=')[1];
 
       const [responseSeller, responsePurchaseRequest, responseProducts] = await Promise.all([
         axios.get('/account/me/data'),
         axios.get(`/account/purchase_request/suggest?pr=${purchaseRequestId || ''}`),
-        this.getProductsInventory({ page, perPage }),
+        this.getProductsInventory({page, perPage}),
       ]);
 
       if (responsePurchaseRequest.data.cause && responsePurchaseRequest.data.cause === 'INVALID_PURCHASE_REQUEST_ID') {

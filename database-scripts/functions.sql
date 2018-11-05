@@ -47,7 +47,7 @@ $$ LANGUAGE 'plpgsql';
 
 -- SELECT * FROM get_pr_sellers(10042);
 CREATE OR REPLACE FUNCTION get_pr_sellers(pr_id integer) 
-RETURNS TABLE (person_id integer, created_at timestamp with time zone, quotes_expiration_period integer)
+RETURNS TABLE (person_id integer, created_at timestamp with time zone, positive_sales_count integer, negative_sales_count integer)
 AS $$ 
 DECLARE
   pr_id ALIAS FOR $1;
@@ -97,7 +97,7 @@ BEGIN
       SELECT UNNEST(ppg_duplicated) GROUP BY 1 HAVING COUNT(*) = pi_count
     ) INTO sellers_ids_result;
   END IF;
-  RETURN QUERY SELECT s.person_id, s.created_at, s.quotes_expiration_period 
+  RETURN QUERY SELECT s.person_id, s.created_at, s.positive_sales_count, s.negative_sales_count 
     FROM sellers AS s WHERE s.person_id = ANY(sellers_ids_result::integer[]);
 END;
 $$ LANGUAGE 'plpgsql';

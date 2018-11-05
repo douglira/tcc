@@ -16,6 +16,14 @@ public class Address {
 	private Calendar createdAt;
 	private Calendar updatedAt;
 
+	public Address() {
+
+	}
+
+	public Address(int id) {
+		this.id = id;
+	}
+
 	public int getId() {
 		return id;
 	}
