@@ -143,17 +143,48 @@
                                                 href="javascript:void(0)">
                                             <div :class="['d-flex flex-row w-100', quote.seller.id === loggedSeller.id ? 'justify-content-end' : 'justify-content-start']">
                                                 <div class="d-flex flex-column w-50">
-                                                    <span class="text-muted text-uppercase font-italic">{{ getDisplayQuoteStatus(quote.status) }}</span>
-                                                    <div class="d-flex flex-row w-100 justify-content-between">
-                                                        <strong class="text-secondary" style="margin-bottom: 3px; font-size: 15px;">Cotação:&nbsp;<span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></strong>
-                                                        <small class="text-monospace text-muted">Criado em&colon;&nbsp;{{ formatDatetime(quote.createdAt) }}</small>
+                                                    <span class="text-muted text-uppercase font-italic" style="padding-bottom: 10px;">{{ getDisplayQuoteStatus(quote.status) }}</span>
+                                                    <div class="d-flex flex-row">
+                                                        <div class="d-flex flex-column align-items-start" style="flex: 1;">
+                                                            <h6 class="align-self-center">Cotação</h6>
+                                                            <span class="text-secondary">Valor:&nbsp;<span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></span>
+                                                            <i class="text-muted" style="margin: 3px 0; font-size: 14px;">Desconto&colon;&nbsp;{{ quote.discount }}&percnt;</i>
+                                                        </div>
+                                                        <div class="d-flex flex-column align-items-end" style="flex: 1;">
+                                                            <h6 class="align-self-center">Prazos</h6>
+                                                            <small class="text-monospace text-muted">Criado em&colon;&nbsp;{{ formatDate(quote.createdAt) }}</small>
+                                                            <i><small class="text-monospace text-muted">Válida até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small></i>
+                                                        </div>
                                                     </div>
-                                                    <div v-if="quote.seller.id === loggedSeller.id" class="d-flex flex-row w-100 justify-content-center align-items-center"><i>- VOCÊ -</i></div>
-                                                    <br v-else>
-                                                    <div class="d-flex flex-row w-100 justify-content-between align-items-center">
-                                                        <i class="text-muted" style="margin: 3px 0; font-size: 14px;">Desconto&colon;&nbsp;{{ quote.discount }}&percnt;</i>
-                                                        <i><small class="text-monospace text-muted">Válida até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small></i>
-                                                    </div>
+                                                    <template v-if="quote.shipmentOptions && quote.shipmentOptions.length">
+                                                        <div class="d-flex flex-column align-items-between">
+                                                            <h6 class="align-self-center">Envios disponíveis</h6>
+                                                            <div class="d-flex flex-column justify-content-center flex-md-row align-items-md-center">
+                                                                <div v-for="(shipmentOption, shipmentOptionIndex) in quote.shipmentOptions" class="d-flex justify-content-between align-items-center" style="flex: 1;">
+                                                                    <template v-if="shipmentOption.method === 'CUSTOM'">
+                                                                        <blockquote class="d-flex flex-column blockquote" style="font-size: 14px; flex: 1;">
+                                                                            <i>Frete customizado</i>
+                                                                            <small>Prazo de entrega:&nbsp;{{ formatDate(shipmentOption.estimatedTime) }}</small>
+                                                                            <small>Custo:&nbsp;<span class="text-success">{{ formatCurrency(shipmentOption.cost) }}</span></small>
+                                                                        </blockquote>
+                                                                    </template>
+
+                                                                    <template v-if="shipmentOption.method === 'FREE'">
+                                                                        <blockquote class="d-flex flex-column blockquote" style="font-size: 14px; flex: 1;">
+                                                                            <i>Frete grátis</i>
+                                                                            <small>Prazo de entrega:&nbsp;{{ formatDate(shipmentOption.estimatedTime) }}</small>
+                                                                        </blockquote>
+                                                                    </template>
+
+                                                                    <template v-if="shipmentOption.method === 'LOCAL_PICK_UP'">
+                                                                        <blockquote class="d-flex flex-column blockquote" style="font-size: 14px; flex: 1;">
+                                                                            <i>Retirada no local</i>
+                                                                        </blockquote>
+                                                                    </template>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
                                                     <i
                                                             v-if="quote.customListProduct && quote.customListProduct.length"
                                                             class="fas fa-angle-down text-muted d-flex w-100 justify-content-center align-items-center"
@@ -211,15 +242,48 @@
                                                 :data-target="'#collapse' + quote.id"
                                                 aria-expanded="true"
                                                 :aria-controls="'collapse' + quote.id">
-                                            <span class="text-muted text-uppercase font-italic">{{ getDisplayQuoteStatus(quote.status) }}</span>
-                                            <div class="d-flex flex-row w-100 justify-content-between">
-                                                <strong class="text-secondary" style="margin-bottom: 3px; font-size: 15px;">Cotação:&nbsp;<span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></strong>
-                                                <small class="text-monospace text-muted">Criado em&colon;&nbsp;{{ formatDatetime(quote.createdAt) }}</small>
+                                            <span class="text-muted text-uppercase font-italic" style="padding-bottom: 10px;">{{ getDisplayQuoteStatus(quote.status) }}</span>
+                                            <div class="d-flex flex-row">
+                                                <div class="d-flex flex-column align-items-start" style="flex: 1;">
+                                                    <h6 class="align-self-center">Cotação</h6>
+                                                    <span class="text-secondary">Valor:&nbsp;<span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></span>
+                                                    <i class="text-muted" style="margin: 3px 0; font-size: 14px;">Desconto&colon;&nbsp;{{ quote.discount }}&percnt;</i>
+                                                </div>
+                                                <div class="d-flex flex-column align-items-end" style="flex: 1;">
+                                                    <h6 class="align-self-center">Prazos</h6>
+                                                    <small class="text-monospace text-muted">Criado em&colon;&nbsp;{{ formatDate(quote.createdAt) }}</small>
+                                                    <i><small class="text-monospace text-muted">Válida até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small></i>
+                                                </div>
                                             </div>
-                                            <div class="d-flex flex-row w-100 justify-content-between align-items-center">
-                                                <i class="text-muted" style="margin: 3px 0; font-size: 14px;">Desconto&colon;&nbsp;{{ quote.discount }}&percnt;</i>
-                                                <i><small class="text-monospace text-muted">Válida até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small></i>
-                                            </div>
+                                            <template v-if="quote.shipmentOptions && quote.shipmentOptions.length">
+                                                <div class="d-flex flex-column align-items-between">
+                                                    <h6 class="align-self-center">Envios disponíveis</h6>
+                                                    <div class="d-flex flex-column justify-content-center flex-md-row align-items-md-center">
+                                                        <div v-for="(shipmentOption, shipmentOptionIndex) in quote.shipmentOptions" class="d-flex justify-content-between align-items-center" style="flex: 1;">
+                                                            <template v-if="shipmentOption.method === 'CUSTOM'">
+                                                                <blockquote class="d-flex flex-column blockquote" style="font-size: 14px; flex: 1;">
+                                                                    <i>Frete customizado</i>
+                                                                    <small>Prazo de entrega:&nbsp;{{ formatDate(shipmentOption.estimatedTime) }}</small>
+                                                                    <small>Custo:&nbsp;<span class="text-success">{{ formatCurrency(shipmentOption.cost) }}</span></small>
+                                                                </blockquote>
+                                                            </template>
+
+                                                            <template v-if="shipmentOption.method === 'FREE'">
+                                                                <blockquote class="d-flex flex-column blockquote" style="font-size: 14px; flex: 1;">
+                                                                    <i>Frete grátis</i>
+                                                                    <small>Prazo de entrega:&nbsp;{{ formatDate(shipmentOption.estimatedTime) }}</small>
+                                                                </blockquote>
+                                                            </template>
+
+                                                            <template v-if="shipmentOption.method === 'LOCAL_PICK_UP'">
+                                                                <blockquote class="d-flex flex-column blockquote" style="font-size: 14px; flex: 1;">
+                                                                    <i>Retirada no local</i>
+                                                                </blockquote>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
                                             <i class="fas fa-angle-down text-muted d-flex w-100 justify-content-center align-items-center" style="font-size: 28px;"></i>
                                         </a>
                                         <div :id="'collapse' + quote.id" class="collapse" style="margin-bottom: 5px;" >

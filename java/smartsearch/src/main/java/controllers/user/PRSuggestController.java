@@ -65,6 +65,13 @@ public class PRSuggestController extends HttpServlet {
                 return;
             }
 
+            String validationShipmentMessage = validateShipmentOptions(quote.getShipmentOptions());
+
+            if (validationShipmentMessage != null) {
+                Helper.responseMessage(outError, new Messenger(validationShipmentMessage, MessengerType.ERROR));
+                return;
+            }
+
             quote.getPurchaseRequest().setListProducts(new PurchaseItemDAO(true).findByPurchaseRequest(quote.getPurchaseRequest().getId()));
 
             quote.getCustomListProduct().forEach(quoteItem -> {
@@ -72,10 +79,7 @@ public class PRSuggestController extends HttpServlet {
                 quoteItem.calculateAmount();
             });
 
-            Item item = quote.getCustomListProduct().stream()
-                    .filter(quoteItem -> quoteItem.getQuantity() > ((Product) quoteItem.getProduct()).getAvailableQuantity())
-                    .findFirst()
-                    .orElse(null);
+            Item item = validateProductsAvailability(quote.getCustomListProduct());
 
             if (item != null) {
                 Helper.responseMessage(outError, new Messenger("Quantidade indisponível. PRODUTO: " + item.getProduct().getTitle(), MessengerType.ERROR));
@@ -98,8 +102,23 @@ public class PRSuggestController extends HttpServlet {
 
             quote.getCustomListProduct().forEach(prodList -> quotationItemDao.attachQuote(quote.getId(), prodList));
 
-            quotationItemDao.closeTransaction();
-            quotationItemDao.closeConnection();
+            ShipmentDAO shipmentDao = new ShipmentDAO(quotationItemDao.getConnection());
+            quote.getShipmentOptions().forEach(shipment -> {
+                shipment.setStatus(ShipmentStatus.HANDLING);
+                shipment.setQuote(new Quote(quote.getId()));
+
+                if (!ShipmentMethod.LOCAL_PICK_UP.equals(shipment.getMethod())) {
+                    setShippingReceiverAddress(shipment, quote.getPurchaseRequest());
+                } else {
+                    shipment.setCost(0);
+                }
+
+                shipment.setCreatedAt(Calendar.getInstance());
+                shipmentDao.create(shipment);
+            });
+
+            shipmentDao.closeTransaction();
+            shipmentDao.closeConnection();
 
             QuoteNotifierSocket.notifyUpdatedQuotes(quote.getPurchaseRequest());
             sendNotificationsToBuyer(user, quote, getQuotesUrl(request, quote));
@@ -145,6 +164,13 @@ public class PRSuggestController extends HttpServlet {
         new Thread(socketNotification).start();
     }
 
+    private void setShippingReceiverAddress(Shipment shipment, PurchaseRequest purchaseRequest) {
+        Buyer buyer = purchaseRequest.getBuyer();
+
+        Address receiverAddress = new AddressDAO(true).findByPerson(buyer.getId());
+        shipment.setReceiverAddress(receiverAddress);
+    }
+
     private boolean validateSuggestedQuotes(Integer purchaseRequestId, Integer sellerId) {
         ArrayList<Quote> quotes = new QuoteDAO(true).findByPurchaseRequest(purchaseRequestId);
         ArrayList<Quote> sellerQuotes = quotes.stream()
@@ -173,6 +199,47 @@ public class PRSuggestController extends HttpServlet {
         }
 
         return false;
+    }
+
+    private String validateShipmentOptions(ArrayList<Shipment> shipments) {
+        String validationMessage = null;
+
+        if (shipments == null || shipments.isEmpty()) {
+            validationMessage = "Nenhum método de envio especificado";
+            return validationMessage;
+        }
+
+        long freeShippingCount = shipments.stream()
+                .filter(ship -> ShipmentMethod.FREE.equals(ship.getMethod()))
+                .count();
+
+        if (freeShippingCount > 1) {
+            validationMessage = "Adicione apenas um método de envio do mesmo tipo";
+            return validationMessage;
+        }
+
+        long customShippingCount = shipments.stream()
+                .filter(ship -> ShipmentMethod.CUSTOM.equals(ship.getMethod()))
+                .count();
+
+        if (customShippingCount > 1) {
+            validationMessage = "Adicione apenas um método de envio do mesmo tipo";
+            return validationMessage;
+        }
+
+        if (customShippingCount == 1 && freeShippingCount == 1) {
+            validationMessage = "Métodos de envio inválidos";
+            return validationMessage;
+        }
+
+        return validationMessage;
+    }
+
+    private Item validateProductsAvailability(ArrayList<Item> customListProduct) {
+        return customListProduct.stream()
+                .filter(quoteItem -> quoteItem.getQuantity() > ((Product) quoteItem.getProduct()).getAvailableQuantity())
+                .findFirst()
+                .orElse(null);
     }
 
     private String getQuotesUrl(HttpServletRequest request, Quote quote) {
@@ -232,13 +299,13 @@ public class PRSuggestController extends HttpServlet {
                 ArrayList<Quote> quotes = new QuoteDAO(true).findByPurchaseRequest(purchaseRequest.getId());
                 quotes.forEach(quote -> {
                     if (person.getId() == quote.getSeller().getId()) {
-                        quote.setCustomListProduct(new QuotationItemDAO(true).findByQuote(quote.getId()));
+                        this.populateQuote(quote);
                     }
                 });
                 purchaseRequest.setQuotes(quotes);
             } else {
                 ArrayList<Quote> restrictQuotes = new QuoteDAO(true).findRestrictQuotes(purchaseRequest.getId(), person.getId());
-                restrictQuotes.forEach(restrictQuote -> restrictQuote.setCustomListProduct(new QuotationItemDAO(true).findByQuote(restrictQuote.getId())));
+                restrictQuotes.forEach(this::populateQuote);
                 purchaseRequest.setQuotes(restrictQuotes);
             }
 
@@ -249,6 +316,11 @@ public class PRSuggestController extends HttpServlet {
             System.out.println("PRSuggestController.doPost [ERROR]: " + error);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
+    }
+
+    private void populateQuote(Quote quote) {
+        quote.setCustomListProduct(new QuotationItemDAO(true).findByQuote(quote.getId()));
+        quote.setShipmentOptions(new ShipmentDAO(true).findByQuoteAndSeller(quote.getId(), quote.getSeller().getId()));
     }
 
     private boolean isValidRequest(String purchaseRequestIdString, Integer buyerId) {

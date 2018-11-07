@@ -106,6 +106,20 @@ public class AddressDAO extends GenericDAO {
 		}
 	}
 
+	private Address fetch(ResultSet rs, Address address) throws SQLException {
+		address.setId(rs.getInt("id"));
+		address.setPostalCode(rs.getString("postal_code"));
+		address.setStreet(rs.getString("street"));
+		address.setDistrict(rs.getString("district"));
+		address.setCity(rs.getString("city"));
+		address.setProvinceCode(rs.getString("province_code"));
+		address.setCountryName(rs.getString("country_name"));
+		address.setBuildingNumber(rs.getInt("building_number"));
+		address.setAdditionalData(rs.getString("additional_data"));
+
+		return address;
+	}
+
 	public Address findByPerson(int personId) {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -118,17 +132,7 @@ public class AddressDAO extends GenericDAO {
 			rs = stmt.executeQuery();
 
 			if (rs.next()) {
-				address = new Address();
-
-				address.setId(rs.getInt("id"));
-				address.setPostalCode(rs.getString("postal_code"));
-				address.setStreet(rs.getString("street"));
-				address.setDistrict(rs.getString("district"));
-				address.setCity(rs.getString("city"));
-				address.setProvinceCode(rs.getString("province_code"));
-				address.setCountryName(rs.getString("country_name"));
-				address.setBuildingNumber(rs.getInt("building_number"));
-				address.setAdditionalData(rs.getString("additional_data"));
+				address = this.fetch(rs, new Address());
 			}
 		} catch (Exception error) {
 			try {

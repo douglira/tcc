@@ -106,6 +106,7 @@ const VueComponent = new Vue({
         quoteAdditionalData: this.quoteAdditionalData,
         discount: this.quoteDiscount,
         expirationDate: this.getCalendar(new Date(this.quoteExpirationDate)),
+        shipmentOptions: this.quoteShipmentOptions,
       };
 
       $.post(
@@ -122,6 +123,9 @@ const VueComponent = new Vue({
             this.productsQuote = [];
             this.quoteDiscount = null;
             this.quoteAdditionalData = '';
+            this.quoteExpirationDate = '';
+            this.quoteShipmentOptions = [];
+            this.invalidQuote = true;
             this.updateQuoteTotalAmount();
           }
         })
