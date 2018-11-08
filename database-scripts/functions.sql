@@ -101,3 +101,20 @@ BEGIN
     FROM sellers AS s WHERE s.person_id = ANY(sellers_ids_result::integer[]);
 END;
 $$ LANGUAGE 'plpgsql';
+
+-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+CREATE OR REPLACE FUNCTION pr_update_views(pr_id integer)
+RETURNS void AS $$
+DECLARE
+  pr_id ALIAS FOR $1;
+  final_views_count integer;
+  row_select record;
+BEGIN
+  FOR row_select IN SELECT views_count FROM purchase_requests WHERE id = pr_id
+  LOOP
+    final_views_count := row_select.views_count + 1;
+    UPDATE purchase_requests SET views_count = final_views_count WHERE id = pr_id;
+  END LOOP;
+END;
+$$ LANGUAGE 'plpgsql';

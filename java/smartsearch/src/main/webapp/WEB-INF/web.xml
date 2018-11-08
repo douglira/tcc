@@ -104,12 +104,12 @@
     <servlet-name>userProductNew</servlet-name>
     <url-pattern>/account/product/new</url-pattern>
   </servlet-mapping>
-  <!--<servlet>
-    <servlet-name>userPurchaseRequestCreation</servlet-name>
-    <jsp-file>/user/purchase-request-creation.jsp</jsp-file>
+  <servlet>
+    <servlet-name>userPurchaseRequestList</servlet-name>
+    <jsp-file>/user/purchase-request-list.jsp</jsp-file>
   </servlet>
   <servlet-mapping>
-    <servlet-name>userPurchaseRequestCreation</servlet-name>
-    <url-pattern>/account/purchase_request/new</url-pattern>
-  </servlet-mapping>-->
+    <servlet-name>userPurchaseRequestList</servlet-name>
+    <url-pattern>/account/purchase_request/list</url-pattern>
+  </servlet-mapping>
 </web-app>

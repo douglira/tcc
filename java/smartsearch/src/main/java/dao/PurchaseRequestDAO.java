@@ -74,12 +74,17 @@ public class PurchaseRequestDAO extends GenericDAO {
             Calendar updatedAt = Calendar.getInstance();
             updatedAt.setTime(rs.getTimestamp("updated_at"));
             purchaseRequest.setUpdatedAt(updatedAt);
+        } catch (SQLException | NullPointerException error) {
+            purchaseRequest.setUpdatedAt(null);
+        }
+
+        try {
 
             Calendar closedAt = Calendar.getInstance();
             closedAt.setTime(rs.getTimestamp("closed_at"));
             purchaseRequest.setClosedAt(closedAt);
-        } catch (NullPointerException error) {
-            // error.printStackTrace();
+        } catch (SQLException | NullPointerException error) {
+            purchaseRequest.setClosedAt(null);
         }
 
         Buyer buyer = new Buyer();
@@ -121,6 +126,39 @@ public class PurchaseRequestDAO extends GenericDAO {
         return purchaseRequest;
     }
 
+    public ArrayList<PurchaseRequest> findByBuyer(int buyerId) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE buyer_id = ?";
+        ArrayList<PurchaseRequest> purchaseRequests = new ArrayList<PurchaseRequest>();
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, buyerId);
+            rs = stmt.executeQuery();
+
+            while(rs.next()) {
+                PurchaseRequest purchaseRequest = this.fetch(rs, new PurchaseRequest());
+
+                purchaseRequests.add(purchaseRequest);
+            }
+        } catch (SQLException sqlError) {
+            sqlError.printStackTrace();
+            System.out.println("PurchaseRequestDAO.findByBuyer [ERROR](1): " + sqlError);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException sqlError) {
+                    sqlError.printStackTrace();
+                    System.out.println("PurchaseRequestDAO.findByBuyer [ERROR](2): " + sqlError);
+                }
+            }
+        }
+
+        return purchaseRequests;
+    }
+
     public ArrayList<PurchaseRequest> findByStageAndBuyer(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -134,8 +172,7 @@ public class PurchaseRequestDAO extends GenericDAO {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                PurchaseRequest pr = new PurchaseRequest();
-                pr = this.fetch(rs, pr);
+                PurchaseRequest pr = this.fetch(rs, new PurchaseRequest());
 
                 purchaseRequests.add(pr);
             }
@@ -154,6 +191,29 @@ public class PurchaseRequestDAO extends GenericDAO {
         }
 
         return purchaseRequests;
+    }
+
+    public void updateViewsCount(PurchaseRequest purchaseRequest) {
+        CallableStatement stmt = null;
+        String sql = "{CALL pr_update_views(?)}";
+
+        try {
+            stmt = this.conn.prepareCall(sql);
+            stmt.setInt(1, purchaseRequest.getId());
+            stmt.execute();
+        } catch (SQLException error) {
+            error.printStackTrace();
+            System.out.println("SellerDAO.updateViewsCount [ERROR](1): " + error);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException sqlError) {
+                    sqlError.printStackTrace();
+                    System.out.println("PurchaseRequestDAO.updateViewsCount [ERROR](2): " + sqlError);
+                }
+            }
+        }
     }
 
     public void updatePropagation(PurchaseRequest purchaseRequest) {

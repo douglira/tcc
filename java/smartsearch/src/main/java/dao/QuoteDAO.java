@@ -73,8 +73,8 @@ public class QuoteDAO extends GenericDAO {
             Calendar updatedAt = Calendar.getInstance();
             updatedAt.setTime(rs.getTimestamp("updated_at"));
             quote.setUpdatedAt(updatedAt);
-        } catch (NullPointerException err) {
-
+        } catch (SQLException | NullPointerException err) {
+            quote.setUpdatedAt(null);
         }
 
         return quote;

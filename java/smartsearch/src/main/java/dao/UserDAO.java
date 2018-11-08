@@ -53,24 +53,31 @@ public class UserDAO extends GenericDAO {
 
     private User fetch(ResultSet rs, User user, String scope) throws SQLException {
 
-        if (scope !=null && scope.equals("full")) {
+        if (scope != null && scope.equals("full")) {
             user.setPassword(rs.getString("password"));
 
             try {
-
                 Calendar updatedAt = Calendar.getInstance();
                 updatedAt.setTime(rs.getTimestamp("updated_at"));
                 user.setUpdatedAt(updatedAt);
+            } catch (NullPointerException error) {
+                user.setUpdatedAt(null);
+            }
 
+            try {
                 Calendar lastActive = Calendar.getInstance();
                 lastActive.setTime(rs.getTimestamp("last_active"));
                 user.setLastActive(lastActive);
+            } catch (NullPointerException error) {
+                user.setLastActive(null);
+            }
 
+            try {
                 Calendar lastInactive = Calendar.getInstance();
                 lastInactive.setTime(rs.getTimestamp("last_inactive"));
                 user.setLastInactive(lastInactive);
             } catch (NullPointerException error) {
-
+                user.setLastInactive(null);
             }
         }
 

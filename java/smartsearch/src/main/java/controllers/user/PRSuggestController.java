@@ -264,6 +264,8 @@ public class PRSuggestController extends HttpServlet {
                 return;
             }
 
+            new PurchaseRequestDAO(true).updateViewsCount(new PurchaseRequest(Integer.parseInt(purchaseRequestIdString)));
+
             request.getRequestDispatcher(request.getContextPath() + "/user/purchase-request-suggest.jsp").forward(request, response);
         }
     }

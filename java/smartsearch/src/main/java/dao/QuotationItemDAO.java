@@ -70,7 +70,7 @@ public class QuotationItemDAO extends GenericDAO {
             updatedAt.setTime(rs.getTimestamp("updated_at"));
             product.setUpdatedAt(updatedAt);
         } catch (NullPointerException | SQLException err) {
-
+            product.setUpdatedAt(null);
         }
 
         item.setProduct(product);

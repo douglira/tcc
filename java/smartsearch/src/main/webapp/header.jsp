@@ -62,7 +62,7 @@
                         </c:when>
                         <c:otherwise>
                             <a class="dropdown-item"
-                               href="<%=request.getContextPath()%>/account">Meus pedidos de
+                               href="<%=request.getContextPath()%>/account/purchase_request/list">Meus pedidos de
                                 compra</a>
                             <a class="dropdown-item" href="#">Orçamentos lançados</a>
                             <a class="dropdown-item" href="<%=request.getContextPath()%>/account/inventory">Estoque</a>
