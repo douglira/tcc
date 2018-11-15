@@ -28,13 +28,14 @@ public class QuotationItemDAO extends GenericDAO {
 
     public void attachQuote(int quoteId, Item item) {
         PreparedStatement stmt = null;
-        String sql = "INSERT INTO " + TABLE_NAME + " (quote_id, product_id, quantity) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO " + TABLE_NAME + " (quote_id, product_id, quantity, sale_price) VALUES (?, ?, ?, ?)";
 
         try {
             stmt = this.conn.prepareStatement(sql);
             stmt.setInt(1, quoteId);
             stmt.setInt(2, item.getProduct().getId());
             stmt.setInt(3, item.getQuantity());
+            stmt.setDouble(4, item.getProduct().getBasePrice());
             stmt.execute();
         } catch (SQLException err) {
             err.printStackTrace();
@@ -55,7 +56,7 @@ public class QuotationItemDAO extends GenericDAO {
         product.setCategory(new Category(rs.getInt("category_id")));
         product.setTitle(rs.getString("title"));
         product.setDescription(rs.getString("description"));
-        product.setBasePrice(rs.getDouble("base_price"));
+        product.setBasePrice(rs.getDouble("sale_price"));
         product.setSoldQuantity(rs.getInt("sold_quantity"));
         product.setAvailableQuantity(rs.getInt("available_quantity"));
         product.setStatus(Status.valueOf(rs.getString("status")));

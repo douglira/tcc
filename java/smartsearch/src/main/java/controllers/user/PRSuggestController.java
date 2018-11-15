@@ -100,7 +100,7 @@ public class PRSuggestController extends HttpServlet {
 
             QuotationItemDAO quotationItemDao = new QuotationItemDAO(quoteDao.getConnection());
 
-            quote.getCustomListProduct().forEach(prodList -> quotationItemDao.attachQuote(quote.getId(), prodList));
+            quote.getCustomListProduct().forEach(quoteItem -> quotationItemDao.attachQuote(quote.getId(), quoteItem));
 
             ShipmentDAO shipmentDao = new ShipmentDAO(quotationItemDao.getConnection());
             quote.getShipmentOptions().forEach(shipment -> {

@@ -58,9 +58,7 @@ public class AuthController extends HttpServlet {
             request.setAttribute("error", "Email ou senha inválida");
             request.getRequestDispatcher("/signin").forward(request, response);
             return;
-        }
-
-        if (loggedUser.getStatus() == Status.INACTIVE) {
+        } else if (loggedUser.getStatus() == Status.INACTIVE) {
             request.setAttribute("error", "Cadastro desativado");
             request.getRequestDispatcher("/signin").forward(request, response);
             return;
