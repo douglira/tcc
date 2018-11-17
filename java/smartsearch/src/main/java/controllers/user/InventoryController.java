@@ -76,7 +76,7 @@ public class InventoryController extends HttpServlet {
             String productItemId = request.getParameter("productItemId");
             String productJson = request.getParameter("product");
 
-            if (validateParameters(categoryId, productJson)) {
+            if (invalidParameters(categoryId, productJson)) {
                 msg = new Messenger("Operação inválida.", MessengerType.ERROR);
                 out.print(gJson.toJson(msg));
                 return;
@@ -131,32 +131,10 @@ public class InventoryController extends HttpServlet {
             ProductDAO productDao = new ProductDAO(productItemDao.getConnection());
             product = productDao.create(product);
 
-            FileDAO fileDao = new FileDAO(false);
-            fileDao.setConnection(productDao.getConnection());
+            FileDAO fileDao = new FileDAO(productDao.getConnection());
 
             if (product.getPictures() != null && !product.getPictures().isEmpty()) {
-
-
-                for (File picture : product.getPictures()) {
-                    int index = product.getPictures().indexOf(picture);
-                    picture = fileDao.create(picture);
-                    fileDao.attachProduct(product.getId(), picture.getId());
-                    product.getPictures().set(index, picture);
-                }
-
-                if (validateProductItemPictures) {
-                    for (File picture : product.getPictures()) {
-                        if (remainingPicturesCount == 0) {
-                            break;
-                        }
-
-                        fileDao.attachProductItem(productItem.getId(), picture.getId());
-                        productItem.addPicture(picture);
-
-                        remainingPicturesCount--;
-                    }
-                }
-                productItem.setDefaultThumbnail(Helper.getBaseUrl(request));
+                attachPictures(product, productItem, fileDao, validateProductItemPictures, remainingPicturesCount, Helper.getBaseUrl(request));
             }
 
             fileDao.closeTransaction();
@@ -171,6 +149,29 @@ public class InventoryController extends HttpServlet {
             System.out.println("InventoryController.doPost [ERROR]: " + error);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
+    }
+
+    private void attachPictures(Product product, ProductItem productItem, FileDAO fileDao, boolean validateProductItemPictures, int remainingPicturesCount, String baseUrl) {
+        for (File picture : product.getPictures()) {
+            int index = product.getPictures().indexOf(picture);
+            picture = fileDao.create(picture);
+            fileDao.attachProduct(product.getId(), picture.getId());
+            product.getPictures().set(index, picture);
+        }
+
+        if (validateProductItemPictures) {
+            for (File picture : product.getPictures()) {
+                if (remainingPicturesCount == 0) {
+                    break;
+                }
+
+                fileDao.attachProductItem(productItem.getId(), picture.getId());
+                productItem.addPicture(picture);
+
+                remainingPicturesCount--;
+            }
+        }
+        productItem.setDefaultThumbnail(baseUrl);
     }
 
     private Integer getRemainingPictures(ProductItem productItem) {
@@ -208,7 +209,7 @@ public class InventoryController extends HttpServlet {
         return productItemDao.create(productItem);
     }
 
-    private boolean validateParameters(String categoryId, String productJson) {
+    private boolean invalidParameters(String categoryId, String productJson) {
         return categoryId == null || categoryId.length() == 0 || productJson == null || productJson.length() == 0;
     }
 
