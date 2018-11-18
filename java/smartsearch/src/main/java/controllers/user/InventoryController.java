@@ -108,7 +108,7 @@ public class InventoryController extends HttpServlet {
 
             ProductItemDAO productItemDao = new ProductItemDAO(true);
 
-            Boolean validateProductItemPictures = true;
+            boolean validateProductItemPictures = true;
             Integer remainingPicturesCount = ProductItem.MAX_PICTURES;
 
             if (productItemId == null || productItemId.length() == 0) {

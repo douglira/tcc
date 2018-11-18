@@ -2,10 +2,7 @@ package controllers.user;
 
 import com.google.gson.Gson;
 import controllers.socket.NotificationSocket;
-import dao.NotificationDAO;
-import dao.PersonDAO;
-import dao.PurchaseRequestDAO;
-import dao.SellerDAO;
+import dao.*;
 import enums.MessengerType;
 import enums.NotificationStatus;
 import enums.NotificationResource;
@@ -22,6 +19,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
@@ -137,5 +135,79 @@ public class PRPublishController extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        HttpSession session = request.getSession();
+        Person person = (Person) session.getAttribute("loggedPerson");
+
+        String purchaseRequestIdString = request.getParameter("id");
+
+        if (person == null || !isValidRequest(purchaseRequestIdString, person.getId())) {
+            response.sendRedirect("/");
+            return;
+        }
+
+        if (request.getHeader("Accept").contains("application/json")) {
+            responseJson(request, response);
+        } else {
+            request.getRequestDispatcher(request.getContextPath() + "/user/purchase-request-details.jsp").forward(request, response);
+        }
+    }
+
+    private void responseJson(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
+
+        try {
+            HttpSession session = request.getSession();
+            Person person = (Person) session.getAttribute("loggedPerson");
+
+            PurchaseRequest purchaseRequest = new PurchaseRequestDAO(true).findById(new PurchaseRequest(Integer.parseInt(request.getParameter("id"))));
+            purchaseRequest.setQuotes(new QuoteDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
+            purchaseRequest.setListProducts(new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
+
+            out.print(gson.toJson(purchaseRequest));
+            out.close();
+        } catch (Exception err) {
+            err.printStackTrace();
+            System.out.println("PRPublishController.doPost [ERROR]: " + err);
+            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
+        }
+    }
+
+    private boolean isValidRequest(String purchaseRequestIdString, Integer buyerId) {
+        boolean isValid = false;
+
+        if (purchaseRequestIdString == null || purchaseRequestIdString.length() <= 4) {
+            return isValid;
+        }
+
+        if (!isInteger(purchaseRequestIdString)) {
+            return isValid;
+        }
+
+        PurchaseRequest pr = new PurchaseRequestDAO(true).findById(new PurchaseRequest(Integer.parseInt(purchaseRequestIdString)));
+
+        if (pr == null) {
+            return isValid;
+        }
+
+        if (buyerId == null || !buyerId.equals(pr.getBuyer().getId())) {
+            return isValid;
+        }
+
+        isValid = true;
+        return isValid;
+    }
+
+    private boolean isInteger(String purchaseRequestIdString) {
+        boolean isInteger = true;
+
+        try {
+            Integer id = Integer.parseInt(purchaseRequestIdString, 10);
+        } catch (NumberFormatException error) {
+            isInteger = false;
+        }
+
+        return isInteger;
     }
 }

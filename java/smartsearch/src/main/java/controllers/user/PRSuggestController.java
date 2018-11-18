@@ -342,7 +342,7 @@ public class PRSuggestController extends HttpServlet {
             return isValid;
         }
 
-        if (buyerId != null && pr.getBuyer().getId() == buyerId) {
+        if (buyerId == null || !buyerId.equals(pr.getBuyer().getId())) {
             return isValid;
         }
 

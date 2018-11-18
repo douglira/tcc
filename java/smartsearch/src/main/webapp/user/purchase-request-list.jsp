@@ -21,6 +21,37 @@
 <jsp:include page="/header.jsp"/>
 
 <div id="userPRList" class="container mb-sm-5 mb-md-5" v-if="purchaseRequests.length">
+    <div class="card border-light mb-sm-3 mb-md-3">
+        <div class="card-body d-flex flex-nowrap align-items-center">
+            <h1 class="text-muted">
+                Histórico: Pedidos de compra
+            </h1>
+        </div>
+    </div>
+
+    <a  v-for="(pr, prIndex) in purchaseRequests" :key="prIndex + '_' + pr.id" :href="'/account/purchase_request/details?id=' + pr.id" style="text-decoration: none;">
+        <div class="card text-muted mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>&numero;&nbsp;<i>{{ pr.id }}</i></h5>
+                <small>Criado em: {{ formatDatetime(pr.createdAt) }}</small>
+            </div>
+            <div class="card-body">
+                <h6 class="card-title text-center text-uppercase">{{ getPRStage(pr.stage) }}</h6>
+                <div class="card-text d-flex flex-column flex-md-row justify-content-md-between">
+                    <div class="d-flex flex-column align-items-md-start align-items-center">
+                        <span>Visualizações: <strong>{{ pr.viewsCount}}</strong></span>
+                        <span>Número de cotações: <strong>{{ pr.quotes.length }}</strong></span>
+                        <span>Relevância atingida: <strong>{{ pr.propagationCount }}</strong></span>
+                    </div>
+                    <div class="d-flex flex-column align-items-md-end align-items-center">
+                        <span>Total: <strong class="text-success">{{ formatCurrency(pr.totalAmount) }}</strong></span>
+                        <span>Visibilidade: <strong>{{ pr.quotesVisibility ? 'Permitida' : 'Restrita' }}</strong></span>
+                        <span>Expira em: <strong>{{ formatDatetime(pr.dueDate) }}</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
 </div>
 
 <script src="<%=request.getContextPath()%>/assets/libs/fontawesome/js/all.js"></script>
