@@ -19,11 +19,9 @@ import models.Category;
 import models.Messenger;
 
 @WebServlet(name = "RestrictCategoryController", urlPatterns = {
-//        GET
         "/admin/categories",
         "/admin/categories/list",
 
-//        POST
         "/admin/categories/new",
         "/admin/categories/edit",
         "/admin/categories/toggle_status",

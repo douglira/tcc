@@ -15,11 +15,16 @@ import mail.MailerService;
 import mail.ResetPassword;
 import models.User;
 
-@WebServlet(name = "RedefinePassController", urlPatterns = { "/password/redefine", "/form/reset_pass" })
-public class RedefinePassController extends HttpServlet {
+@WebServlet(name = "RedefinePasswordController", urlPatterns = {
+		"/form/reset_pass",
+
+		"/password/redefine/forgot",
+		"/password/redefine/reset"
+})
+public class RedefinePasswordController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public RedefinePassController() {
+	public RedefinePasswordController() {
 		super();
 	}
 
@@ -43,12 +48,16 @@ public class RedefinePassController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String action = request.getParameter("action");
+		String uri = request.getRequestURI();
+		String action = uri.replace("/password/redefine/", "");
 
-		if (action.equals("forgot_pass")) {
-			forgotPassRequest(request, response);
-		} else if (action.equals("reset_pass")) {
-			resetPassAction(request, response);
+		switch (action) {
+			case "forgot":
+				forgotPassRequest(request, response);
+				break;
+			case "reset":
+				resetPassAction(request, response);
+				break;
 		}
 	}
 
@@ -75,11 +84,9 @@ public class RedefinePassController extends HttpServlet {
 		mailer.setMail(MailSMTPService.getInstance());
 		mailer.setTo(user.getEmail());
 
-		Runnable r = new Runnable() {
-			public void run() {
-				mailer.send();
-				new UserDAO(true).setPasswordResetToken(user);
-			}
+		Runnable r = () -> {
+			mailer.send();
+			new UserDAO(true).setPasswordResetToken(user);
 		};
 
 		new Thread(r).start();

@@ -19,14 +19,14 @@
 
 	<div class="container">
 		<div class="content">
-			<h1 style="font-size: 28px; color: #666;">Redefinição de senha</h1>
+			<h1 style="font-size: 28px; color: #666;">Redefiniï¿½ï¿½o de senha</h1>
 			<%String error = (String) request.getAttribute("error");%>
 			<c:if test="<%=error != null%>">
 				<div class="div-error">
 					<div class="alert alert-danger"><%= error %></div>
 				</div>
 			</c:if>
-			<form action="<%=request.getContextPath()%>/password/redefine" method="POST">
+			<form action="<%=request.getContextPath()%>/password/redefine/reset" method="POST">
 				<input type="hidden" name="token" value="<%=((String) request.getAttribute("token"))%>"/>
 				<p class="text-secondary text-left" style="font-size: 13px">
 					Preencha e confirme sua nova senha nos campos abaixo para redefini-la.
@@ -39,7 +39,7 @@
 					<label for="confirmPasswordInput">Confirmar senha</label>
 					<input class="form-control" type="password" id="confirmPasswordInput" name="confirmPassword" placeholder="Confirme sua senha" />
 				</div>
-				<button class="btn btn-primary" type="submit" value="reset_pass" name="action" >Pronto</button>
+				<button class="btn btn-primary" type="submit" name="action" >Pronto</button>
 			</form>
 		</div>
 	</div>

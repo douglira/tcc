@@ -28,7 +28,7 @@
 					<div class="alert alert-danger"><%= error %></div>
 				</div>
 			</c:if>
-			<form action="<%=request.getContextPath()%>/password/redefine" method="POST">
+			<form action="<%=request.getContextPath()%>/password/redefine/forgot" method="POST">
 				<p class="text-secondary text-left" style="font-size: 13px">
 					Insira seu email de cadastro no campo abaixo e em alguns minutos enviaremos um e-mail
 					para que possa redefinir sua senha.
@@ -37,7 +37,7 @@
 					<label for="emailInput">Email</label>
 					<input class="form-control" type="email" id="emailInput" name="email" placeholder="Email cadastrado" autofocus/>
 				</div>
-				<button class="btn btn-primary" type="submit" value="forgot_pass" name="action" >Enviar</button>
+				<button class="btn btn-primary" type="submit" name="action" >Enviar</button>
 			</form>
 		</div>
 	</div>

@@ -15,13 +15,32 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
-@WebServlet(name = "ProductHomepageController", urlPatterns = {"/products/homepage", "/products/homepage/search"})
-public class ProductHomepageController extends HttpServlet {
+@WebServlet(name = "ProductItemController", urlPatterns = {
+        "/product_items/homepage",
+        "/product_items/predict",
+})
+public class ProductItemController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String uri = request.getRequestURI();
+        String action = uri.replace("/product_items/", "");
+
+        switch (action) {
+            case "homepage": {
+                getHomepage(request, response);
+            }
+            case "predict": {
+                getPrediction(request, response);
+            }
+        }
+    }
+
+    private void getHomepage(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         Gson gJson = new Gson();
@@ -47,9 +66,22 @@ public class ProductHomepageController extends HttpServlet {
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("ProductHomepageController.doGet [ERROR]: " + e);
+            System.out.println("ProductItemController.doGet [ERROR]: " + e);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
+    }
 
+    private void getPrediction(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+
+        Gson gJson = new Gson();
+
+        String productItemTitle = request.getParameter("productPredictTitle");
+
+        List<ProductItem> products = new ElasticsearchFacade().getProductsItemPredict(productItemTitle);
+
+        out.print(gJson.toJson(products));
+        out.close();
     }
 }

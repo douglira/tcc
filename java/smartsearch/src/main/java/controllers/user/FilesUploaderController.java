@@ -22,7 +22,7 @@ import models.File;
         * 5)
 public class FilesUploaderController extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    private static final String UPLOAD_DIRECTORY = "pictures";
+    private static final String UPLOAD_PICTURES_DIRECTORY = "pictures";
 
     public FilesUploaderController() {
         super();
@@ -48,7 +48,7 @@ public class FilesUploaderController extends HttpServlet {
         PrintWriter out = response.getWriter();
         Gson gJson = new Gson();
 
-        String uploadPath = request.getServletContext().getRealPath("") + UPLOAD_DIRECTORY;
+        String uploadPath = request.getServletContext().getRealPath("") + UPLOAD_PICTURES_DIRECTORY;
         java.io.File uploadDir = new java.io.File(uploadPath);
 
         if (!uploadDir.exists()) uploadDir.mkdir();
@@ -60,7 +60,7 @@ public class FilesUploaderController extends HttpServlet {
         for (Part part : request.getParts()) {
             String filename = String.valueOf(System.currentTimeMillis()) + "_" + part.getSubmittedFileName();
             String filenamePath = uploadPath + java.io.File.separator + filename;
-            String urlPath = baseUrl + java.io.File.separator + UPLOAD_DIRECTORY + java.io.File.separator + filename;
+            String urlPath = baseUrl + java.io.File.separator + UPLOAD_PICTURES_DIRECTORY + java.io.File.separator + filename;
             part.write(filenamePath);
 
             File picture = new File();

@@ -743,4 +743,3 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         request.getRequestDispatcher(request.getContextPath() + "/user/purchase-request-suggest.jsp").forward(request, response);
     }
 }
-
