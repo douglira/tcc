@@ -146,12 +146,12 @@
                                                     <span class="text-muted text-uppercase font-italic" style="padding-bottom: 10px;">{{ getDisplayQuoteStatus(quote.status) }}</span>
                                                     <div class="d-flex flex-row">
                                                         <div class="d-flex flex-column align-items-start" style="flex: 1;">
-                                                            <h6 class="align-self-center">Cotação</h6>
+                                                            <h6 class="align-self-start">Cotação</h6>
                                                             <span class="text-secondary">Valor:&nbsp;<span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></span>
                                                             <i class="text-muted" style="margin: 3px 0; font-size: 14px;">Desconto&colon;&nbsp;{{ quote.discount }}&percnt;</i>
                                                         </div>
                                                         <div class="d-flex flex-column align-items-end" style="flex: 1;">
-                                                            <h6 class="align-self-center">Prazos</h6>
+                                                            <h6 class="align-self-end">Prazos</h6>
                                                             <small class="text-monospace text-muted">Criado em&colon;&nbsp;{{ formatDate(quote.createdAt) }}</small>
                                                             <i><small class="text-monospace text-muted">Válida até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small></i>
                                                         </div>
@@ -245,12 +245,12 @@
                                             <span class="text-muted text-uppercase font-italic" style="padding-bottom: 10px;">{{ getDisplayQuoteStatus(quote.status) }}</span>
                                             <div class="d-flex flex-row">
                                                 <div class="d-flex flex-column align-items-start" style="flex: 1;">
-                                                    <h6 class="align-self-center">Cotação</h6>
+                                                    <h6 class="align-self-start">Cotação</h6>
                                                     <span class="text-secondary">Valor:&nbsp;<span class="text-success">{{ formatCurrency(quote.totalAmount) }}</span></span>
                                                     <i class="text-muted" style="margin: 3px 0; font-size: 14px;">Desconto&colon;&nbsp;{{ quote.discount }}&percnt;</i>
                                                 </div>
                                                 <div class="d-flex flex-column align-items-end" style="flex: 1;">
-                                                    <h6 class="align-self-center">Prazos</h6>
+                                                    <h6 class="align-self-end">Prazos</h6>
                                                     <small class="text-monospace text-muted">Criado em&colon;&nbsp;{{ formatDate(quote.createdAt) }}</small>
                                                     <i><small class="text-monospace text-muted">Válida até&colon;&nbsp;{{ formatDate(quote.expirationDate) }}</small></i>
                                                 </div>

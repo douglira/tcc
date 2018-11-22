@@ -558,7 +558,14 @@ public class RestrictPurchaseRequestController extends HttpServlet {
 
         String purchaseRequestIdString = request.getParameter("id");
 
-        if (!isValidRequest(purchaseRequestIdString, person.getId())) {
+        if (!isValidRequest(purchaseRequestIdString)) {
+            response.sendRedirect("/");
+            return;
+        }
+
+        PurchaseRequest pr = new PurchaseRequestDAO(true).findById(new PurchaseRequest(Integer.parseInt(purchaseRequestIdString)));
+
+        if (person.getId() != pr.getBuyer().getId()) {
             response.sendRedirect("/");
             return;
         }
@@ -592,7 +599,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         }
     }
 
-    private boolean isValidRequest(String purchaseRequestIdString, Integer buyerId) {
+    private boolean isValidRequest(String purchaseRequestIdString) {
         boolean isValid = false;
 
         if (purchaseRequestIdString == null || purchaseRequestIdString.length() <= 4) {
@@ -606,10 +613,6 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         PurchaseRequest pr = new PurchaseRequestDAO(true).findById(new PurchaseRequest(Integer.parseInt(purchaseRequestIdString)));
 
         if (pr == null) {
-            return isValid;
-        }
-
-        if (buyerId == null || !buyerId.equals(pr.getBuyer().getId())) {
             return isValid;
         }
 
@@ -680,7 +683,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
             Person person = (Person) request.getSession().getAttribute("loggedPerson");
             String purchaseRequestIdString = request.getParameter("pr");
 
-            if (!isValidRequest(purchaseRequestIdString, null)) {
+            if (!isValidRequest(purchaseRequestIdString)) {
                 Helper.responseMessage(out, new Messenger(("Não foi possível carregar os dados"), MessengerType.ERROR, "INVALID_PURCHASE_REQUEST_ID"));
                 return;
             }
@@ -730,7 +733,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         Person person = (Person) request.getSession().getAttribute("loggedPerson");
         String purchaseRequestIdString = request.getParameter("pr");
 
-        if (!isValidRequest(purchaseRequestIdString, person.getId())) {
+        if (!isValidRequest(purchaseRequestIdString)) {
             response.sendRedirect("/");
             return;
         }
