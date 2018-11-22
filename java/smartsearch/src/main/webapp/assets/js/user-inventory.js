@@ -11,7 +11,7 @@ new Vue({
   methods: {
     async loadData() {
       try {
-        const response = await axios.get('/account/me/inventory?list=products');
+        const response = await axios.get('/account/products');
 
         this.products = response.data;
       } catch (error) {

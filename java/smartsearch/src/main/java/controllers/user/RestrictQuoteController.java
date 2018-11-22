@@ -21,14 +21,26 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.stream.Collectors;
 
-@WebServlet(name = "PRSuggestController", urlPatterns = "/account/purchase_request/suggest")
-public class PRSuggestController extends HttpServlet {
+@WebServlet(name = "RestrictQuoteController", urlPatterns = {
+        "/account/quote/new"
+})
+public class RestrictQuoteController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String uri = request.getRequestURI();
+        String action = uri.replace("/account/quote/", "");
+
+        switch (action) {
+            case "new":
+                create(request, response);
+                break;
+        }
+    }
+
+    private void create(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(400);
         final PrintWriter outError = response.getWriter();
@@ -130,7 +142,7 @@ public class PRSuggestController extends HttpServlet {
             err.printStackTrace();
             response.setStatus(500);
             PrintWriter out = response.getWriter();
-            System.out.println("PRSuggestController.doPost [ERROR]: " + err);
+            System.out.println("RestrictQuoteController.doPost [ERROR]: " + err);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
     }
@@ -249,116 +261,5 @@ public class PRSuggestController extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        HttpSession session = request.getSession();
-        Person person = (Person) session.getAttribute("loggedPerson");
-
-        // Content Negotiation
-        if (request.getHeader("Accept").contains("application/json")) {
-            responseJson(request, response);
-        } else {
-            String purchaseRequestIdString = request.getParameter("pr");
-            User user = (User) request.getSession().getAttribute("loggedUser");
-
-            if (user == null || !isValidRequest(purchaseRequestIdString, person.getId())) {
-                response.sendRedirect("/");
-                return;
-            }
-
-            new PurchaseRequestDAO(true).updateViewsCount(new PurchaseRequest(Integer.parseInt(purchaseRequestIdString)));
-
-            request.getRequestDispatcher(request.getContextPath() + "/user/purchase-request-suggest.jsp").forward(request, response);
-        }
-    }
-
-    private void responseJson(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        Gson gJson = new Gson();
-
-        try {
-            Person person = (Person) request.getSession().getAttribute("loggedPerson");
-            String purchaseRequestIdString = request.getParameter("pr");
-
-            if (!isValidRequest(purchaseRequestIdString, null)) {
-                Helper.responseMessage(out, new Messenger(("Não foi possível carregar os dados"), MessengerType.ERROR, "INVALID_PURCHASE_REQUEST_ID"));
-                return;
-            }
-
-            PurchaseRequest purchaseRequest = new PurchaseRequestDAO(true).findById(new PurchaseRequest(Integer.parseInt(purchaseRequestIdString)));
-            ArrayList<Item> prProducts = new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId());
-
-            prProducts.forEach(item -> {
-                synchronized (item) {
-                    ProductItem productItem = (ProductItem) item.getProduct();
-                    productItem.setPictures(new FileDAO(true).getProductItemPictures(productItem.getId()));
-                    productItem.setDefaultThumbnail(Helper.getBaseUrl(request));
-                }
-            });
-            prProducts.sort(Item::compareTo);
-            purchaseRequest.setListProducts(prProducts);
-
-            if (purchaseRequest.getQuotesVisibility()) {
-                ArrayList<Quote> quotes = new QuoteDAO(true).findByPurchaseRequest(purchaseRequest.getId());
-                quotes.forEach(quote -> {
-                    if (person.getId() == quote.getSeller().getId()) {
-                        this.populateQuote(quote);
-                    }
-                });
-                purchaseRequest.setQuotes(quotes);
-            } else {
-                ArrayList<Quote> restrictQuotes = new QuoteDAO(true).findRestrictQuotes(purchaseRequest.getId(), person.getId());
-                restrictQuotes.forEach(this::populateQuote);
-                purchaseRequest.setQuotes(restrictQuotes);
-            }
-
-            out.print(gJson.toJson(purchaseRequest));
-            out.close();
-        } catch (Exception error) {
-            error.printStackTrace();
-            System.out.println("PRSuggestController.doPost [ERROR]: " + error);
-            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
-        }
-    }
-
-    private void populateQuote(Quote quote) {
-        quote.setCustomListProduct(new QuotationItemDAO(true).findByQuote(quote.getId()));
-        quote.setShipmentOptions(new ShipmentDAO(true).findByQuoteAndSeller(quote.getId(), quote.getSeller().getId()));
-    }
-
-    private boolean isValidRequest(String purchaseRequestIdString, Integer buyerId) {
-        boolean isValid = false;
-
-        if (purchaseRequestIdString == null || purchaseRequestIdString.length() <= 4) {
-            return isValid;
-        }
-
-        if (!isInteger(purchaseRequestIdString)) {
-            return isValid;
-        }
-
-        PurchaseRequest pr = new PurchaseRequestDAO(true).findById(new PurchaseRequest(Integer.parseInt(purchaseRequestIdString)));
-
-        if (pr == null) {
-            return isValid;
-        }
-
-        if (buyerId == null || !buyerId.equals(pr.getBuyer().getId())) {
-            return isValid;
-        }
-
-        isValid = true;
-        return isValid;
-    }
-
-    private boolean isInteger(String purchaseRequestIdString) {
-        boolean isInteger = true;
-
-        try {
-            Integer id = Integer.parseInt(purchaseRequestIdString, 10);
-        } catch (NumberFormatException error) {
-            isInteger = false;
-        }
-
-        return isInteger;
     }
 }

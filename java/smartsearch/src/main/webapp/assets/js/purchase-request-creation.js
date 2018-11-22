@@ -105,7 +105,7 @@ const VuePRCreation = new Vue({
     },
     confirmRemove(productList) {
       $.post(
-        '/account/purchase_request/edit?action=remove',
+        '/account/purchase_request/remove',
         {
           purchaseRequestId: this.purchaseRequest.id,
           productItemId: this.modalData.productItemId,
@@ -122,7 +122,7 @@ const VuePRCreation = new Vue({
       };
 
       $.post(
-        '/account/purchase_request/edit?action=update',
+        '/account/purchase_request/save',
         {
           purchaseRequestId: this.purchaseRequest.id,
           productItemId: this.modalData.productItemId,
@@ -134,7 +134,7 @@ const VuePRCreation = new Vue({
         })
     },
     deletePurchaseRequest() {
-      $.post('/account/purchase_request/abort?abortAction=delete', { purchaseRequestId: this.purchaseRequest.id })
+      $.post('/account/purchase_request/abort', { purchaseRequestId: this.purchaseRequest.id })
     },
     initPopover() {
       $(function () {
@@ -162,7 +162,7 @@ const VuePRCreation = new Vue({
       }
     },
     async loadData() {
-      const response = await axios.get('/account/purchase_request/edit');
+      const response = await axios.get('/account/purchase_request/creation');
       this.purchaseRequest = response.data;
     },
     showMessage(msg, type = 'success', options) {

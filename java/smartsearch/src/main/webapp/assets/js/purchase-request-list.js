@@ -44,7 +44,7 @@ const VueComponent = new Vue({
     },
     async loadData() {
       try {
-        const response = await axios.get('/account/purchase_request/all');
+        const response = await axios.get('/account/purchase_request/list');
         this.purchaseRequests = response.data;
       } catch (err) {
         const error = JSON.parse(err);

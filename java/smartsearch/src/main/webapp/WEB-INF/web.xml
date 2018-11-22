@@ -102,14 +102,6 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>userProductNew</servlet-name>
-    <url-pattern>/account/product/new</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <servlet-name>userPurchaseRequestList</servlet-name>
-    <jsp-file>/user/purchase-request-list.jsp</jsp-file>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>userPurchaseRequestList</servlet-name>
-    <url-pattern>/account/purchase_request/list</url-pattern>
+    <url-pattern>/account/new_product</url-pattern>
   </servlet-mapping>
 </web-app>

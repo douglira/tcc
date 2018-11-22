@@ -28,7 +28,7 @@
 					<div class="alert alert-danger"><%= error %></div>
 				</div>
 			</c:if>
-			<form action="auth" method="POST">
+			<form action="/auth/signin" method="POST">
 				<div class="form-group">
 					<label for="emailInput">Email</label>
 					<input class="form-control" type="email" id="emailInput" name="email" placeholder="Seu email de acesso" autofocus />
@@ -38,7 +38,7 @@
 					<input class="form-control" type="password" id="passwordInput" name="password" placeholder="Sua senha" />
 					<a class="link-forgot_pass" href="<%=request.getContextPath()%>/form/forgot_pass">Esqueceu sua senha?</a>
 				</div>
-				<button class="btn btn-primary" type="submit" value="signin" name="action" >Entrar</button>
+				<button class="btn btn-primary" type="submit" name="action" >Entrar</button>
 				<small>ou</small>
 				<p><a href="<%=request.getContextPath() %>/register" class="text-info">Não possui conta? Cadastrar</a></p>
 			</form>

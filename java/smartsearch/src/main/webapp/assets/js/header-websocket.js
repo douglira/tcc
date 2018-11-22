@@ -27,7 +27,7 @@ const VueHeader = new Vue({
 	methods: {
 		async loadPurchaseRequest() {
 				try {
-          const response = await axios.get('/account/purchase_request/edit');
+          const response = await axios.get('/account/purchase_request/creation');
           if (response.status === 200) {
             this.purchaseRequest = response.data;
           }

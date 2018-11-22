@@ -21,7 +21,7 @@ new Vue({
   methods: {
     onClickAddToPR(productItem) {
       $.post(
-        '/purchase_request/new',
+        '/account/purchase_request/new',
         {
           productItemId: productItem.id,
           productItemQuantity: 1,

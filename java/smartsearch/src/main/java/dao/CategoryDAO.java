@@ -83,7 +83,7 @@ public class CategoryDAO extends GenericDAO {
 		return categories;
 	}
 
-	public ArrayList<Category> generals() {
+	public ArrayList<Category> restrictGenerals() {
 		ArrayList<Category> categories = new ArrayList<Category>();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -96,14 +96,41 @@ public class CategoryDAO extends GenericDAO {
 			categories = this.fetch(rs);
 		} catch (SQLException sqlException) {
 			sqlException.printStackTrace();
-			System.out.println("CategoryDAO.generals [ERROR](1): " + sqlException);
+			System.out.println("CategoryDAO.restrictGenerals [ERROR](1): " + sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
 					errClose.printStackTrace();
-					System.out.println("CategoryDAO.generals [ERROR](2): " + errClose);
+					System.out.println("CategoryDAO.restrictGenerals [ERROR](2): " + errClose);
+				}
+			}
+		}
+		return categories;
+	}
+
+	public ArrayList<Category> publicGenerals() {
+		ArrayList<Category> categories = new ArrayList<Category>();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		String sql = "SELECT * FROM " + TABLE_NAME + " WHERE layer = 1 AND status = CAST('ACTIVE' AS status_entity)";
+
+		try {
+			stmt = this.conn.prepareStatement(sql);
+			rs = stmt.executeQuery();
+
+			categories = this.fetch(rs);
+		} catch (SQLException sqlException) {
+			sqlException.printStackTrace();
+			System.out.println("CategoryDAO.publicGenerals [ERROR](1): " + sqlException);
+		} finally {
+			if (this.conn != null) {
+				try {
+					this.conn.close();
+				} catch (SQLException errClose) {
+					errClose.printStackTrace();
+					System.out.println("CategoryDAO.publicGenerals [ERROR](2): " + errClose);
 				}
 			}
 		}
@@ -221,7 +248,7 @@ public class CategoryDAO extends GenericDAO {
 		}
 	}
 
-	public ArrayList<Category> subcategoriesByParent(Integer parentId) {
+	public ArrayList<Category> restrictSubcategoriesByParent(Integer parentId) {
 		ArrayList<Category> subcategories = new ArrayList<Category>();
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -235,14 +262,43 @@ public class CategoryDAO extends GenericDAO {
 			subcategories = this.fetch(rs);
 		} catch (SQLException sqlException) {
 			sqlException.printStackTrace();
-			System.out.println("CategoryDAO.subcategoriesByParent [ERROR](1): " + sqlException);
+			System.out.println("CategoryDAO.restrictSubcategoriesByParent [ERROR](1): " + sqlException);
 		} finally {
 			if (this.conn != null) {
 				try {
 					this.conn.close();
 				} catch (SQLException errClose) {
 					errClose.printStackTrace();
-					System.out.println("CategoryDAO.subcategoriesByParent [ERROR](2): " +  errClose);
+					System.out.println("CategoryDAO.restrictSubcategoriesByParent [ERROR](2): " +  errClose);
+				}
+			}
+		}
+
+		return subcategories;
+	}
+
+	public ArrayList<Category> publicSubcategoriesByParent(Integer parentId) {
+		ArrayList<Category> subcategories = new ArrayList<Category>();
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		String sql = "SELECT * FROM " + TABLE_NAME + " WHERE parent_id = ? AND status = CAST('ACTIVE' AS status_entity)";
+
+		try {
+			stmt = this.conn.prepareStatement(sql);
+			stmt.setInt(1, parentId);
+			rs = stmt.executeQuery();
+
+			subcategories = this.fetch(rs);
+		} catch (SQLException sqlException) {
+			sqlException.printStackTrace();
+			System.out.println("CategoryDAO.publicSubcategoriesByParent [ERROR](1): " + sqlException);
+		} finally {
+			if (this.conn != null) {
+				try {
+					this.conn.close();
+				} catch (SQLException errClose) {
+					errClose.printStackTrace();
+					System.out.println("CategoryDAO.publicSubcategoriesByParent [ERROR](2): " +  errClose);
 				}
 			}
 		}

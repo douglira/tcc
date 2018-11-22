@@ -7,10 +7,16 @@ $(document).ready(function() {
 });
 
 function loadCategories(params) {
-	$.get('/categories/json', params, function(data) {
-		mountBreadcrumb();
-		mountTableCategories(JSON.parse(data));
-	});
+	axios.get(
+		'/admin/categories/list',
+		{
+			params,
+		}
+	)
+		.then((response) => {
+      mountBreadcrumb();
+      mountTableCategories(response.data);
+		});
 }
 
 function mountTableCategories(categories) {

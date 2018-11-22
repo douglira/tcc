@@ -32,7 +32,7 @@ new Vue({
   },
   mounted() {
     this.picturesDropzone = new Dropzone('div.dropzone', {
-      url: '/products/pictures/upload',
+      url: '/files/product_pictures',
       acceptedFiles: 'image/jpg,image/jpeg',
       maxFiles: 4,
 //			createThumbnails: false,
@@ -175,7 +175,7 @@ new Vue({
       payload.product.pictures= pictures;
 
       $.post(
-        '/account/me/inventory',
+        '/account/products/new',
         {
           ...payload,
           product: JSON.stringify(payload.product),
@@ -200,10 +200,10 @@ new Vue({
 
       try {
         if (categoryId) {
-          const response = await axios.get(`/categories/json?parentId=${categoryId}`);
+          const response = await axios.get(`/categories/list?parentId=${categoryId}`);
           ({ data } = response);
         } else {
-          const response = await axios.get('/categories/json');
+          const response = await axios.get('/categories/list');
           ({ data } = response);
         }
 

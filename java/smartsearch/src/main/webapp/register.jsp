@@ -23,7 +23,7 @@
 		<div class="content">
 			<h1 class="display-4 text-muted">Cadastrar-se</h1>
 			<small>Preencha o fomulário abaixo</small>
-			<form action="auth" method="POST">
+			<form action="/auth/signup" method="POST">
 				<div class="form-group w-100">
 					<label for="email">Email</label>
 					<input class="form-control" type="email" id="email" name="email">

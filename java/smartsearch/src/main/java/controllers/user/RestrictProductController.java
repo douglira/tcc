@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import dao.FileDAO;
 import dao.ProductDAO;
 import dao.ProductItemDAO;
-import database.elasticsearch.ElasticsearchFacade;
 import enums.MessengerType;
 import enums.ProductSituation;
 import enums.Status;
@@ -22,46 +21,40 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-@WebServlet(name = "InventoryController", urlPatterns = {"/account/me/inventory"})
-public class InventoryController extends HttpServlet {
+@WebServlet(name = "RestrictProductController", urlPatterns = {
+        "/account/products",
+
+        "/account/products/new"
+})
+public class RestrictProductController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    public InventoryController() {
+    public RestrictProductController() {
         super();
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        Gson gJson = new Gson();
-        Messenger msg;
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String uri = request.getRequestURI();
+        String action = uri.replace("/account/products/", "");
 
-        try {
-            String list = request.getParameter("list");
-            HttpSession session = request.getSession();
-            Person person = (Person) session.getAttribute("loggedPerson");
-            String jsonElement = null;
-            String baseUrl = Helper.getBaseUrl(request);
-
-            if (list != null && list.equals("products")) {
-                jsonElement = this.getSellerProducts(person, baseUrl);
-            } else if (list != null && list.equals("product-items")) {
-//                jsonElement = this.getSellerProductItems(person);
-            } else {
-                jsonElement = gJson.toJson(new Messenger("Ops, requisição inválida", MessengerType.ERROR));
-            }
-
-            out.print(jsonElement);
-            out.close();
-        } catch (Exception error) {
-            error.printStackTrace();
-            System.out.println("InventoryController.doGet [ERROR]: " + error);
-            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
+        switch (action) {
+            default:
+                this.getSellerProducts(request, response);
         }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String uri = request.getRequestURI();
+        String action = uri.replace("/account/products/", "");
+
+        switch (action) {
+            case "new":
+                createNewProduct(request, response);
+                break;
+        }
+    }
+
+    private void createNewProduct(HttpServletRequest request, HttpServletResponse response) throws IOException  {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         Gson gJson = new Gson();
@@ -118,8 +111,8 @@ public class InventoryController extends HttpServlet {
                 msg = new Messenger("Seu novo produto foi cadastrado com sucesso em nosso sistema.", MessengerType.SUCCESS);
             } else {
                 productItem.setId(Integer.parseInt(productItemId));
-                attachNewProduct(product, productItem, productItemDao);
-                remainingPicturesCount = getRemainingPictures(productItem);
+                attachToProductItem(product, productItem, productItemDao);
+                remainingPicturesCount = fetchRemainingPictures(productItem);
                 validateProductItemPictures = validateRemainingPictures(product, productItem, remainingPicturesCount);
                 productItem.setDefaultThumbnail(Helper.getBaseUrl(request));
 
@@ -140,24 +133,22 @@ public class InventoryController extends HttpServlet {
             fileDao.closeTransaction();
             fileDao.closeConnection();
 
-            new ElasticsearchFacade().indexProductItem(productItem);
+//            new ElasticsearchFacade().indexProductItem(productItem);
 
             out.print(gJson.toJson(msg));
             out.close();
         } catch (Exception error) {
             error.printStackTrace();
-            System.out.println("InventoryController.doPost [ERROR]: " + error);
+            System.out.println("RestrictProductController.doPost [ERROR]: " + error);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
     }
 
     private void attachPictures(Product product, ProductItem productItem, FileDAO fileDao, boolean validateProductItemPictures, int remainingPicturesCount, String baseUrl) {
-        for (File picture : product.getPictures()) {
-            int index = product.getPictures().indexOf(picture);
-            picture = fileDao.create(picture);
+        product.getPictures().forEach(picture -> {
+            fileDao.create(picture);
             fileDao.attachProduct(product.getId(), picture.getId());
-            product.getPictures().set(index, picture);
-        }
+        });
 
         if (validateProductItemPictures) {
             for (File picture : product.getPictures()) {
@@ -174,7 +165,7 @@ public class InventoryController extends HttpServlet {
         productItem.setDefaultThumbnail(baseUrl);
     }
 
-    private Integer getRemainingPictures(ProductItem productItem) {
+    private Integer fetchRemainingPictures(ProductItem productItem) {
         productItem.setPictures(new FileDAO(true).getProductItemPictures(productItem.getId()));
 
         return ProductItem.MAX_PICTURES - productItem.getPictures().size();
@@ -185,7 +176,7 @@ public class InventoryController extends HttpServlet {
         return product.getPictures() != null && remainingPicturesCount > 0;
     }
 
-    private void attachNewProduct(Product product, ProductItem productItem, ProductItemDAO productItemDao) throws SQLException {
+    private void attachToProductItem(Product product, ProductItem productItem, ProductItemDAO productItemDao) throws SQLException {
 
         productItem = new ProductItemDAO(true).findById(productItem);
         productItem.setRelevance(productItem.getRelevance() + 1);
@@ -229,17 +220,67 @@ public class InventoryController extends HttpServlet {
         return isValid;
     }
 
-    private String getSellerProducts(Person person, String baseUrl) {
-        Gson gJson = new Gson();
+    private void getSellerProducts(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
 
-        ArrayList<Product> products = new ProductDAO(true).findBySeller(person.getId());
+        try {
+            String page = request.getParameter("page");
+            String perPage = request.getParameter("perPage");
+            String searchTitle = request.getParameter("search");
 
+            HttpSession session = request.getSession();
+            Person person = (Person) session.getAttribute("loggedPerson");
+            String baseUrl = Helper.getBaseUrl(request);
+            ArrayList<Product> products = null;
+
+            if (searchTitle != null && searchTitle.length() > 2) {
+                products = new ProductDAO(true)
+                        .searchByTitle(searchTitle, person.getId());
+            } else if (validatePagination(page, perPage)) {
+                products = new ProductDAO(true)
+                        .pagination(Integer.parseInt(page, 10), Integer.parseInt(perPage, 10), person.getId());
+            } else {
+                products = new ProductDAO(true)
+                        .pagination(1, 15, person.getId());
+            }
+
+            fetchProductPictures(products, baseUrl);
+
+            out.print(gson.toJson(products));
+            out.close();
+        } catch (Exception err) {
+            err.printStackTrace();
+            System.out.println("RestrictProductController.doPost [ERROR]: " + err);
+            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
+        }
+    }
+
+    private void fetchProductPictures(ArrayList<Product> products, String baseUrl) {
         products.forEach(product -> {
             product.setPictures(new FileDAO(true).getProductPictures(product.getId()));
             product.setDefaultThumbnail(baseUrl);
         });
+    }
 
-        return gJson.toJson(products);
+    private boolean validatePagination(String page, String perPage) {
+        boolean validation = true;
+
+        if (page == null || perPage == null) {
+            validation = false;
+            return validation;
+        }
+
+        try {
+            Integer.parseInt(page);
+            Integer.parseInt(perPage);
+
+        } catch (NumberFormatException err) {
+            validation = false;
+        }
+
+        return validation;
     }
 
 //    private String getSellerProductItems(Person person) {

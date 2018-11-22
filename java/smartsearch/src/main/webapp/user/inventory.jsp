@@ -44,7 +44,7 @@
                 <a
                         class="dropdown-item"
                         role="button"
-                        href="<%=request.getContextPath()%>/account/product/new">
+                        href="<%=request.getContextPath()%>/account/new_product">
                     Novo produto
                 </a>
             </div>

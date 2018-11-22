@@ -48,23 +48,22 @@ function toggleStatus() {
 	}
 	
 	$.post(
-		'/admin/categories/edit', 
+		'/admin/categories/toggle_status',
 		{
-			action: 'ToggleStatus',
 			['category-id']: category.id,
 			['category-status']: category.status,
 		},
 		function(response) {
-			response = JSON.parse(response);
-			
-			if (!response.error && response.error === null) {
+			msg = JSON.parse(response);
+
+			if (msg.topic && msg.topic === 'SUCCESS') {
 				window.location.replace('/admin/categories/new');
 				return;
 			}
 			
 			const divError = $('#divError');
 			
-			divError.text(response.error);
+			divError.text(msg.content);
 			divError.show();
 			
 			setTimeout(() => divError.hide(), 3200);
@@ -78,9 +77,8 @@ function deleteCategory() {
 	}
 	
 	$.post(
-		'/admin/categories/edit', 
+		'/admin/categories/delete',
 		{
-			action: 'Delete',
 			['category-id']: category.id,
 		},
 		function() {

@@ -121,11 +121,11 @@
 			</div>
 			<div class="form-group">
 				<label for="category-description">Descrição</label>
-				<textarea class="form-control" id="category-description" rows="3" value="${category.description}"></textarea>
+				<textarea class="form-control" id="category-description" rows="3" name="category-description">${category.description}</textarea>
 			</div>
 			<input type="hidden" id="category-status" value="${category.status}"/>
 			<hr>
-			<button type="submit" class="btn btn-primary btn-lg btn-block" name="action" value="Edit">Salvar</button>
+			<button type="submit" class="btn btn-primary btn-lg btn-block" name="action">Salvar</button>
 		</form>
 	</div>
 

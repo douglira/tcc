@@ -82,7 +82,7 @@
                         </c:when>
                         <c:otherwise>
                             <a class="dropdown-item"
-                               href="<%=request.getContextPath()%>/auth">Sair</a>
+                               href="<%=request.getContextPath()%>/auth/signout">Sair</a>
                         </c:otherwise>
                     </c:choose>
                 </div>

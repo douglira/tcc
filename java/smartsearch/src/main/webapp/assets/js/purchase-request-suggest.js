@@ -110,7 +110,7 @@ const VueComponent = new Vue({
       };
 
       $.post(
-        '/account/purchase_request/suggest',
+        '/account/quote/new',
         {
           quote: JSON.stringify(quote),
         },

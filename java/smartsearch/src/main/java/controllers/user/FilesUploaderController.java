@@ -17,14 +17,14 @@ import com.google.gson.Gson;
 import libs.Helper;
 import models.File;
 
-@WebServlet(name= "PicturesUploaderController", urlPatterns = "/products/pictures/upload")
+@WebServlet(name= "FilesUploaderController", urlPatterns = "/files/product_pictures")
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5
         * 5)
-public class PicturesUploaderController extends HttpServlet {
+public class FilesUploaderController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final String UPLOAD_DIRECTORY = "pictures";
 
-    public PicturesUploaderController() {
+    public FilesUploaderController() {
         super();
     }
 
@@ -34,6 +34,16 @@ public class PicturesUploaderController extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String uri = request.getRequestURI();
+        String action = uri.replace("/files/", "");
+
+        switch (action) {
+            case "product_pictures":
+                uploadProductPictures(request, response);
+        }
+    }
+
+    private void uploadProductPictures(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         Gson gJson = new Gson();

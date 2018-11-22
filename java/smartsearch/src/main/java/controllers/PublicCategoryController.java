@@ -15,16 +15,15 @@ import com.google.gson.Gson;
 import dao.CategoryDAO;
 import models.Category;
 
-@WebServlet(name = "CategoryControllerJson", urlPatterns = "/categories/json")
-public class CategoryController extends HttpServlet {
+@WebServlet(name = "PublicCategoryController", urlPatterns = {"/categories/list"})
+public class PublicCategoryController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public CategoryController() {
+	public PublicCategoryController() {
 		super();
 	}
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		
@@ -35,13 +34,13 @@ public class CategoryController extends HttpServlet {
 		ArrayList<Category> categories = null;
 		
 		if (parentId != null && parentId.length() != 0) {
-			categories = new CategoryDAO(true).subcategoriesByParent(Integer.parseInt(parentId));
+			categories = new CategoryDAO(true).publicSubcategoriesByParent(Integer.parseInt(parentId));
 			out.print(gJson.toJson(categories));
 			out.close();
 			return;
 		}
 		
-		categories = new CategoryDAO(true).generals();
+		categories = new CategoryDAO(true).publicGenerals();
 		out.print(gJson.toJson(categories));
 		out.close();
 	}
