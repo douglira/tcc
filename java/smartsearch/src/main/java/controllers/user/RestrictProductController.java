@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dao.FileDAO;
 import dao.ProductDAO;
 import dao.ProductItemDAO;
+import database.elasticsearch.ElasticsearchFacade;
 import enums.MessengerType;
 import enums.ProductSituation;
 import enums.Status;
@@ -131,7 +132,7 @@ public class RestrictProductController extends HttpServlet {
             fileDao.closeTransaction();
             fileDao.closeConnection();
 
-//            new ElasticsearchFacade().indexProductItem(productItem);
+            new ElasticsearchFacade().indexProductItem(productItem);
 
             out.print(gJson.toJson(msg));
             out.close();

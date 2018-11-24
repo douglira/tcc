@@ -274,7 +274,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
             if ((new PurchaseRequestDAO(true).findById(new PurchaseRequest(purchaseRequest.getId()))).getPropagationCount() == 0) {
                 response.setStatus(400);
                 out = response.getWriter();
-                Helper.responseMessage(out, new Messenger("Abrangência zerada!", MessengerType.ERROR));
+                Helper.responseMessage(out, new Messenger("Nenhum fornecedor encontrado para este pedido!", MessengerType.ERROR));
                 return;
             }
 
@@ -289,7 +289,8 @@ public class RestrictPurchaseRequestController extends HttpServlet {
             sellers.forEach(seller -> {
                 Person person = new Person();
                 person.setId(seller.getId());
-                person = new PersonDAO(true).findByIdWithUser(person);
+                person = new PersonDAO(true).findById(person);
+                person.setUser(new UserDAO(true).findByPerson(person.getId()));
 
                 sellerUsers.add(person.getUser());
             });
