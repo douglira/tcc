@@ -29,29 +29,57 @@
         </div>
     </div>
 
-    <a  v-for="(pr, prIndex) in purchaseRequests" :key="prIndex + '_' + pr.id" :href="'/account/purchase_request/details?id=' + pr.id" style="text-decoration: none;">
-        <div class="card text-muted mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5>&numero;&nbsp;<i>{{ pr.id }}</i></h5>
-                <small>Criado em: {{ formatDatetime(pr.createdAt) }}</small>
-            </div>
-            <div class="card-body">
-                <h6 class="card-title text-center text-uppercase">{{ getPRStage(pr.stage) }}</h6>
-                <div class="card-text d-flex flex-column flex-md-row justify-content-md-between">
-                    <div class="d-flex flex-column align-items-md-start align-items-center">
-                        <span>Visualizações: <strong>{{ pr.viewsCount}}</strong></span>
-                        <span>Número de cotações: <strong>{{ pr.quotes.length }}</strong></span>
-                        <span>Relevância atingida: <strong>{{ pr.propagationCount }}</strong></span>
+    <template v-for="(pr, prIndex) in purchaseRequests">
+        <div class="card d-flex flex-md-row flex-sm-row flex-lg-row text-muted mb-3">
+
+
+            <div id="carouselProductPictures" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner"
+                     style="width: 250px; display: flex; justify-content: center; padding: 10px; -webkit-box-sizing: border-box;-moz-box-sizing: border-box;box-sizing: border-box;">
+                    <div v-for="(item, itemIndex) in pr.listProducts"
+                         :key="itemIndex + '_' + item.product.id"
+                        :class="{'carousel-item': true, active: itemIndex === 0}"
+                        style="text-align: center;">
+                        <img class="img-carousel" :src="item.product.thumbnail.urlPath" :alt="item.product.thumbnail.name">
                     </div>
-                    <div class="d-flex flex-column align-items-md-end align-items-center">
-                        <span>Total: <strong class="text-success">{{ formatCurrency(pr.totalAmount) }}</strong></span>
-                        <span>Visibilidade: <strong>{{ pr.quotesVisibility ? 'Permitida' : 'Restrita' }}</strong></span>
-                        <span>Expira em: <strong>{{ formatDatetime(pr.dueDate) }}</strong></span>
+                </div>
+                <template v-if="pr.listProducts.length > 1">
+                    <a class="carousel-control-prev" href="#carouselProductPictures" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Anterior</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselProductPictures" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Próximo</span>
+                    </a>
+                </template>
+            </div>
+
+            <div class="w-100">
+                <a :href="'/account/purchase_request/details?id=' + pr.id"
+                   style="text-decoration: none; background-color: inherit !important; border-bottom: none !important;"
+                   class="card-header d-flex justify-content-between align-items-center">
+                    <h5>&numero;&nbsp;<i>{{ pr.id }}</i></h5>
+                    <small>Criado em: {{ formatDatetime(pr.createdAt) }}</small>
+                </a>
+                <div class="card-body">
+                    <h6 class="card-title text-center text-uppercase">{{ getPRStage(pr.stage) }}</h6>
+                    <div class="card-text d-flex flex-column flex-md-row justify-content-md-between">
+                        <div class="d-flex flex-column align-items-md-start align-items-center">
+                            <span>Visualizações: <strong>{{ pr.viewsCount}}</strong></span>
+                            <span>Número de cotações: <strong>{{ pr.quotes.length }}</strong></span>
+                            <span>Relevância atingida: <strong>{{ pr.propagationCount }}</strong></span>
+                        </div>
+                        <div class="d-flex flex-column align-items-md-end align-items-center">
+                            <span>Total: <strong class="text-success">{{ formatCurrency(pr.totalAmount) }}</strong></span>
+                            <span>Visibilidade: <strong>{{ pr.quotesVisibility ? 'Permitida' : 'Restrita' }}</strong></span>
+                            <span>Expira em: <strong>{{ formatDatetime(pr.dueDate) }}</strong></span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </a>
+    </template>
 </div>
 
 <script src="<%=request.getContextPath()%>/assets/libs/fontawesome/js/all.js"></script>

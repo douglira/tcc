@@ -651,9 +651,13 @@ public class RestrictPurchaseRequestController extends HttpServlet {
 
         try {
             ArrayList<PurchaseRequest> purchaseRequests = new PurchaseRequestDAO(true).findByBuyer(person.getId());
-            purchaseRequests.forEach(purchaseRequest -> purchaseRequest.setQuotes(new QuoteDAO(true).findByPurchaseRequest(purchaseRequest.getId())));
             purchaseRequests = purchaseRequests.stream()
                     .filter(purchaseRequest -> !PRStage.CREATION.equals(purchaseRequest.getStage()))
+                    .peek(purchaseRequest -> {
+                        purchaseRequest.setListProducts(new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
+                        fetchPictures(purchaseRequest.getListProducts(), Helper.getBaseUrl(request));
+                        purchaseRequest.setQuotes(new QuoteDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
+                    })
                     .collect(Collectors.toCollection(ArrayList::new));
 
             out.print(gJson.toJson(purchaseRequests));

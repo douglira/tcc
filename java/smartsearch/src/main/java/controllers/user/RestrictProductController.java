@@ -81,8 +81,7 @@ public class RestrictProductController extends HttpServlet {
             productItem.setTitle(product.getTitle().trim());
             productItem.setStatus(Status.ACTIVE);
 
-            Seller seller = new Seller();
-            seller.setId(person.getId());
+            Seller seller = new Seller(person.getId());
 
             if (!validateTitle(seller, product.getTitle().trim())) {
                 msg = new Messenger("Já existe um produto com este título em seu estoque", MessengerType.ERROR);
@@ -90,8 +89,7 @@ public class RestrictProductController extends HttpServlet {
                 return;
             }
 
-            Category category = new Category();
-            category.setId(Integer.parseInt(categoryId));
+            Category category = new Category(Integer.parseInt(categoryId));
 
             product.setCategory(category);
             product.setSeller(seller);
@@ -112,7 +110,7 @@ public class RestrictProductController extends HttpServlet {
             } else {
                 productItem.setId(Integer.parseInt(productItemId));
                 attachToProductItem(product, productItem, productItemDao);
-                remainingPicturesCount = fetchRemainingPictures(productItem);
+                remainingPicturesCount = fetchRemainingPicturesCount(productItem);
                 validateProductItemPictures = validateRemainingPictures(product, productItem, remainingPicturesCount);
                 productItem.setDefaultThumbnail(Helper.getBaseUrl(request));
 
@@ -165,7 +163,7 @@ public class RestrictProductController extends HttpServlet {
         productItem.setDefaultThumbnail(baseUrl);
     }
 
-    private Integer fetchRemainingPictures(ProductItem productItem) {
+    private Integer fetchRemainingPicturesCount(ProductItem productItem) {
         productItem.setPictures(new FileDAO(true).getProductItemPictures(productItem.getId()));
 
         return ProductItem.MAX_PICTURES - productItem.getPictures().size();
@@ -193,7 +191,7 @@ public class RestrictProductController extends HttpServlet {
         productItem.setBasePrice(product.getBasePrice());
         productItem.setMaxPrice(product.getBasePrice());
         productItem.setMinPrice(product.getBasePrice());
-        productItem.setCreatedAt(Calendar.getInstance());
+        productItem.setCreatedAt(product.getCreatedAt());
         productItem.setPictures(new ArrayList<File>());
 
         productItemDao.initTransaction();

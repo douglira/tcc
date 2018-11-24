@@ -44,7 +44,7 @@ new Vue({
     },
     async loadData() {
       try {
-        const response = await axios.get('/products/homepage');
+        const response = await axios.get('/product_items/homepage');
         this.products = response.data;
       } catch (err) {
         if (response.status !== 200) {
