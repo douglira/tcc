@@ -2,6 +2,7 @@ package models;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -48,13 +49,21 @@ public class User {
         this.id = id;
     }
 
-    public Person getPerson () { return person; }
+    public Person getPerson() {
+        return person;
+    }
 
-    public void setPerson(Person person) { this.person = person; }
+    public void setPerson(Person person) {
+        this.person = person;
+    }
 
-    public File getAvatar() { return this.avatar; }
+    public File getAvatar() {
+        return this.avatar;
+    }
 
-    public void setAvatar(File avatar) { this.avatar = avatar; }
+    public void setAvatar(File avatar) {
+        this.avatar = avatar;
+    }
 
     public String getEmail() {
         return email;
@@ -196,15 +205,9 @@ public class User {
         return isValid;
     }
 
-    public void processPassResetToken() {
+    public void processPassResetToken() throws NoSuchAlgorithmException {
         MessageDigest messageDigest = null;
-
-        try {
-            messageDigest = MessageDigest.getInstance("MD5");
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.toString());
-        }
+        messageDigest = MessageDigest.getInstance("MD5");
         String str = Calendar.getInstance().getTimeInMillis() + "_" + this.email;
         messageDigest.update(str.getBytes(), 0, str.length());
         this.passwordResetToken = ((String) new BigInteger(1, messageDigest.digest()).toString(16)).toUpperCase();

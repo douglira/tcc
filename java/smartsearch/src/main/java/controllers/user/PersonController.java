@@ -38,10 +38,7 @@ public class PersonController extends HttpServlet {
 		Gson gJson = new Gson();
 
 		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute("loggedUser");
-
-		Person person = new Person(user);
-		person = new PersonDAO(true).findByUser(person);
+		Person person = (Person) session.getAttribute("loggedPerson");
 
 		Address address = new AddressDAO(true).findByPerson(person.getId());
 

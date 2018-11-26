@@ -67,13 +67,13 @@
                     <div class="card-text d-flex flex-column flex-md-row justify-content-md-between">
                         <div class="d-flex flex-column align-items-md-start align-items-center">
                             <span>Visualizações: <strong>{{ pr.viewsCount}}</strong></span>
-                            <span>Número de cotações: <strong>{{ pr.quotes.length }}</strong></span>
-                            <span>Relevância atingida: <strong>{{ pr.propagationCount }}</strong></span>
+                            <span>Cotações recebidas: <strong>{{ pr.quotes.length }}</strong></span>
+                            <span>Fornecedores encontrados: <strong>{{ pr.propagationCount }}</strong></span>
                         </div>
                         <div class="d-flex flex-column align-items-md-end align-items-center">
                             <span>Total: <strong class="text-success">{{ formatCurrency(pr.totalAmount) }}</strong></span>
                             <span>Visibilidade: <strong>{{ pr.quotesVisibility ? 'Permitida' : 'Restrita' }}</strong></span>
-                            <span>Expira em: <strong>{{ formatDatetime(pr.dueDate) }}</strong></span>
+                            <span>Expira em: <strong>{{ formatDate(pr.dueDate) }}</strong></span>
                         </div>
                     </div>
                 </div>
