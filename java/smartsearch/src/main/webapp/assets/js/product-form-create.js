@@ -32,7 +32,7 @@ new Vue({
   },
   mounted() {
     this.picturesDropzone = new Dropzone('div.dropzone', {
-      url: '/files/product_pictures',
+      url: '/files/s3/upload/product_pictures',
       acceptedFiles: 'image/jpg,image/jpeg',
       maxFiles: 4,
 //			createThumbnails: false,
@@ -128,9 +128,12 @@ new Vue({
       if (this.picturesDropzone.getQueuedFiles() && this.picturesDropzone.getQueuedFiles().length) {
         this.picturesDropzone.processQueue();
 
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
           this.picturesDropzone.on('successmultiple', (files, response) => {
             resolve(JSON.parse(response));
+          });
+          this.picturesDropzone.on('error', (files, errorMessage) => {
+            reject(errorMessage);
           });
         });
       } else {
@@ -140,7 +143,7 @@ new Vue({
     },
     async save() {
       let isValid = true;
-
+      let pictures = [];
       const categoryId = this.product.category.id;
       const productItemId = this.product.productItemId;
       const payload = {
@@ -170,27 +173,39 @@ new Vue({
         return null;
       }
 
-      const pictures = await this.savePictures();
+      try {
+        pictures = await this.savePictures();
+        payload.product.pictures = pictures;
 
-      payload.product.pictures= pictures;
-
-      $.post(
-        '/account/products/new',
-        {
-          ...payload,
-          product: JSON.stringify(payload.product),
-        },
-        (data, status) => {
-          const msg = data && JSON.parse(data);
-          if (status === 'success') {
-            this.showToast(msg.content, msg.type);
-            this.resetData();
-            return;
-          }
-
-          this.showToast(msg.content, msg.type);
+        const { data } = await axios.post(
+            '/account/products/new',
+            Qs.stringify({
+              ...payload,
+              product: JSON.stringify(payload.product)
+            }),
+            {
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              }
+            }
+        );
+        const { content, type } = JSON.parse(data);
+        this.showToast(content, type);
+        this.resetData();
+      } catch (err) {
+        if (pictures.length) {
+          await axios.post(
+              '/files/s3/delete/product_pictures',
+              Qs.stringify({ pictures: JSON.stringify(pictures) }),
+              {
+                headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              }
+          });
         }
-      );
+        const { content, type } = JSON.parse(err.response.data);
+        this.showToast(content, type);
+      }
     },
     clearPredictProducts: _.debounce(function() {
       this.productsPredict = [];
@@ -199,7 +214,7 @@ new Vue({
       let data;
 
       try {
-        if (categoryId) {
+        if (categoryId && (categoryId !== 'default')) {
           const response = await axios.get(`/categories/list?parentId=${categoryId}`);
           ({ data } = response);
         } else {

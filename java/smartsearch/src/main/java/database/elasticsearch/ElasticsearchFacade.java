@@ -69,7 +69,8 @@ public class ElasticsearchFacade {
     }
 
     public List<ProductItem> getProductsItemPredict(String productItemTitle) {
-        if (productItemTitle == null || productItemTitle.length() <= 1) {
+
+        if (productItemTitle == null || productItemTitle.isEmpty()) {
             return null;
         }
         final List<ProductItem> products = new ArrayList<ProductItem>();

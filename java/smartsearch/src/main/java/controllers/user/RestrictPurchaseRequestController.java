@@ -10,9 +10,9 @@ import enums.NotificationResource;
 import enums.NotificationStatus;
 import enums.PRStage;
 import libs.Helper;
-import mail.MailSMTPService;
-import mail.MailerService;
-import mail.PublishedPurchaseRequest;
+import services.mail.MailSMTPService;
+import services.mail.MailerService;
+import services.mail.PublishedPurchaseRequest;
 import models.*;
 import models.socket.Notification;
 

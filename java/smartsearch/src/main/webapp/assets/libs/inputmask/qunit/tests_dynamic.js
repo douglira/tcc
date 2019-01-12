@@ -66,9 +66,9 @@ export default function (qunit, $, Inputmask) {
 		}).mask(testmask);
 
 		testmask.focus();
-		$("#testmask").Type("some.body@mail.com");
+		$("#testmask").Type("some.body@services.mail.com");
 		testmask.blur();
-		assert.equal(testmask.value, "some.body@mail.com", "Result " + testmask.value);
+		assert.equal(testmask.value, "some.body@services.mail.com", "Result " + testmask.value);
 
 
 	});
@@ -82,10 +82,10 @@ export default function (qunit, $, Inputmask) {
 		}).mask(testmask);
 
 		testmask.focus();
-		$("#testmask").Type("some.body@mail.com");
+		$("#testmask").Type("some.body@services.mail.com");
 		testmask.blur();
 		setTimeout(function () {
-			assert.equal(testmask.value, "some.body@mail.com", "Result " + testmask.value);
+			assert.equal(testmask.value, "some.body@services.mail.com", "Result " + testmask.value);
 			done();
 		}, 0);
 	});
@@ -109,10 +109,10 @@ export default function (qunit, $, Inputmask) {
 		Inputmask("email").mask(testmask);
 
 		testmask.focus();
-		$("#testmask").Type("some@mail.com");
+		$("#testmask").Type("some@services.mail.com");
 		$.caret(testmask, 4);
 		$("#testmask").Type(".body");
-		assert.equal(testmask.value, "some.body@mail.com", "Result " + testmask.value);
+		assert.equal(testmask.value, "some.body@services.mail.com", "Result " + testmask.value);
 
 
 	});
@@ -319,30 +319,30 @@ export default function (qunit, $, Inputmask) {
 		}, 0);
 	});
 
-	qunit.test("email mask - some.body@mail.com - delete before @", function (assert) {
+	qunit.test("email mask - some.body@services.mail.com - delete before @", function (assert) {
 		var $fixture = $("#qunit-fixture");
 		$fixture.append('<input type="text" id="testmask" />');
 		var testmask = document.getElementById("testmask");
 		Inputmask("email").mask(testmask);
 
 		testmask.focus();
-		$("#testmask").Type("some.body@mail.com");
+		$("#testmask").Type("some.body@services.mail.com");
 		$.caret(testmask, 9);
 		$("#testmask").SendKey(Inputmask.keyCode.DELETE);
 		assert.equal(testmask.value, "some.body@ail.com", "Result " + testmask.value);
 	});
 
-	qunit.test("email mask -123@mail.com - 123 => info", function (assert) {
+	qunit.test("email mask -123@services.mail.com - 123 => info", function (assert) {
 		var $fixture = $("#qunit-fixture");
 		$fixture.append('<input type="text" id="testmask" />');
 		var testmask = document.getElementById("testmask");
 		Inputmask("email").mask(testmask);
 
 		testmask.focus();
-		$("#testmask").Type("123@mail.com");
+		$("#testmask").Type("123@services.mail.com");
 		$.caret(testmask, 0, 3);
 		$("#testmask").Type("info");
-		assert.equal(testmask.value, "info@mail.com", "Result " + testmask.value);
+		assert.equal(testmask.value, "info@services.mail.com", "Result " + testmask.value);
 	});
 
 	qunit.test("(aa)|(a.a.)|(aaa)|(aa.a.)|(a.aa.) - incomplete - danielpiterak", function (assert) {

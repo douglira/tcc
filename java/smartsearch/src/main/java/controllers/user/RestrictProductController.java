@@ -134,12 +134,16 @@ public class RestrictProductController extends HttpServlet {
 
             new ElasticsearchFacade().indexProductItem(productItem);
 
+
+            response.setStatus(201);
+            out = response.getWriter();
             out.print(gJson.toJson(msg));
             out.close();
         } catch (Exception error) {
             error.printStackTrace();
             System.out.println("RestrictProductController.doPost [ERROR]: " + error);
-            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
+            response.setStatus(403);
+            Helper.responseMessage(response.getWriter(), new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
     }
 

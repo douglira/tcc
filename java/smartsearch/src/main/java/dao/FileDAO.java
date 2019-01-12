@@ -22,12 +22,12 @@ public class FileDAO extends GenericDAO {
     public File create(File file) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        String sql = "INSERT INTO " + TABLE_NAME + " (filename, name, size, "
+        String sql = "INSERT INTO " + TABLE_NAME + " (file_path, name, size, "
                 + "type, subtype, url_path, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try {
             stmt = this.conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            stmt.setString(1, file.getFilename());
+            stmt.setString(1, file.getFilePath());
             stmt.setString(2, file.getName());
             stmt.setDouble(3, file.getSize());
             stmt.setString(4, file.getType());
@@ -58,7 +58,7 @@ public class FileDAO extends GenericDAO {
         while (rs.next()) {
             File file = new File();
             file.setId(rs.getInt("id"));
-            file.setFilename(rs.getString("filename"));
+            file.setFilePath(rs.getString("file_path"));
             file.setName(rs.getString("name"));
             file.setSize(rs.getDouble("size"));
             file.setType(rs.getString("type"));

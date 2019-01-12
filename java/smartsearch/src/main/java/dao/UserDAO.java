@@ -86,7 +86,7 @@ public class UserDAO extends GenericDAO {
 
             file.setId(rs.getInt("avatar_id"));
             file.setName(rs.getString("name"));
-            file.setFilename(rs.getString("filename"));
+            file.setFilePath(rs.getString("filename"));
             file.setSize(rs.getDouble("size"));
             file.setUrlPath(rs.getString("url_path"));
             file.setType(rs.getString("type"));

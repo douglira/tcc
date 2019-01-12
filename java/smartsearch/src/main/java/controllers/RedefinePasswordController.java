@@ -10,9 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import dao.UserDAO;
 import libs.Helper;
-import mail.MailSMTPService;
-import mail.MailerService;
-import mail.ResetPassword;
+import services.mail.MailSMTPService;
+import services.mail.MailerService;
+import services.mail.ResetPassword;
 import models.User;
 
 @WebServlet(name = "RedefinePasswordController", urlPatterns = {
@@ -65,7 +65,7 @@ public class RedefinePasswordController extends HttpServlet {
 		final User user = new UserDAO(true).checkIfExists(new User(request.getParameter("email")));
 
 		if (user == null) {
-			request.setAttribute("error", "E-mail inválido");
+			request.setAttribute("error", "E-services.mail inválido");
 			request.getRequestDispatcher("/form/forgot_pass").forward(request, response);
 			return;
 		}

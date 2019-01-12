@@ -30,7 +30,7 @@
 			</c:if>
 			<form action="<%=request.getContextPath()%>/password/redefine/forgot" method="POST">
 				<p class="text-secondary text-left" style="font-size: 13px">
-					Insira seu email de cadastro no campo abaixo e em alguns minutos enviaremos um e-mail
+					Insira seu email de cadastro no campo abaixo e em alguns minutos enviaremos um e-services.mail
 					para que possa redefinir sua senha.
 				</p>
 				<div class="form-group">

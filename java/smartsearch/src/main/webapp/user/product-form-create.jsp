@@ -184,7 +184,7 @@
                                     <label for="categoryId">Categorias</label>
                                     <select id="categoryId" name="categoryId" class="custom-select"
                                             @change="onChangeCategorySelection">
-                                        <option selected :value="null">Selecione</option>
+                                        <option :value="0">Selecione</option>
                                         <template v-for="(category, categoryIndex) in categories">
                                             <option :value="category.id">{{ category.title }}</option>
                                         </template>
@@ -220,11 +220,12 @@
 <script src="<%=request.getContextPath()%>/assets/libs/fontawesome/js/all.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/jquery-3.3.1.slim.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="<%=request.getContextPath() %>/assets/libs/toast/toastr.min.js"></script>
+<script src="<%=request.getContextPath()%>/assets/libs/toast/toastr.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/axios/axios-dist.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/vuejs/vue-dist.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/lodash/lodash-dist.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/dropzone/dropzone.js"></script>
+<script src="<%=request.getContextPath()%>/assets/libs/qs/index.js"></script>
 <script>Dropzone.autoDiscover = false;</script>
 <script src="<%=request.getContextPath()%>/assets/js/product-form-create.js"></script>
 </body>

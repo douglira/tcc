@@ -527,7 +527,7 @@ supple:
     - comments-dollar
     - envelope-open-text
     - funnel-dollar
-    - mail-bulk
+    - services.mail-bulk
     - poll
     - poll-h
     - search-dollar

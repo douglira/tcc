@@ -6,9 +6,9 @@ import controllers.socket.QuoteNotifierSocket;
 import dao.*;
 import enums.*;
 import libs.Helper;
-import mail.MailSMTPService;
-import mail.MailerService;
-import mail.NewSuggestedQuote;
+import services.mail.MailSMTPService;
+import services.mail.MailerService;
+import services.mail.NewSuggestedQuote;
 import models.*;
 import models.socket.Notification;
 

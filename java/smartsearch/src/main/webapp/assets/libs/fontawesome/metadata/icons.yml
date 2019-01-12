@@ -727,7 +727,7 @@ at:
   label: At
   search:
     terms:
-      - e-mail
+      - e-services.mail
       - email
   styles:
     - solid
@@ -4040,10 +4040,10 @@ envelope:
   label: Envelope
   search:
     terms:
-      - e-mail
+      - e-services.mail
       - email
       - letter
-      - mail
+      - services.mail
       - message
       - notification
       - support
@@ -4058,10 +4058,10 @@ envelope-open:
   label: Envelope Open
   search:
     terms:
-      - e-mail
+      - e-services.mail
       - email
       - letter
-      - mail
+      - services.mail
       - message
       - notification
       - support
@@ -4085,10 +4085,10 @@ envelope-square:
   label: Envelope Square
   search:
     terms:
-      - e-mail
+      - e-services.mail
       - email
       - letter
-      - mail
+      - services.mail
       - message
       - notification
       - support

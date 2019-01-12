@@ -66,21 +66,21 @@ export default function(qunit, $, Inputmask) {
 	});
 
 	qunit.test("Inputmask.isValid email => false", function(assert) {
-		var isValid = Inputmask.isValid("some.body@mail.c", {
+		var isValid = Inputmask.isValid("some.body@services.mail.c", {
 			alias: "email"
 		});
 		assert.equal(isValid, true, "Result " + isValid);
 	});
 
 	qunit.test("Inputmask.isValid email => true", function(assert) {
-		var isValid = Inputmask.isValid("some.body@mail.com", {
+		var isValid = Inputmask.isValid("some.body@services.mail.com", {
 			alias: "email"
 		});
 		assert.equal(isValid, true, "Result " + isValid);
 	});
 
 	qunit.test("Inputmask.isValid email greedy => false", function(assert) {
-		var isValid = Inputmask.isValid("some.body@mail.c", {
+		var isValid = Inputmask.isValid("some.body@services.mail.c", {
 			alias: "email",
 			greedy: true
 		});
@@ -88,7 +88,7 @@ export default function(qunit, $, Inputmask) {
 	});
 
 	qunit.test("Inputmask.isValid email greedy => true", function(assert) {
-		var isValid = Inputmask.isValid("some.body@mail.com", {
+		var isValid = Inputmask.isValid("some.body@services.mail.com", {
 			alias: "email",
 			greedy: true
 		});
@@ -204,8 +204,8 @@ export default function(qunit, $, Inputmask) {
 		assert.equal(isValid, true, "Result " + isValid);
 	});
 
-	qunit.test("a13x3y isValid(\"some_body@mail.com\", {alias:\"email\"}", function(assert) {
-		var isValid = Inputmask.isValid("some_body@mail.com", {
+	qunit.test("a13x3y isValid(\"some_body@services.mail.com\", {alias:\"email\"}", function(assert) {
+		var isValid = Inputmask.isValid("some_body@services.mail.com", {
 			alias: "email"
 		});
 		assert.equal(isValid, true, "Result " + isValid);

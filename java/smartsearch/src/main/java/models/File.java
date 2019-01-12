@@ -4,7 +4,7 @@ import java.util.Calendar;
 
 public class File {
     private Integer id;
-    private String filename;
+    private String filePath;
     private String name;
     private String urlPath;
     private double size;
@@ -20,12 +20,12 @@ public class File {
         this.id = id;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getFilePath() {
+        return filePath;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
     public String getName() {

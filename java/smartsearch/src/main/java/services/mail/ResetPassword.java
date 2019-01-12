@@ -1,4 +1,4 @@
-package mail;
+package services.mail;
 
 public class ResetPassword extends MailerService {
 

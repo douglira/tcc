@@ -125,9 +125,9 @@ qunit.test("inputmask({ regex: \"[a-za-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z
 	}).mask(testmask);
 
 	testmask.focus();
-	$("#testmask").Type("some.body@mail.com");
+	$("#testmask").Type("some.body@services.mail.com");
 
-	assert.equal(testmask.value, "some.body@mail.com", "Result " + testmask.value);
+	assert.equal(testmask.value, "some.body@services.mail.com", "Result " + testmask.value);
 });
 
 qunit.test("inputmask({ regex: \"[a-za-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*)?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\" - complexer regex email", function(assert) {
@@ -139,9 +139,9 @@ qunit.test("inputmask({ regex: \"[a-za-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z
 	}).mask(testmask);
 
 	testmask.focus();
-	$("#testmask").Type("denise.van.de.cruys@mail.com");
+	$("#testmask").Type("denise.van.de.cruys@services.mail.com");
 
-	assert.equal(testmask.value, "denise.van.de.cruys@mail.com", "Result " + testmask.value);
+	assert.equal(testmask.value, "denise.van.de.cruys@services.mail.com", "Result " + testmask.value);
 });
 
 qunit.test("inputmask({ regex: \"(([2-9][0-9])-([0-9]{3}-[0-9]{3}))|((1|30|20|70)-([0-9]{3}-[0-9]{4}))\" - mrpanacs regex 1-123-4562", function(assert) {
