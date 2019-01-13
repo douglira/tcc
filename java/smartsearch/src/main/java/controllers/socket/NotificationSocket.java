@@ -1,5 +1,20 @@
 package controllers.socket;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import javax.websocket.EncodeException;
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.PathParam;
+import javax.websocket.server.ServerEndpoint;
+
 import dao.NotificationDAO;
 import dao.PersonDAO;
 import dao.UserDAO;
@@ -9,16 +24,6 @@ import models.User;
 import models.socket.Notification;
 import models.socket.NotificationDecoder;
 import models.socket.NotificationEncoder;
-
-import javax.websocket.*;
-import javax.websocket.server.PathParam;
-import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @ServerEndpoint(value = "/notify/{username}", encoders = NotificationEncoder.class, decoders = NotificationDecoder.class)
 public class NotificationSocket {

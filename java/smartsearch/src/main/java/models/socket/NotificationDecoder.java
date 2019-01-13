@@ -1,15 +1,14 @@
 package models.socket;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
 import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class NotificationDecoder implements Decoder.Text<ArrayList<Notification>> {
 

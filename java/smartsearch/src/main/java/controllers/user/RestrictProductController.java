@@ -46,10 +46,10 @@ public class RestrictProductController extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String uri = request.getRequestURI();
-        String action = uri.replace("/account/products/", "");
+        String action = uri.replace("/account/products", "");
 
         switch (action) {
-            case "new":
+            case "/new":
                 createNewProduct(request, response);
                 break;
         }

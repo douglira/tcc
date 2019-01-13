@@ -1,23 +1,31 @@
 package database.elasticsearch;
 
-import com.google.gson.Gson;
-import models.ProductItem;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.SuggestBuilders;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestion;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.google.gson.Gson;
+
+import models.ProductItem;
 
 public class ElasticsearchFacade {
 
@@ -54,7 +62,7 @@ public class ElasticsearchFacade {
         indexRequest.source(productItemJson, XContentType.JSON);
 
         try {
-            this.client.index(indexRequest);
+            this.client.index(indexRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -93,7 +101,7 @@ public class ElasticsearchFacade {
                         SuggestBuilders.completionSuggestion("title.completion").prefix(productItemTitle, Fuzziness.ONE).size(20))));
 
         try {
-            SearchResponse searchResponse = this.client.search(searchRequest);
+            SearchResponse searchResponse = this.client.search(searchRequest, RequestOptions.DEFAULT);
             if (searchResponse.getSuggest() != null) {
                 CompletionSuggestion compSuggestion = searchResponse.getSuggest().getSuggestion("products-suggest");
 
@@ -131,7 +139,7 @@ public class ElasticsearchFacade {
             SearchRequest searchRequest = new SearchRequest("product_items")
                     .source(new SearchSourceBuilder().from(from).size(perPage));
 
-            SearchResponse searchResponse = this.client.search(searchRequest);
+            SearchResponse searchResponse = this.client.search(searchRequest, RequestOptions.DEFAULT);
             List<SearchHit> searchHits = Arrays.asList(searchResponse.getHits().getHits());
 
             searchHits.forEach(hit -> {
@@ -157,5 +165,32 @@ public class ElasticsearchFacade {
         }
 
         return products;
+    }
+    
+    public void updateProductItemViewsCount(Integer productItemId, Integer viewsCount) {
+    	try {
+    		Map<String, Object> parameters = new HashMap<String, Object>();
+    		parameters.put("viewsCount", viewsCount);
+    		
+    		this.client.update(new UpdateRequest("product_items", "_doc", String.valueOf(productItemId))
+    				.script(new Script(
+    						ScriptType.INLINE, 
+    						"painless",
+    						"ctx._source.viewsCount = params.viewsCount",
+    						parameters)), RequestOptions.DEFAULT);
+    		
+    	} catch (Exception e) {
+    		e.printStackTrace();
+            System.out.println("Elasticsearch.updateProductItemViewsCount - [ERROR](1): " + e);
+    	} finally {
+    		if (this.client != null) {
+                try {
+                    this.client.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println("Elasticsearch.updateProductItemViewsCount - [ERROR](2): " + e);
+                }
+            }
+    	}
     }
 }

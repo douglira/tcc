@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
+
 import dao.CategoryDAO;
 import enums.MessengerType;
 import enums.Status;
@@ -18,6 +19,7 @@ import libs.Helper;
 import models.Category;
 import models.Messenger;
 
+@SuppressWarnings("serial")
 @WebServlet(name = "RestrictCategoryController", urlPatterns = {
         "/admin/categories",
         "/admin/categories/list",

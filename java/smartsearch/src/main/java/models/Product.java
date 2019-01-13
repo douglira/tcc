@@ -1,8 +1,5 @@
 package models;
 
-import java.util.Calendar;
-
-import com.google.gson.annotations.SerializedName;
 import enums.ProductSituation;
 import enums.Status;
 

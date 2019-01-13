@@ -1,12 +1,10 @@
 package models;
 
-import enums.PRStage;
-
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
+import enums.PRStage;
 
 public class PurchaseRequest {
     private Integer id;

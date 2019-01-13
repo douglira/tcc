@@ -1,27 +1,5 @@
 package controllers.user;
 
-import com.google.gson.Gson;
-import controllers.socket.NotificationSocket;
-import controllers.socket.PRCreationSocket;
-import dao.*;
-import database.elasticsearch.ElasticsearchFacade;
-import enums.MessengerType;
-import enums.NotificationResource;
-import enums.NotificationStatus;
-import enums.PRStage;
-import libs.Helper;
-import services.mail.MailSMTPService;
-import services.mail.MailerService;
-import services.mail.PublishedPurchaseRequest;
-import models.*;
-import models.socket.Notification;
-
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -33,6 +11,51 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
+
+import controllers.socket.NotificationSocket;
+import controllers.socket.PRCreationSocket;
+import dao.AddressDAO;
+import dao.FileDAO;
+import dao.NotificationDAO;
+import dao.PersonDAO;
+import dao.ProductItemDAO;
+import dao.PurchaseItemDAO;
+import dao.PurchaseRequestDAO;
+import dao.QuotationItemDAO;
+import dao.QuoteDAO;
+import dao.SellerDAO;
+import dao.ShipmentDAO;
+import dao.UserDAO;
+import database.elasticsearch.ElasticsearchFacade;
+import enums.MessengerType;
+import enums.NotificationResource;
+import enums.NotificationStatus;
+import enums.PRStage;
+import libs.Helper;
+import models.Address;
+import models.Buyer;
+import models.Item;
+import models.Messenger;
+import models.Person;
+import models.ProductItem;
+import models.PurchaseRequest;
+import models.Quote;
+import models.Seller;
+import models.User;
+import models.socket.Notification;
+import services.mail.MailSMTPService;
+import services.mail.MailerService;
+import services.mail.PublishedPurchaseRequest;
+
+@SuppressWarnings("serial")
 @WebServlet(name = "RestrictPurchaseRequestController", urlPatterns = {
         "/account/purchase_request",
         "/account/purchase_request/list",
@@ -160,7 +183,6 @@ public class RestrictPurchaseRequestController extends HttpServlet {
     private void removeItem(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        Gson gJson = new Gson();
 
         try {
             int purchaseRequestId = Integer.parseInt(request.getParameter("purchaseRequestId"));
@@ -224,7 +246,6 @@ public class RestrictPurchaseRequestController extends HttpServlet {
     private void abortCreation(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        Gson gJson = new Gson();
 
         try {
 
@@ -371,10 +392,8 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         productItem = new ProductItemDAO(true).findById(productItem);
         productItem.setViewsCount(productItem.getViewsCount() + 1);
         new ProductItemDAO(true).updateViewsCount(productItem);
-        productItem.setPictures(new FileDAO(true).getProductItemPictures(productItem.getId()));
-        productItem.setDefaultThumbnail(baseUrl);
 
-        new ElasticsearchFacade().indexProductItem(productItem);
+        new ElasticsearchFacade().updateProductItemViewsCount(productItemId, productItem.getViewsCount());
     }
 
     private void addProductItem(PrintWriter out, String baseUrl, User user, Item item) throws SQLException {
@@ -584,9 +603,6 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         Gson gson = new Gson();
 
         try {
-            HttpSession session = request.getSession();
-            Person person = (Person) session.getAttribute("loggedPerson");
-
             PurchaseRequest purchaseRequest = new PurchaseRequestDAO(true).findById(new PurchaseRequest(Integer.parseInt(request.getParameter("id"))));
             purchaseRequest.setQuotes(new QuoteDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
             purchaseRequest.setListProducts(new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
@@ -735,7 +751,6 @@ public class RestrictPurchaseRequestController extends HttpServlet {
     }
 
     private void renderSuggestPage(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        Person person = (Person) request.getSession().getAttribute("loggedPerson");
         String purchaseRequestIdString = request.getParameter("pr");
 
         if (!isValidRequest(purchaseRequestIdString)) {

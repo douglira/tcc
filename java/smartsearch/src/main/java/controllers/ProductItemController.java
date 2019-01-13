@@ -1,22 +1,25 @@
 package controllers;
 
-import com.google.gson.Gson;
-import database.elasticsearch.ElasticsearchFacade;
-import enums.MessengerType;
-import libs.Helper;
-import models.Messenger;
-import models.ProductItem;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
 
+import com.google.gson.Gson;
+
+import database.elasticsearch.ElasticsearchFacade;
+import enums.MessengerType;
+import libs.Helper;
+import models.Messenger;
+import models.ProductItem;
+
+@SuppressWarnings("serial")
 @WebServlet(name = "ProductItemController", urlPatterns = {
         "/product_items/homepage",
         "/product_items/predict",
@@ -44,7 +47,6 @@ public class ProductItemController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         Gson gJson = new Gson();
-        Messenger msg;
 
         try {
             String page = request.getParameter("page");

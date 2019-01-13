@@ -1,14 +1,16 @@
 package dao;
 
-import enums.Status;
-import models.Person;
-import models.User;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-import java.sql.*;
+import models.Person;
 
 public class PersonDAO extends GenericDAO {
     private static final String TABLE_NAME = "people";
-    private static final String TABLE_RELATION_USER = "users";
+//    private static final String TABLE_RELATION_USER = "users";
 
     public PersonDAO(boolean getConnection) {
         super(getConnection);

@@ -1,12 +1,10 @@
 package database;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
-import java.beans.PropertyVetoException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 
 public class ConnectionFactory {

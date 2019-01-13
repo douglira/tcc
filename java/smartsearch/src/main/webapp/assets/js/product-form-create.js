@@ -46,6 +46,7 @@ new Vue({
       dictDefaultMessage: 'Arraste para cá ou clique para carregar',
       dictFallbackMessage: 'Arquivo não suportado',
       dictFallbackMessage: null,
+      dictCancelUpload: 'Cancelar upload',
       dictInvalidFileType: 'Tipo do arquivo inválido',
       dictFileTooBig: 'Arquivo muito grande',
       dictResponseError: 'Algo deu errado, tente novamente',
@@ -189,7 +190,7 @@ new Vue({
               }
             }
         );
-        const { content, type } = JSON.parse(data);
+        const { content, type } = data;
         this.showToast(content, type);
         this.resetData();
       } catch (err) {
@@ -203,8 +204,11 @@ new Vue({
               }
           });
         }
-        const { content, type } = JSON.parse(err.response.data);
-        this.showToast(content, type);
+        if (err.response.data && err.response.data.type === 'ERROR') {
+            const { content, type } = err.response.data;
+            return this.showToast(content, type);
+        }
+        this.showToast('Erro inesperado, tente novamente', 'ERROR');
       }
     },
     clearPredictProducts: _.debounce(function() {

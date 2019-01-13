@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import database.ConnectionFactory;
 import enums.Status;
 import models.Category;
 

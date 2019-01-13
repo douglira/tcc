@@ -111,7 +111,6 @@ public class FilesController extends HttpServlet {
         PrintWriter out = response.getWriter();
         Gson gJson = new Gson();
         try {
-            User user = (User) request.getSession().getAttribute("loggedUser");
             ArrayList<File> pictures = gJson.fromJson(request.getParameter("pictures"), new TypeToken<ArrayList<File>>(){}.getType());
 
             for (File picture : pictures) {

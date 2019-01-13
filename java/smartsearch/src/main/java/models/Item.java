@@ -2,7 +2,7 @@ package models;
 
 import java.util.Objects;
 
-public class Item implements Comparable{
+public class Item implements Comparable<Item>{
 	private ProductRepresentation product;
 	private String additionalSpec;
 	private int quantity;
@@ -60,7 +60,7 @@ public class Item implements Comparable{
 	}
 
 	@Override
-	public int compareTo(Object o) {
+	public int compareTo(Item o) {
 		Item pl = (Item) o;
 		return pl.getProduct().getId().compareTo(pl.getProduct().getId());
 	}

@@ -1,23 +1,5 @@
 package controllers.user;
 
-import com.google.gson.Gson;
-import controllers.socket.NotificationSocket;
-import controllers.socket.QuoteNotifierSocket;
-import dao.*;
-import enums.*;
-import libs.Helper;
-import services.mail.MailSMTPService;
-import services.mail.MailerService;
-import services.mail.NewSuggestedQuote;
-import models.*;
-import models.socket.Notification;
-
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
@@ -25,6 +7,52 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.stream.Collectors;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.google.gson.Gson;
+
+import controllers.socket.NotificationSocket;
+import controllers.socket.QuoteNotifierSocket;
+import dao.AddressDAO;
+import dao.NotificationDAO;
+import dao.ProductDAO;
+import dao.PurchaseItemDAO;
+import dao.PurchaseRequestDAO;
+import dao.QuotationItemDAO;
+import dao.QuoteDAO;
+import dao.SellerDAO;
+import dao.ShipmentDAO;
+import dao.UserDAO;
+import enums.MessengerType;
+import enums.NotificationResource;
+import enums.NotificationStatus;
+import enums.PRStage;
+import enums.QuoteStatus;
+import enums.ShipmentMethod;
+import enums.ShipmentStatus;
+import libs.Helper;
+import models.Address;
+import models.Buyer;
+import models.Item;
+import models.Messenger;
+import models.Person;
+import models.Product;
+import models.PurchaseRequest;
+import models.Quote;
+import models.Seller;
+import models.Shipment;
+import models.User;
+import models.socket.Notification;
+import services.mail.MailSMTPService;
+import services.mail.MailerService;
+import services.mail.NewSuggestedQuote;
+
+@SuppressWarnings("serial")
 @WebServlet(name = "RestrictQuoteController", urlPatterns = {
         "/account/quote/new"
 })
