@@ -1,4 +1,4 @@
-package database.elasticsearch;
+package services;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -14,6 +15,8 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.Fuzziness;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptType;
@@ -25,14 +28,15 @@ import org.elasticsearch.search.suggest.completion.CompletionSuggestion;
 
 import com.google.gson.Gson;
 
+import database.elasticsearch.ElasticsearchClient;
 import models.ProductItem;
 
-public class ElasticsearchFacade {
+public class ElasticsearchService {
 
     private RestHighLevelClient client;
     private final Gson gJson = new Gson();
 
-    public ElasticsearchFacade() {
+    public ElasticsearchService() {
         this.client = ElasticsearchClient.getTransport();
     }
 
@@ -96,11 +100,12 @@ public class ElasticsearchFacade {
 //				}
 //			});
 
-        SearchRequest searchRequest = new SearchRequest("product_items")
-                .source(new SearchSourceBuilder().suggest(new SuggestBuilder().addSuggestion("products-suggest",
-                        SuggestBuilders.completionSuggestion("title.completion").prefix(productItemTitle, Fuzziness.ONE).size(20))));
 
         try {
+            SearchRequest searchRequest = new SearchRequest("product_items")
+                    .source(new SearchSourceBuilder().suggest(new SuggestBuilder().addSuggestion("products-suggest",
+                            SuggestBuilders.completionSuggestion("title.completion").prefix(productItemTitle, Fuzziness.ONE).size(20))));
+            
             SearchResponse searchResponse = this.client.search(searchRequest, RequestOptions.DEFAULT);
             if (searchResponse.getSuggest() != null) {
                 CompletionSuggestion compSuggestion = searchResponse.getSuggest().getSuggestion("products-suggest");
@@ -189,6 +194,54 @@ public class ElasticsearchFacade {
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.out.println("Elasticsearch.updateProductItemViewsCount - [ERROR](2): " + e);
+                }
+            }
+    	}
+    }
+    
+    public void updateProductItemPrices(ProductItem productItem) {
+    	try {
+    		XContentBuilder builder = XContentFactory.jsonBuilder();
+    		
+    		builder.startObject();
+    		builder.field("basePrice", productItem.getBasePrice());
+    		builder.field("maxPrice", productItem.getMaxPrice());
+    		builder.field("minPrice", productItem.getMinPrice());
+    		builder.endObject();
+    		
+    		this.client.update(
+    				new UpdateRequest("product_items", "_doc", String.valueOf(productItem.getId()))
+    				.doc(builder), RequestOptions.DEFAULT);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+            System.out.println("Elasticsearch.updateProductItemPrices - [ERROR](1): " + e);
+    	} finally {
+    		if (this.client != null) {
+                try {
+                    this.client.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println("Elasticsearch.updateProductItemPrices - [ERROR](2): " + e);
+                }
+            }
+    	}
+    }
+    
+    public void deleteProductItem(Integer productItemId) {
+    	try {
+    		DeleteRequest deleteRequest = new DeleteRequest("product_items", "_doc", String.valueOf(productItemId));
+    		
+    		this.client.delete(deleteRequest, RequestOptions.DEFAULT);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+            System.out.println("Elasticsearch.deleteProductItem - [ERROR](1): " + e);
+    	} finally {
+    		if (this.client != null) {
+                try {
+                    this.client.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println("Elasticsearch.deleteProductItem - [ERROR](2): " + e);
                 }
             }
     	}

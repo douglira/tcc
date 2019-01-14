@@ -223,6 +223,35 @@ public class ProductDAO extends GenericDAO {
 
         return product;
     }
+    
+    public void update(Product product) {
+    	PreparedStatement stmt = null;
+    	String sql = "UPDATE " + TABLE_NAME + " SET description = ?, available_quantity = ?, "
+    			+ "category_id = ?, base_price = ?";
+    	
+    	try {
+    		stmt = this.conn.prepareStatement(sql);
+    		stmt.setString(1, product.getDescription());
+    		stmt.setInt(2, product.getAvailableQuantity());
+    		stmt.setInt(3, product.getCategory().getId());
+    		stmt.setDouble(4, product.getBasePrice());
+    		stmt.executeUpdate();
+    		
+    		this.conn.commit();
+    	} catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("ProductDAO.update [ERROR](1): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException sqlException) {
+                    sqlException.printStackTrace();
+                    System.out.println("ProductDAO.update [ERROR](2): " + sqlException);
+                }
+            }
+        }
+    }
 
     public ArrayList<Product> pagination(int page, int perPage, int sellerId) {
         int offset = (page - 1) * perPage;

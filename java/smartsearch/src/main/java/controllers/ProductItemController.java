@@ -13,11 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 
-import database.elasticsearch.ElasticsearchFacade;
 import enums.MessengerType;
 import libs.Helper;
 import models.Messenger;
 import models.ProductItem;
+import services.ElasticsearchService;
 
 @SuppressWarnings("serial")
 @WebServlet(name = "ProductItemController", urlPatterns = {
@@ -60,8 +60,8 @@ public class ProductItemController extends HttpServlet {
                 perPage = "15";
             }
 
-            ElasticsearchFacade elasticsearchFacade = new ElasticsearchFacade();
-            ArrayList<ProductItem> productItems = elasticsearchFacade
+            ElasticsearchService elasticsearchService = new ElasticsearchService();
+            ArrayList<ProductItem> productItems = elasticsearchService
                     .getProductsItemHomepage(Integer.parseInt(page), Integer.parseInt(perPage));
 
             out.print(gJson.toJson(productItems));
@@ -81,7 +81,7 @@ public class ProductItemController extends HttpServlet {
 
         String productItemTitle = request.getParameter("productPredictTitle");
 
-        List<ProductItem> products = new ElasticsearchFacade().getProductsItemPredict(productItemTitle);
+        List<ProductItem> products = new ElasticsearchService().getProductsItemPredict(productItemTitle);
 
         out.print(gJson.toJson(products));
         out.close();

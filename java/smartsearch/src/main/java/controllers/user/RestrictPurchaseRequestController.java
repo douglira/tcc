@@ -34,7 +34,6 @@ import dao.QuoteDAO;
 import dao.SellerDAO;
 import dao.ShipmentDAO;
 import dao.UserDAO;
-import database.elasticsearch.ElasticsearchFacade;
 import enums.MessengerType;
 import enums.NotificationResource;
 import enums.NotificationStatus;
@@ -51,6 +50,7 @@ import models.Quote;
 import models.Seller;
 import models.User;
 import models.socket.Notification;
+import services.ElasticsearchService;
 import services.mail.MailSMTPService;
 import services.mail.MailerService;
 import services.mail.PublishedPurchaseRequest;
@@ -393,7 +393,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         productItem.setViewsCount(productItem.getViewsCount() + 1);
         new ProductItemDAO(true).updateViewsCount(productItem);
 
-        new ElasticsearchFacade().updateProductItemViewsCount(productItemId, productItem.getViewsCount());
+        new ElasticsearchService().updateProductItemViewsCount(productItemId, productItem.getViewsCount());
     }
 
     private void addProductItem(PrintWriter out, String baseUrl, User user, Item item) throws SQLException {
