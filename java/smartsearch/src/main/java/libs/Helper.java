@@ -20,4 +20,10 @@ public class Helper {
         out.print(gJson.toJson(msg));
         out.close();
     }
+    
+    public static void responseMessage(PrintWriter out, Object obj) {
+        Gson gJson = new Gson();
+        out.print(gJson.toJson(obj));
+        out.close();
+    }
 }

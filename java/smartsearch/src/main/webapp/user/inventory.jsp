@@ -71,6 +71,7 @@
                         </div>
                     </div>
                     <a role="button" aria-pressed="true"
+                   	   :href="'/account/products/details?id=' + product.id"
                        class="btn btn btn-outline-info btn-block btn-sm btn-product-details">
                         Ver detalhes
                     </a>

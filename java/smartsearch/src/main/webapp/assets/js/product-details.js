@@ -2,36 +2,26 @@ let FormatterMixin = {
   methods: {
     formatCurrency: Formatter.currency,
     formatDecimal: Formatter.decimal,
+    formatDate: Formatter.date,
   }
 };
 
 new Vue({
-  el: '#productNew',
+  el: '#productDetails',
+  name: 'ProductDetails',
   mixins: [FormatterMixin],
   data() {
     return {
-      productItemPreview: null,
-      product: {
-        title: '',
-        basePrice: null,
-        availableQuantity: null,
-        description: '',
-        productItemId: null,
-        picturesPath: [],
-        category: {
-          id: null,
-        },
-      },
-      productsPredict: [],
-      categories: [],
-      breadcrumbCategories: [{ id: 0, title: 'Geral' }],
+      product: {},
+      picturesDropzone: null,
     };
   },
   created() {
     this.loadData();
   },
-  mounted() {
-    this.picturesDropzone = new Dropzone('div.dropzone', {
+  updated() {
+    if (!document.getElementById('productDropzone')) return;
+    this.picturesDropzone = new Dropzone('#productDropzone', {
       url: '/files/s3/upload/product_pictures',
       acceptedFiles: 'image/jpg,image/jpeg,image/png',
       maxFiles: 4,
@@ -59,71 +49,6 @@ new Vue({
     });
   },
   methods: {
-    async onChangeCategorySelection(event) {
-      const categoryId = Number(event.target.value);
-      const category = this.categories.find(cat => cat.id === categoryId);
-
-      if (category && category.isLastChild) {
-        this.product.category = { ...category };
-        return;
-      }
-
-      this.categories = await this.getCategories(categoryId);
-
-      const index = this.breadcrumbCategories.findIndex(cat => cat.id === categoryId);
-
-      if (index === -1) {
-        this.breadcrumbCategories = [...this.breadcrumbCategories, category];
-      }
-
-      if (index === 0 ) {
-        this.breadcrumbCategories = [this.breadcrumbCategories[index]];
-        this.product.category = { id: null };
-      }
-    },
-    async onClickBreadcrumbCategory(categoryId) {
-      categoryId = Number(categoryId);
-      this.categories = await this.getCategories(categoryId);
-
-      const lastIndex = this.breadcrumbCategories.length - 1;
-      const index = this.breadcrumbCategories.findIndex(cat => cat.id === categoryId);
-
-      if (index !== lastIndex) {
-        this.breadcrumbCategories.splice((index + 1), lastIndex);
-        this.product.category = null;
-      }
-    },
-    onClickPredictProduct(predictProduct) {
-      this.product.title = predictProduct.title;
-      this.product.productItemId = predictProduct.id;
-
-      this.productItemPreview = predictProduct;
-
-      this.productsPredict = [];
-    },
-    onKeyupProductTitle(event) {
-      this.productItemPreview = null;
-      const productTitle = event.target.value;
-
-      this.product.title = productTitle;
-      this.product.productItemId = null;
-      if (!productTitle || productTitle.length <= 1) {
-        this.productsPredict = [];
-        return;
-      }
-      this.getPredictProducts(productTitle);
-    },
-    onClickRemoveProductItem() {
-      this.product.title = '';
-      this.product.productItemId = null;
-
-      this.productItemPreview = null;
-    },
-    getPredictProducts: _.debounce(async function(productTitle) {
-      // predict at elasticsearch
-      const { data } = await axios.get(`/product_items/predict?productPredictTitle=${productTitle}`);
-      this.productsPredict = data;
-    }, 450),
     async savePictures() {
 
       if (this.picturesDropzone.getQueuedFiles() && this.picturesDropzone.getQueuedFiles().length) {
@@ -148,7 +73,6 @@ new Vue({
       const categoryId = this.product.category.id;
       const productItemId = this.product.productItemId;
       const payload = {
-        categoryId,
         productItemId,
         product: {
           title: this.product.title,
@@ -211,30 +135,23 @@ new Vue({
         this.showToast('Erro inesperado, tente novamente', 'ERROR');
       }
     },
-    clearPredictProducts: _.debounce(function() {
-      this.productsPredict = [];
-    }, 300),
-    async getCategories(categoryId) {
-      let data;
-
-      try {
-        if (categoryId && (categoryId !== 'default')) {
-          const response = await axios.get(`/categories/list?parentId=${categoryId}`);
-          ({ data } = response);
-        } else {
-          const response = await axios.get('/categories/list');
-          ({ data } = response);
-        }
-
+    async getProduct() {
+        const id = new URLSearchParams(document.location.search.substring(1)).get("id");
+        
+        const { data } = await axios.get(`/account/products/details?id=${id}`);
         return data;
-      } catch(err) {
-        console.log(err);
-        this.showToast('Não foi possível carregar as categorias do sistema. Tente mais tarde', 'error');
-      }
-
     },
     async loadData() {
-      this.categories = await this.getCategories();
+        try {
+            const product = await this.getProduct();
+            this.product = product;
+        } catch(err) {
+            if (err.response.data && err.response.data.type) {
+                const { content, type } = err.response.data;
+                return this.showToast(content, type);
+            }
+            this.showToast('Erro inesperado, tente novamente', 'ERROR');
+        }
     },
     showToast(msg, topic = 'success') {
       topic = topic.toLowerCase();
@@ -248,15 +165,8 @@ new Vue({
         availableQuantity: null,
         description: null,
         productItemId: null,
-        category: {
-          id: null,
-        },
       };
-      this.productItemPreview = null;
-      this.productsPredict = [];
-      this.categories = await this.getCategories();
       this.breadcrumbCategories = [{ id: 0, title: 'Geral' }];
-      this.getCategories();
       this.picturesDropzone.removeAllFiles(true);
     }
   },

@@ -1,15 +1,11 @@
 package controllers.user;
 
-import com.google.gson.Gson;
-import dao.FileDAO;
-import dao.ProductDAO;
-import dao.ProductItemDAO;
-import enums.MessengerType;
-import enums.ProductSituation;
-import enums.Status;
-import libs.Helper;
-import models.*;
-import services.ElasticsearchService;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.stream.Collectors;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,16 +15,27 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.stream.Collectors;
+import com.google.gson.Gson;
+
+import dao.FileDAO;
+import dao.ProductDAO;
+import dao.ProductItemDAO;
+import enums.MessengerType;
+import enums.ProductSituation;
+import enums.Status;
+import libs.Helper;
+import models.Category;
+import models.File;
+import models.Messenger;
+import models.Person;
+import models.Product;
+import models.ProductItem;
+import models.Seller;
+import services.ElasticsearchService;
 
 @WebServlet(name = "RestrictProductController", urlPatterns = {
         "/account/products",
+        "/account/products/details",
 
         "/account/products/new",
         "/account/products/edit",
@@ -43,9 +50,13 @@ public class RestrictProductController extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String uri = request.getRequestURI();
-        String action = uri.replace("/account/products/", "");
+        String action = uri.replace("/account/products", "");
 
         switch (action) {
+        	case "/details": {
+        		getDetails(request, response);
+        		break;
+        	}
             default:
                 this.getSellerProducts(request, response);
         }
@@ -83,9 +94,15 @@ public class RestrictProductController extends HttpServlet {
             String productJson = request.getParameter("product");
 
             if (invalidParameters(categoryId, productJson)) {
-                msg = new Messenger("Operação inválida.", MessengerType.ERROR);
-                out.print(gJson.toJson(msg));
+            	response.setStatus(403);
+            	Helper.responseMessage(response.getWriter(), new Messenger("Operação inválida", MessengerType.ERROR));
                 return;
+            }
+            
+            if (StringUtils.isBlank(categoryId)) {
+            	response.setStatus(403);
+            	Helper.responseMessage(response.getWriter(), new Messenger("Selecione uma categoria", MessengerType.ERROR));
+            	return;
             }
 
             Product product = gJson.fromJson(productJson, Product.class);
@@ -115,7 +132,7 @@ public class RestrictProductController extends HttpServlet {
             boolean validateProductItemPictures = true;
             Integer remainingPicturesCount = ProductItem.MAX_PICTURES;
 
-            if (productItemId == null || productItemId.length() == 0) {
+            if (StringUtils.isBlank(productItemId)) {
                 productItem = createNewProductItem(productItem, product, productItemDao);
                 productItem.setDefaultThumbnail(Helper.getBaseUrl(request));
 
@@ -181,10 +198,6 @@ public class RestrictProductController extends HttpServlet {
         	
         	if (StringUtils.isNotBlank(request.getParameter("availableQuantity"))) {
         		product.setAvailableQuantity(Integer.parseInt(request.getParameter("availableQuantity")));
-        	}
-        	
-        	if (StringUtils.isNotBlank(request.getParameter("categoryId"))) {
-        		product.setCategory(new Category(Integer.parseInt(request.getParameter("categoryId"))));
         	}
         	
         	if (StringUtils.isNotBlank(request.getParameter("basePrice"))) {
@@ -279,14 +292,14 @@ public class RestrictProductController extends HttpServlet {
     }
 
     private boolean invalidParameters(String categoryId, String productJson) {
-        return categoryId == null || categoryId.length() == 0 || productJson == null || productJson.length() == 0;
+        return StringUtils.isBlank(categoryId) || StringUtils.isBlank(productJson);
     }
 
     private boolean validateTitle(Seller seller, String title) {
         boolean isValid = true;
 
         ArrayList<Product> products = new ProductDAO(true).findBySeller(seller.getId());
-        if (!products.isEmpty()) {
+        if (!products.isEmpty() && StringUtils.isNotBlank(title)) {
             for (Product product : products) {
                 if (product.getTitle().toLowerCase().trim().equals(title.toLowerCase().trim())) {
                     isValid = false;
@@ -345,7 +358,7 @@ public class RestrictProductController extends HttpServlet {
     private boolean validatePagination(String page, String perPage) {
         boolean validation = true;
 
-        if (page == null || perPage == null) {
+        if (StringUtils.isBlank(page) || StringUtils.isBlank(perPage)) {
             validation = false;
             return validation;
         }
@@ -361,6 +374,71 @@ public class RestrictProductController extends HttpServlet {
         return validation;
     }
 
+    private void getDetails(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    	if (request.getHeader("Accept").contains("application/json")) {
+    		jsonGetDetails(request, response);
+        } else {
+            renderGetDetails(request, response);
+        }   	
+    }
+
+	private void jsonGetDetails(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		response.setContentType("text/html;charset=UTF-8");
+		
+		try {
+			String productId = request.getParameter("id");
+    		
+	    	if (StringUtils.isBlank(productId)) {
+	    		response.setStatus(403);
+	            Helper.responseMessage(response.getWriter(), new Messenger("Operação inválida", MessengerType.ERROR, "INVALID_PARAMETER"));
+	            return;
+	        }
+    	
+    		Product product = new ProductDAO(true).findById(new Product(Integer.parseInt(productId)));
+
+    		if (product == null) {
+    			response.setStatus(403);
+	            Helper.responseMessage(response.getWriter(), new Messenger("Operação inválida", MessengerType.ERROR, "INVALID_PARAMETER"));
+	            return;
+    		}
+    		
+    		product.setProductItem(new ProductItemDAO(true).findById(new ProductItem(product.getProductItem().getId())));
+    		product.getProductItem().setPictures(new FileDAO(true).getProductItemPictures(product.getProductItem().getId()));
+    		product.getProductItem().setDefaultThumbnail(Helper.getBaseUrl(request));
+    		
+    		product.setPictures(new FileDAO(true).getProductPictures(product.getId()));
+    		product.setDefaultThumbnail(Helper.getBaseUrl(request));
+    		
+    		Helper.responseMessage(response.getWriter(), product);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		response.setStatus(403);
+            Helper.responseMessage(response.getWriter(), new Messenger("Erro inesperado, tente novamente", MessengerType.ERROR));
+    	}
+	}
+
+	private void renderGetDetails(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		try {
+			String productId = request.getParameter("id");
+			if (StringUtils.isBlank(productId)) {
+				response.sendRedirect("/account/inventory");
+	            return;
+	        }
+    	
+    		Product product = new ProductDAO(true).findById(new Product(Integer.parseInt(productId)));
+
+    		if (product == null) {
+    			response.sendRedirect("/account/inventory");
+	            return;
+    		}
+    		
+    		request.getRequestDispatcher(request.getContextPath() + "/user/product-details.jsp").forward(request, response);
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.sendRedirect("/account/inventory");
+		}
+	}
+    
 //    private String getSellerProductItems(Person person) {
 //        Gson gJson = new Gson();
 //

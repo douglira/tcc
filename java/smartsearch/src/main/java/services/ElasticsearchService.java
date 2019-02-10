@@ -227,6 +227,32 @@ public class ElasticsearchService {
     	}
     }
     
+    public void inactiveProductItem(Integer productItemId) {
+    	try {
+    		Map<String, Object> parameters = new HashMap<String, Object>();
+    		parameters.put("status", "INACTIVE");
+    		
+    		this.client.update(new UpdateRequest("product_items", "_doc", String.valueOf(productItemId))
+    				.script(new Script(
+    						ScriptType.INLINE, 
+    						"painless",
+    						"ctx._source.status = params.status",
+    						parameters)), RequestOptions.DEFAULT);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+            System.out.println("Elasticsearch.inactiveProductItem - [ERROR](1): " + e);
+    	} finally {
+    		if (this.client != null) {
+                try {
+                    this.client.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println("Elasticsearch.inactiveProductItem - [ERROR](2): " + e);
+                }
+            }
+    	}
+    }
+    
     public void deleteProductItem(Integer productItemId) {
     	try {
     		DeleteRequest deleteRequest = new DeleteRequest("product_items", "_doc", String.valueOf(productItemId));

@@ -107,7 +107,8 @@ public class ProductItemDAO extends GenericDAO {
 
     public void updatePricesAndRelevance(ProductItem productItem) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET base_price = ?, max_price = ?, min_price = ?, relevance = ?, updated_at = ? "
+        String sql = "UPDATE " + TABLE_NAME + " SET base_price = ?, max_price = ?, min_price = ?, "
+        		+ "relevance = ?, updated_at = ?, status = CAST('ACTIVE' as status_entity) "
                 + "WHERE id = ?";
 
         try {

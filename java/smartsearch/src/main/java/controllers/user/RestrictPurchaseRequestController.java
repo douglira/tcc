@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.google.gson.Gson;
 
 import controllers.socket.NotificationSocket;
@@ -753,7 +755,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
     private void renderSuggestPage(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String purchaseRequestIdString = request.getParameter("pr");
 
-        if (!isValidRequest(purchaseRequestIdString)) {
+        if (StringUtils.isBlank(purchaseRequestIdString)) {
             response.sendRedirect("/");
             return;
         }
