@@ -91,7 +91,7 @@ public class RestrictQuoteController extends HttpServlet {
             quote.setPurchaseRequest(new PurchaseRequestDAO(true).findById(quote.getPurchaseRequest()));
 
             if (validatePRExpiration(quote.getPurchaseRequest())) {
-                Helper.responseMessage(outError, new Messenger("Este pedido de compra não se encontra sob cotação", MessengerType.WARNING));
+                Helper.responseMessage(outError, new Messenger("Pedido de compra expirado", MessengerType.WARNING));
                 return;
             }
 
@@ -229,11 +229,7 @@ public class RestrictQuoteController extends HttpServlet {
     }
 
     private boolean validatePRExpiration(PurchaseRequest purchaseRequest) {
-        if (!purchaseRequest.getStage().equals(PRStage.UNDER_QUOTATION)) {
-            return true;
-        }
-
-        if (purchaseRequest.getDueDate().getTimeInMillis() < Calendar.getInstance().getTimeInMillis()) {
+        if (Calendar.getInstance().after(purchaseRequest.getDueDate())) {
             new PurchaseRequestDAO(true).updateExpired(purchaseRequest);
             return true;
         }

@@ -352,6 +352,7 @@ const VueComponent = new Vue({
         if (distance < 0) {
           clearInterval(countdownInterval);
           this.countdown = '';
+          return;
         }
 
         this.countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;

@@ -20,7 +20,7 @@ new Vue({
     this.loadData();
   },
   updated() {
-    if (!document.getElementById('productDropzone')) return;
+    if (!document.getElementById('productDropzone' && this.picturesDropzone)) return;
     this.picturesDropzone = new Dropzone('#productDropzone', {
       url: '/files/s3/upload/product_pictures',
       acceptedFiles: 'image/jpg,image/jpeg,image/png',
@@ -69,20 +69,14 @@ new Vue({
     },
     async save() {
       let isValid = true;
-      let pictures = [];
-      const categoryId = this.product.category.id;
-      const productItemId = this.product.productItemId;
       const payload = {
-        productItemId,
-        product: {
-          title: this.product.title,
-          basePrice: this.product.basePrice,
-          availableQuantity: this.product.availableQuantity,
-          description: this.product.description,
-        }
+        id: this.product.id,
+        basePrice: this.product.basePrice,
+        availableQuantity: this.product.availableQuantity,
+        description: this.product.description,
       };
 
-      const toValidate = { ...payload.product, categoryId };
+      const toValidate = { ...payload.product };
 
       Object.keys(toValidate).forEach((key) => {
         if (!toValidate[key] && key !== 'description') {
@@ -99,15 +93,9 @@ new Vue({
       }
 
       try {
-        pictures = await this.savePictures();
-        payload.product.pictures = pictures;
-
         const { data } = await axios.post(
-            '/account/products/new',
-            Qs.stringify({
-              ...payload,
-              product: JSON.stringify(payload.product)
-            }),
+            '/account/products/edit',
+            Qs.stringify(payload),
             {
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -116,18 +104,7 @@ new Vue({
         );
         const { content, type } = data;
         this.showToast(content, type);
-        this.resetData();
       } catch (err) {
-        if (pictures.length) {
-          await axios.post(
-              '/files/s3/delete/product_pictures',
-              Qs.stringify({ pictures: JSON.stringify(pictures) }),
-              {
-                headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-              }
-          });
-        }
         if (err.response.data && err.response.data.type === 'ERROR') {
             const { content, type } = err.response.data;
             return this.showToast(content, type);
@@ -158,16 +135,5 @@ new Vue({
 
       toastr[topic](msg);
     },
-    async resetData() {
-      this.product = {
-        title: '',
-        basePrice: null,
-        availableQuantity: null,
-        description: null,
-        productItemId: null,
-      };
-      this.breadcrumbCategories = [{ id: 0, title: 'Geral' }];
-      this.picturesDropzone.removeAllFiles(true);
-    }
   },
 });

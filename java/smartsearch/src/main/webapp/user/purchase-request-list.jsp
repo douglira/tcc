@@ -60,7 +60,7 @@
                    style="text-decoration: none; background-color: inherit !important; border-bottom: none !important;"
                    class="card-header d-flex justify-content-between align-items-center">
                     <h5>&numero;&nbsp;<i>{{ pr.id }}</i></h5>
-                    <small>Criado em: {{ formatDatetime(pr.createdAt) }}</small>
+                    <small>Expira em: {{ formatDatetime(pr.dueDate) }}</small>
                 </a>
                 <div class="card-body">
                     <h6 class="card-title text-center text-uppercase">{{ getPRStage(pr.stage) }}</h6>
