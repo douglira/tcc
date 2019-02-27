@@ -104,4 +104,12 @@
     <servlet-name>userProductNew</servlet-name>
     <url-pattern>/account/new_product</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>quoteDetail</servlet-name>
+    <jsp-file>/user/quote-detail.jsp</jsp-file>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>quoteDetail</servlet-name>
+    <url-pattern>/account/purchase_request/quote</url-pattern>
+  </servlet-mapping>
 </web-app>

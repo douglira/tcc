@@ -48,6 +48,7 @@ import models.Seller;
 import models.Shipment;
 import models.User;
 import models.socket.Notification;
+import org.apache.commons.lang.StringUtils;
 import services.mail.MailSMTPService;
 import services.mail.MailerService;
 import services.mail.NewSuggestedQuote;
@@ -284,6 +285,24 @@ public class RestrictQuoteController extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String uri = request.getRequestURI();
+        String action = uri.replace("/account/quote/", "");
+
+        switch (action) {
+            case "get":
+                getById(request, response);
+                break;
+        }
+    }
+
+    private void getById(HttpServletRequest request, HttpServletResponse response) {
+        String quoteId = request.getParameter("id");
+
+
+        if (StringUtils.isBlank(quoteId)) {
+
+        }
+
 
     }
 }
