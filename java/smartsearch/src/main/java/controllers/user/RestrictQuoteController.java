@@ -16,18 +16,10 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 
+import com.google.gson.JsonObject;
 import controllers.socket.NotificationSocket;
 import controllers.socket.QuoteNotifierSocket;
-import dao.AddressDAO;
-import dao.NotificationDAO;
-import dao.ProductDAO;
-import dao.PurchaseItemDAO;
-import dao.PurchaseRequestDAO;
-import dao.QuotationItemDAO;
-import dao.QuoteDAO;
-import dao.SellerDAO;
-import dao.ShipmentDAO;
-import dao.UserDAO;
+import dao.*;
 import enums.MessengerType;
 import enums.NotificationResource;
 import enums.NotificationStatus;
@@ -48,6 +40,7 @@ import models.Seller;
 import models.Shipment;
 import models.User;
 import models.socket.Notification;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import services.mail.MailSMTPService;
 import services.mail.MailerService;
@@ -55,7 +48,11 @@ import services.mail.NewSuggestedQuote;
 
 @SuppressWarnings("serial")
 @WebServlet(name = "RestrictQuoteController", urlPatterns = {
-        "/account/quote/new"
+        // POST
+        "/account/quote/new",
+
+        // GET
+        "/account/quote/detail"
 })
 public class RestrictQuoteController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -171,7 +168,7 @@ public class RestrictQuoteController extends HttpServlet {
             err.printStackTrace();
             response.setStatus(500);
             PrintWriter out = response.getWriter();
-            System.out.println("RestrictQuoteController.doPost [ERROR]: " + err);
+            System.out.println("RestrictQuoteController.create [ERROR]: " + err);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
     }
@@ -286,23 +283,99 @@ public class RestrictQuoteController extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String uri = request.getRequestURI();
-        String action = uri.replace("/account/quote/", "");
+        String action = uri.replace("/account", "");
 
         switch (action) {
-            case "get":
+            case "/quote/detail":
                 getById(request, response);
                 break;
         }
     }
 
-    private void getById(HttpServletRequest request, HttpServletResponse response) {
-        String quoteId = request.getParameter("id");
+    private void getById(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        if (request.getHeader("Accept").contains("application/json")) {
+            jsonGetById(request, response);
+        } else {
+            renderGetById(request, response);
+        }
+    }
 
+    private void renderGetById(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String quoteId = request.getParameter("q");
+        Person person = (Person) request.getSession().getAttribute("loggedPerson");
 
-        if (StringUtils.isBlank(quoteId)) {
-
+        if (validateQuoteId(quoteId, person) == null) {
+            response.sendRedirect("/");
+            return;
         }
 
+        request.getRequestDispatcher(request.getContextPath() + "/user/quote-detail.jsp").forward(request, response);
+    }
 
+    private void jsonGetById(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        Gson gJson = new Gson();
+        try {
+            String quoteId = request.getParameter("q");
+            Person person = (Person) request.getSession().getAttribute("loggedPerson");
+            Quote quote = validateQuoteId(quoteId, person);
+
+            if (quote == null) {
+                response.setStatus(400);
+                out = response.getWriter();
+                Helper.responseMessage(out, new Messenger("Operação inválida.", MessengerType.ERROR));
+                return;
+            }
+
+            populateProductsAndShipments(quote);
+            quote.getCustomListProduct().forEach(quotationItem -> {
+                quotationItem.getProduct().setPictures(new FileDAO(true).getProductPictures(quotationItem.getProduct().getId()));
+                quotationItem.getProduct().setDefaultThumbnail(Helper.getBaseUrl(request));
+            });
+
+            JsonObject json = new JsonObject();
+            json.add("quote", gJson.toJsonTree(quote));
+            out.print(json.toString());
+            out.close();
+        } catch (Exception err) {
+            err.printStackTrace();
+            response.setStatus(500);
+            out = response.getWriter();
+            System.out.println("RestrictQuoteController.jsonGetById [ERROR]: " + err);
+            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
+        }
+    }
+
+    private void populateProductsAndShipments(Quote quote) {
+        quote.setCustomListProduct(new QuotationItemDAO(true).findByQuote(quote.getId()));
+        quote.setShipmentOptions(new ShipmentDAO(true).findByQuoteAndSeller(quote.getId(), quote.getSeller().getId()));
+    }
+
+    private Quote validateQuoteId(String quoteId, Person person) {
+        Quote quote = null;
+
+        if (StringUtils.isBlank(quoteId)) {
+            return quote;
+        }
+
+        if (!Helper.isInteger(quoteId)) {
+            return quote;
+        }
+
+        quote = new QuoteDAO(true).findById(new Quote(Integer.parseInt(quoteId)));
+
+        if (quote == null) {
+            return quote;
+        }
+
+        quote.setPurchaseRequest(new PurchaseRequestDAO(true).findById(quote.getPurchaseRequest()));
+
+        if (quote.getPurchaseRequest().getBuyer().getId() != person.getId()) {
+            quote = null;
+            return quote;
+        }
+
+        return quote;
     }
 }

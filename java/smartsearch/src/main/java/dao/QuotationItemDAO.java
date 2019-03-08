@@ -76,6 +76,13 @@ public class QuotationItemDAO extends GenericDAO {
 
         item.setProduct(product);
         item.setQuantity(rs.getInt("quantity"));
+
+        try {
+            item.setAdditionalSpec(rs.getString("additional_spec"));
+        } catch (NullPointerException | SQLException err) {
+            item.setAdditionalSpec(null);
+        }
+
         return item;
     }
 

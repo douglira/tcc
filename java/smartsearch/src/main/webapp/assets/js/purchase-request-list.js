@@ -38,6 +38,16 @@ const VueComponent = new Vue({
           throw new Error('Unknown purchase request stage condition.');
       }
     },
+    isExpired(dueDate) {
+      const date = this.getDate(dueDate);
+      const now = new Date();
+
+      if (now.getTime() > date.getTime()) {
+        return true;
+      }
+
+      return false;
+    },
     showMessage(msg, type = 'success', options) {
       toastr.options = options;
       toastr[type.toLowerCase()](msg);

@@ -11,7 +11,7 @@ new Vue({
   methods: {
     async loadData() {
       const quoteId = new URLSearchParams(location.search).get('q');
-      const response = await axios.get(`/account/quote/get?id=${quoteId}`);
+      const response = await axios.get(`/account/quote/detail?q=${quoteId}`);
     }
   }
 });

@@ -80,6 +80,41 @@ public class QuoteDAO extends GenericDAO {
         return quote;
     }
 
+    public Quote findById(Quote quote) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        StringBuilder sql = new StringBuilder()
+                .append("SELECT * FROM ")
+                .append(TABLE_NAME)
+                .append(" WHERE ")
+                .append(" id = ? ");
+        try {
+            stmt = this.conn.prepareStatement(sql.toString());
+            stmt.setInt(1, quote.getId());
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                quote = this.fetch(rs, new Quote());
+            } else {
+                quote = null;
+            }
+        } catch (SQLException err) {
+            quote = null;
+            err.printStackTrace();
+            System.out.println("QuoteDAO.findById [ERROR](1): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException err) {
+                    err.printStackTrace();
+                    System.out.println("QuoteDAO.findById [ERROR](2): " + err);
+                }
+            }
+        }
+        return quote;
+    }
+
     public ArrayList<Quote> findByPurchaseRequest(int purchaseRequestId) {
         PreparedStatement stmt = null;
         ResultSet rs = null;

@@ -67,7 +67,7 @@ const VueHeader = new Vue({
 				case 'PURCHASE_REQUEST':
 					return `/account/purchase_request/suggest?pr=${notification.resourceId}`;
 				case 'QUOTE':
-					return `/account/purchase_request/quote?q=${notification.resourceId}`;
+					return `/account/quote/detail?q=${notification.resourceId}`;
 				default:
 					return 'javascript:void(0)';
 			}

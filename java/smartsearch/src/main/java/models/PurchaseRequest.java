@@ -2,7 +2,9 @@ package models;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import enums.PRStage;
 
@@ -161,5 +163,19 @@ public class PurchaseRequest {
 
     public void calculateAmount() {
         this.totalAmount = this.listProducts.stream().mapToDouble(Item::getSubtotalAmount).sum();
+    }
+
+    public boolean validateDueDate() {
+        Date dueDate = this.getDueDate().getTime();
+        Date now = new Date();
+
+        long diff = dueDate.getTime() - now.getTime();
+        long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+
+        Calendar dueDateCalendar = Calendar.getInstance();
+        dueDateCalendar.setTime(dueDate);
+        this.setDueDate(dueDateCalendar);
+
+        return days > 90 || days <= 0;
     }
 }

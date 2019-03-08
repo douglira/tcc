@@ -1,6 +1,7 @@
 package libs;
 
 import com.google.gson.Gson;
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import models.Messenger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,5 +26,17 @@ public class Helper {
         Gson gJson = new Gson();
         out.print(gJson.toJson(obj));
         out.close();
+    }
+
+    public static boolean isInteger(String intString) {
+        boolean isInteger = true;
+
+        try {
+            Integer.parseInt(intString, 10);
+        } catch (NumberFormatException error) {
+            isInteger = false;
+        }
+
+        return isInteger;
     }
 }

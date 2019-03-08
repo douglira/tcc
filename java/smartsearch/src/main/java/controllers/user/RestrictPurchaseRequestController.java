@@ -287,7 +287,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         try {
             PurchaseRequest purchaseRequest = gson.fromJson(request.getParameter("purchaseRequest"), PurchaseRequest.class);
 
-            if (validateDueDate(purchaseRequest)) {
+            if (purchaseRequest.validateDueDate()) {
                 response.setStatus(400);
                 out = response.getWriter();
                 Helper.responseMessage(out, new Messenger("Data de expiração inválida", MessengerType.ERROR));
@@ -334,20 +334,6 @@ public class RestrictPurchaseRequestController extends HttpServlet {
             System.out.println("RestrictPurchaseRequestController.doPost [ERROR]: " + err);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
-    }
-
-    private boolean validateDueDate(PurchaseRequest purchaseRequest) throws ParseException {
-        Date dueDate = purchaseRequest.getDueDate().getTime();
-        Date now = new Date();
-
-        long diff = dueDate.getTime() - now.getTime();
-        long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-
-        Calendar dueDateCalendar = Calendar.getInstance();
-        dueDateCalendar.setTime(dueDate);
-        purchaseRequest.setDueDate(dueDateCalendar);
-
-        return days > 90 || days <= 0;
     }
 
     private void socketNotification(ArrayList<User> sellerUsers, PurchaseRequest purchaseRequest) {
@@ -625,7 +611,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
             return isValid;
         }
 
-        if (!isInteger(purchaseRequestIdString)) {
+        if (!Helper.isInteger(purchaseRequestIdString)) {
             return isValid;
         }
 
@@ -637,18 +623,6 @@ public class RestrictPurchaseRequestController extends HttpServlet {
 
         isValid = true;
         return isValid;
-    }
-
-    private boolean isInteger(String purchaseRequestIdString) {
-        boolean isInteger = true;
-
-        try {
-            Integer.parseInt(purchaseRequestIdString, 10);
-        } catch (NumberFormatException error) {
-            isInteger = false;
-        }
-
-        return isInteger;
     }
 
     private void list(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
