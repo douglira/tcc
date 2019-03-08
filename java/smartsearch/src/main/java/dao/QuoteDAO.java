@@ -177,4 +177,34 @@ public class QuoteDAO extends GenericDAO {
         }
         return quotes;
     }
+
+    public void updateStatus(Quote quote) {
+        PreparedStatement stmt = null;
+        StringBuilder sql = new StringBuilder()
+                .append("UPDATE ")
+                .append(TABLE_NAME)
+                .append(" SET ")
+                .append(" status = CAST (? AS quote_status) ")
+                .append("WHERE ")
+                .append("id = ?");
+        try {
+            stmt = this.conn.prepareStatement(sql.toString());
+            stmt.setString(1, quote.getStatus().toString());
+            stmt.setInt(2, quote.getId());
+            stmt.executeUpdate();
+
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("QuoteDAO.updateStatus [ERROR](1): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException err) {
+                    err.printStackTrace();
+                    System.out.println("QuoteDAO.updateStatus [ERROR](2): " + err);
+                }
+            }
+        }
+    }
 }

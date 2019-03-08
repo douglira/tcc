@@ -20,13 +20,7 @@ import com.google.gson.JsonObject;
 import controllers.socket.NotificationSocket;
 import controllers.socket.QuoteNotifierSocket;
 import dao.*;
-import enums.MessengerType;
-import enums.NotificationResource;
-import enums.NotificationStatus;
-import enums.PRStage;
-import enums.QuoteStatus;
-import enums.ShipmentMethod;
-import enums.ShipmentStatus;
+import enums.*;
 import libs.Helper;
 import models.Address;
 import models.Buyer;
@@ -40,7 +34,6 @@ import models.Seller;
 import models.Shipment;
 import models.User;
 import models.socket.Notification;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import services.mail.MailSMTPService;
 import services.mail.MailerService;
@@ -88,7 +81,8 @@ public class RestrictQuoteController extends HttpServlet {
 
             quote.setPurchaseRequest(new PurchaseRequestDAO(true).findById(quote.getPurchaseRequest()));
 
-            if (validatePRExpiration(quote.getPurchaseRequest())) {
+            if (quote.getPurchaseRequest().isExpired()) {
+                new PurchaseRequestDAO(true).updateStage(quote.getPurchaseRequest());
                 Helper.responseMessage(outError, new Messenger("Pedido de compra expirado", MessengerType.WARNING));
                 return;
             }
@@ -117,7 +111,7 @@ public class RestrictQuoteController extends HttpServlet {
                 quoteItem.calculateAmount();
             });
 
-            Item item = validateProductsAvailability(quote.getCustomListProduct());
+            Item item = quote.validateProductsAvailability();
 
             if (item != null) {
                 Helper.responseMessage(outError, new Messenger("Quantidade indisponível. PRODUTO: " + item.getProduct().getTitle(), MessengerType.ERROR));
@@ -219,20 +213,11 @@ public class RestrictQuoteController extends HttpServlet {
     }
 
     private boolean validateQuoteExpirationInput(Quote quote) {
-        long now = Calendar.getInstance().getTimeInMillis();
-        long quoteExpiration = quote.getExpirationDate().getTimeInMillis();
-        long prExpiration = quote.getPurchaseRequest().getDueDate().getTimeInMillis();
+        Calendar now = Calendar.getInstance();
+        Calendar quoteExpiration = quote.getExpirationDate();
+        Calendar prExpiration = quote.getPurchaseRequest().getDueDate();
 
-        return quoteExpiration < now || quoteExpiration > prExpiration;
-    }
-
-    private boolean validatePRExpiration(PurchaseRequest purchaseRequest) {
-        if (Calendar.getInstance().after(purchaseRequest.getDueDate())) {
-            new PurchaseRequestDAO(true).updateExpired(purchaseRequest);
-            return true;
-        }
-
-        return false;
+        return quoteExpiration.before(now) || quoteExpiration.after(prExpiration);
     }
 
     private String validateShipmentOptions(ArrayList<Shipment> shipments) {
@@ -269,16 +254,9 @@ public class RestrictQuoteController extends HttpServlet {
         return validationMessage;
     }
 
-    private Item validateProductsAvailability(ArrayList<Item> customListProduct) {
-        return customListProduct.stream()
-                .filter(quoteItem -> quoteItem.getQuantity() > ((Product) quoteItem.getProduct()).getAvailableQuantity())
-                .findFirst()
-                .orElse(null);
-    }
-
     private String getQuotesUrl(HttpServletRequest request, Quote quote) {
         String baseUrl = Helper.getBaseUrl(request);
-        return baseUrl + "/account/purchase_request/quote?q=" + quote.getId();
+        return baseUrl + "/account/quote/detail?q=" + quote.getId();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -303,10 +281,15 @@ public class RestrictQuoteController extends HttpServlet {
     private void renderGetById(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String quoteId = request.getParameter("q");
         Person person = (Person) request.getSession().getAttribute("loggedPerson");
+        Quote quote = validateQuoteId(quoteId, person);
 
-        if (validateQuoteId(quoteId, person) == null) {
+        if (quote == null) {
             response.sendRedirect("/");
             return;
+        }
+
+        if (quote.isExpired()) {
+            new QuoteDAO(true).updateStatus(quote);
         }
 
         request.getRequestDispatcher(request.getContextPath() + "/user/quote-detail.jsp").forward(request, response);

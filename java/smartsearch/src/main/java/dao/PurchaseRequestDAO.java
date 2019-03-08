@@ -341,7 +341,7 @@ public class PurchaseRequestDAO extends GenericDAO {
         }
     }
 
-    public void updateExpired(PurchaseRequest purchaseRequest) {
+    public void updateStage(PurchaseRequest purchaseRequest) {
         PreparedStatement stmt = null;
         String sql = "UPDATE " + TABLE_NAME + " SET stage = CAST(? as pr_stage), closed_at = ?, updated_at = ? WHERE id = ?";
 
@@ -354,14 +354,14 @@ public class PurchaseRequestDAO extends GenericDAO {
             stmt.execute();
         } catch (SQLException err) {
             err.printStackTrace();
-            System.out.println("PurchaseRequest.updateExpired [ERROR](1): " + err);
+            System.out.println("PurchaseRequest.updateStage [ERROR](1): " + err);
         } finally {
             if (this.conn != null) {
                 try {
                     this.conn.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
-                    System.out.println("PurchaseRequest.updateExpired [ERROR](2): " + e);
+                    System.out.println("PurchaseRequest.updateStage [ERROR](2): " + e);
                 }
             }
         }

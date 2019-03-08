@@ -4,11 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -287,7 +284,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         try {
             PurchaseRequest purchaseRequest = gson.fromJson(request.getParameter("purchaseRequest"), PurchaseRequest.class);
 
-            if (purchaseRequest.validateDueDate()) {
+            if (purchaseRequest.validateDueDateInput()) {
                 response.setStatus(400);
                 out = response.getWriter();
                 Helper.responseMessage(out, new Messenger("Data de expiração inválida", MessengerType.ERROR));
@@ -650,6 +647,9 @@ public class RestrictPurchaseRequestController extends HttpServlet {
                         purchaseRequest.setListProducts(new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
                         fetchPictures(purchaseRequest.getListProducts(), Helper.getBaseUrl(request));
                         purchaseRequest.setQuotes(new QuoteDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
+                        if (!PRStage.EXPIRED.equals(purchaseRequest.getStage()) && purchaseRequest.isExpired()) {
+                            new PurchaseRequestDAO(true).updateStage(purchaseRequest);
+                        }
                     })
                     .collect(Collectors.toCollection(ArrayList::new));
 

@@ -123,6 +123,21 @@ public class Quote {
         this.updatedAt = updatedAt;
     }
 
+    public Item validateProductsAvailability() {
+        return this.customListProduct.stream()
+                .filter(quoteItem -> quoteItem.getQuantity() > ((Product) quoteItem.getProduct()).getAvailableQuantity())
+                .findFirst()
+                .orElse(null);
+    }
+
+    public boolean isExpired() {
+        if (Calendar.getInstance().after(this.expirationDate)) {
+            this.status = QuoteStatus.EXPIRED;
+            return true;
+        }
+        return false;
+    }
+
     public void calculateTotalAmount() {
         this.totalAmount = this.customListProduct.stream()
                 .mapToDouble(Item::getSubtotalAmount)

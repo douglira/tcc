@@ -165,17 +165,19 @@ public class PurchaseRequest {
         this.totalAmount = this.listProducts.stream().mapToDouble(Item::getSubtotalAmount).sum();
     }
 
-    public boolean validateDueDate() {
-        Date dueDate = this.getDueDate().getTime();
-        Date now = new Date();
+    public boolean validateDueDateInput() {
+        Calendar limitDueDate = Calendar.getInstance();
+        limitDueDate.add(Calendar.DAY_OF_YEAR, 90);
 
-        long diff = dueDate.getTime() - now.getTime();
-        long days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+        return this.dueDate.after(limitDueDate) || this.dueDate.before(Calendar.getInstance());
+    }
 
-        Calendar dueDateCalendar = Calendar.getInstance();
-        dueDateCalendar.setTime(dueDate);
-        this.setDueDate(dueDateCalendar);
-
-        return days > 90 || days <= 0;
+    public boolean isExpired() {
+        if (this.dueDate.before(Calendar.getInstance())) {
+            this.closedAt = this.dueDate;
+            this.stage = PRStage.EXPIRED;
+            return true;
+        }
+        return false;
     }
 }
