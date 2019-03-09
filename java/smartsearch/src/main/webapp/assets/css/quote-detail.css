@@ -1,0 +1,166 @@
+.page-title {
+    flex: 1;
+    text-transform: uppercase;
+    font-size: 28px;
+}
+
+.quote-created_at {
+    font-size: 14px;
+    text-transform: initial !important;
+}
+
+.quote-expiration_date {
+    font-size: 14px;
+    text-transform: initial !important;
+}
+
+.quote-btn-delete {
+    font-size: 32px;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    border: 0;
+    background-color: inherit;
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+    margin-right: 20px;
+}
+
+.quote-btn-delete:hover {
+    transform: scale(1.2);
+}
+
+.pr-propagation-icon {
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.quote-propagation-text {
+    display: flex;
+    align-items: baseline;
+    font-weight: 500;
+    font-size: 18px;
+    text-transform: uppercase;
+    padding: 30px 0;
+    -webkit-animation: pulsate-bck 1.75s ease-in-out infinite both;
+    animation: pulsate-bck 1.75s ease-in-out infinite both;
+}
+
+.quote-propagation-count {
+    border-radius: 50%;
+    font-size: 20px;
+    padding: 3px;
+    min-width: 32px;
+    min-height: 32px;
+    height: auto;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.quote-propagation-text span {
+    font-size: 20px;
+}
+
+.quote-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.quote-item-thumbnail {
+    width: 72px;
+    height: 80px;
+    padding: 3px;
+    margin-right: 15px;
+}
+
+.quote-item-title {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 500;
+    padding-bottom: 0 !important;
+    margin-right: 10px;
+}
+
+.quote-item-price {
+    padding: 3px !important;
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+.quote-item-quantity {
+    margin: 5px 20px;
+    padding: 10px 20px;
+    box-sizing: border-box;
+}
+
+.quote-item-actions {
+    font-size: 24px;
+    padding: 5px;
+    border: 0;
+    background-color: inherit;
+    cursor: pointer;
+    margin-left: 10px;
+    -webkit-transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    -ms-transition: all .2s ease-in-out;
+    -o-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+}
+
+.quote-item-actions:hover {
+    transform: scale(1.2);
+}
+
+.quote-total_amount {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-weight: 600;
+    font-size: 20px;
+    margin: 20px 0;
+    text-transform: uppercase;
+}
+
+.btn-publish {
+    padding: 30px auto !important;
+}
+
+@-webkit-keyframes pulsate-bck {
+    0% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+    50% {
+        -webkit-transform: scale(0.9);
+        transform: scale(0.9);
+    }
+    100% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+}
+
+@keyframes pulsate-bck {
+    0% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+    50% {
+        -webkit-transform: scale(0.9);
+        transform: scale(0.9);
+    }
+    100% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+}

@@ -156,4 +156,39 @@ public class AddressDAO extends GenericDAO {
 
 		return address;
 	}
+
+    public Address findById(Address address) {
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		StringBuilder sql = new StringBuilder()
+				.append("SELECT * FROM ")
+				.append(TABLE_NAME)
+				.append(" WHERE id = ? ");
+
+		try {
+			stmt = this.conn.prepareStatement(sql.toString());
+			stmt.setInt(1, address.getId());
+			rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				address = this.fetch(rs, new Address());
+			} else {
+				address = null;
+			}
+		} catch (Exception error) {
+			error.printStackTrace();
+			System.out.println("AddressDAO.findById [ERROR](1): " + error);
+		} finally {
+			if (this.conn != null) {
+				try {
+					this.conn.close();
+				} catch (SQLException sqlException) {
+					sqlException.printStackTrace();
+					System.out.println("AddressDAO.findById [ERROR](2): " + sqlException);
+				}
+			}
+		}
+
+		return address;
+    }
 }

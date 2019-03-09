@@ -100,11 +100,13 @@ public class PersonDAO extends GenericDAO {
 
         try {
             stmt = this.conn.prepareStatement(sql);
-            stmt.setInt(1, person.getUser().getId());
+            stmt.setInt(1, person.getId());
             rs = stmt.executeQuery();
 
             if (rs.next()) {
-                person = this.fetch(rs, person);
+                person = this.fetch(rs, new Person());
+            } else {
+                person = null;
             }
         } catch (Exception error) {
             error.printStackTrace();

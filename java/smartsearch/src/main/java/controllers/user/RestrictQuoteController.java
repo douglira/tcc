@@ -311,14 +311,13 @@ public class RestrictQuoteController extends HttpServlet {
                 return;
             }
 
-            populateProductsAndShipments(quote);
-            quote.getCustomListProduct().forEach(quotationItem -> {
-                quotationItem.getProduct().setPictures(new FileDAO(true).getProductPictures(quotationItem.getProduct().getId()));
-                quotationItem.getProduct().setDefaultThumbnail(Helper.getBaseUrl(request));
-            });
+            Person sellerPerson = getQuoteSeller(quote);
+            populatePurchaseRequest(quote.getPurchaseRequest());
+            populateProductsAndShipments(quote, Helper.getBaseUrl(request));
 
             JsonObject json = new JsonObject();
             json.add("quote", gJson.toJsonTree(quote));
+            json.add("seller", gJson.toJsonTree(sellerPerson));
             out.print(json.toString());
             out.close();
         } catch (Exception err) {
@@ -330,9 +329,32 @@ public class RestrictQuoteController extends HttpServlet {
         }
     }
 
-    private void populateProductsAndShipments(Quote quote) {
-        quote.setCustomListProduct(new QuotationItemDAO(true).findByQuote(quote.getId()));
-        quote.setShipmentOptions(new ShipmentDAO(true).findByQuoteAndSeller(quote.getId(), quote.getSeller().getId()));
+    private Person getQuoteSeller(Quote quote) {
+        Person sellerPerson = (Person) quote.getSeller();
+        return new PersonDAO(true).findById(sellerPerson);
+    }
+
+    private void populateProductsAndShipments(Quote quote, String baseUrl) {
+        quote.setCustomListProduct(
+                new QuotationItemDAO(true).findByQuote(quote.getId())
+                .stream()
+                .peek(quotationItem -> {
+                    quotationItem.getProduct().setPictures(new FileDAO(true).getProductPictures(quotationItem.getProduct().getId()));
+                    quotationItem.getProduct().setDefaultThumbnail(baseUrl);
+                    quotationItem.calculateAmount();
+                })
+                .collect(Collectors.toCollection(ArrayList::new))
+        );
+        quote.setShipmentOptions(
+                new ShipmentDAO(true).findByQuoteAndSeller(quote.getId(), quote.getSeller().getId())
+                .stream()
+                .peek(shipment -> shipment.setReceiverAddress(new AddressDAO(true).findById(shipment.getReceiverAddress())))
+                .collect(Collectors.toCollection(ArrayList::new))
+        );
+    }
+
+    private void populatePurchaseRequest(PurchaseRequest purchaseRequest) {
+        purchaseRequest.setListProducts(new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
     }
 
     private Quote validateQuoteId(String quoteId, Person person) {

@@ -22,18 +22,18 @@ public class MailSMTPService extends Mailer {
 
     private static final String HOST = "smtp.mailtrap.io";
     private static final int PORT = 2525;
-    private static final String USER = "c0ad778e5d5be7";
-    private static final String PASS = "aa88e846a55d0e";
+    private static final String USER = "34840dc96cad6b";
+    private static final String PASS = "1fc688566cacdf";
 
     private Properties propsConfig;
     private VelocityEngine ve;
 
     private MailSMTPService() {
         this.propsConfig = new Properties();
-        this.propsConfig.put("services.mail.smtp.auth", "true");
-        this.propsConfig.put("services.mail.smtp.starttls.enable", "true");
-        this.propsConfig.put("services.mail.smtp.host", HOST);
-        this.propsConfig.put("services.mail.smtp.port", PORT);
+        this.propsConfig.put("mail.smtp.auth", "true");
+        this.propsConfig.put("mail.smtp.starttls.enable", "true");
+        this.propsConfig.put("mail.smtp.host", HOST);
+        this.propsConfig.put("mail.smtp.port", PORT);
 
         this.ve = new VelocityEngine();
         this.ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
