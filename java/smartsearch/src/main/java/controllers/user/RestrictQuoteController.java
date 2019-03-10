@@ -43,6 +43,8 @@ import services.mail.NewSuggestedQuote;
 @WebServlet(name = "RestrictQuoteController", urlPatterns = {
         // POST
         "/account/quote/new",
+        "/account/quote/accept",
+        "/account/quote/refuse",
 
         // GET
         "/account/quote/detail"
@@ -50,12 +52,19 @@ import services.mail.NewSuggestedQuote;
 public class RestrictQuoteController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String uri = request.getRequestURI();
-        String action = uri.replace("/account/quote/", "");
+        String action = uri.replace("/account", "");
 
         switch (action) {
-            case "new":
+            case "/quote/new": {
                 create(request, response);
                 break;
+            }
+            case "/quote/accept": {
+                accepted(request, response);
+            }
+            case "/quote/refuse": {
+                refuse(request, response);
+            }
         }
     }
 
@@ -165,6 +174,14 @@ public class RestrictQuoteController extends HttpServlet {
             System.out.println("RestrictQuoteController.create [ERROR]: " + err);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
+    }
+
+    private void accepted(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    }
+
+    private void refuse(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
     }
 
     private void sendNotificationsToBuyer(User sellerUser, Quote quote, String urlQuote) {

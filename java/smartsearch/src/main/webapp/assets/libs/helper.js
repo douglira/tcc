@@ -83,4 +83,15 @@ const Formatter = {
       maximumFractionDigits: 2
     }).format(number)
   },
+  telephone(tel) {
+    const telChars = String(tel).split('');
+
+    if (telChars.length === 10) {
+      const dd = telChars.slice(0, 2);
+      const firstPart = telChars.slice(2, 6);
+      const lastPart = telChars.slice(6);
+      return `(${dd.join('')}) ${firstPart.join('')}-${lastPart.join('')}`;
+    }
+    return tel;
+  },
 };

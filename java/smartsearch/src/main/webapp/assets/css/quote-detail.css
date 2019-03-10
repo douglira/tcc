@@ -131,6 +131,17 @@
     text-transform: uppercase;
 }
 
+.shipment-options {
+    padding: 20px;
+    cursor: pointer;
+    flex: 1;
+    max-width: fit-content;
+}
+
+.shipment-options:hover {
+    background-color: #f8f9fa;
+}
+
 .btn-publish {
     padding: 30px auto !important;
 }

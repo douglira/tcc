@@ -4,6 +4,7 @@ let formatterMixin = {
     formatFullDate: Formatter.fullDate,
     formatDate: Formatter.date,
     formatCurrency: Formatter.currency,
+    formatTel: Formatter.telephone,
     getCalendar: Formatter.getCalendar,
   },
 };
@@ -16,10 +17,22 @@ new Vue({
     return {
       quote: {},
       seller: {},
+      selectedShipment: null,
     }
   },
   created() {
     this.loadData();
+  },
+  updated() {
+    if (this.quote.id && this.quote.shipmentOptions.length === 1) {
+      const shipmentEl = document.getElementsByClassName('shipment-options').item(0);
+      const shipment = this.quote.shipmentOptions[0];
+
+      this.selectedShipment = shipment.id;
+      shipmentEl.classList.remove('text-muted');
+      shipmentEl.classList.add('bg-info');
+      shipmentEl.classList.add('text-white');
+    }
   },
   methods: {
     async loadData() {
@@ -34,6 +47,67 @@ new Vue({
           this.showMessage(err.response.data.content, err.response.data.type);
         }
       }
+    },
+    async onClickAccept() {
+      const quoteId = this.quote.id;
+      const shipmentId = this.selectedShipment;
+
+      if (!shipmentId) {
+        return this.showMessage('Escolha uma opção de frete', 'WARNING');
+      }
+
+      try {
+        const { data } = await axios.post(
+          '/account/quote/accept',
+          Qs.stringify({ quoteId, shipmentId }),
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+        );
+
+        const { content, type } = data;
+        this.showToast(content, type);
+      } catch (err) {
+        this.showMessage(err.response.data.content, err.response.data.type);
+      }
+    },
+    async onClickRefuse() {
+      const quoteId = this.quote.id;
+
+      try {
+        const { data } = await axios.post(
+          '/account/quote/refuse',
+          Qs.stringify({ quoteId }),
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }
+        );
+
+        const { content, type } = data;
+        this.showToast(content, type);
+      } catch (err) {
+        this.showMessage(err.response.data.content, err.response.data.type);
+      }
+    },
+    onSelectShipment(shipmentIndex, shipmentId) {
+      this.selectedShipment = shipmentId;
+      this.quote.shipmentOptions.forEach((shipment, index) => {
+        const el = document.getElementsByClassName('shipment-options').item(index);
+        if (index !== shipmentIndex) {
+          if (el.classList.contains('bg-info')) {
+            el.classList.remove('bg-info');
+            el.classList.add('text-muted');
+          }
+        } else {
+          el.classList.remove('text-muted');
+          el.classList.add('bg-info');
+          el.classList.add('text-white');
+        }
+      });
     },
     showMessage(msg, type = 'success', options) {
       toastr.options = options;
@@ -68,6 +142,19 @@ new Vue({
           return 'Expirado';
         }
       }
-    }
+    },
+    getShipmentMethod(shipmentMethod) {
+      switch (shipmentMethod) {
+        case 'FREE': {
+          return 'Grátis';
+        }
+        case 'CUSTOM': {
+          return 'Normal';
+        }
+        default: {
+          return 'Retirada no local';
+        }
+      }
+    },
   }
 });

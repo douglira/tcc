@@ -23,7 +23,7 @@
     <div class="card border-light mb-sm-3 mb-md-3">
         <div class="card-body d-flex flex-nowrap justify-content-between align-items-center">
             <h1 class="text-muted page-title">
-                Cotação&nbsp;&#45;&nbsp;&numero;
+                Cotação&nbsp;&#45;&nbsp;
                 <i>{{ seller.corporateName }}</i>
                 <br>
                 <small class="quote-created_at">
@@ -44,7 +44,7 @@
 
     <div class="card border-light mb-sm-3 mb-md-3">
         <div class="card-body">
-            <h4>Solicitado</h4>
+            <h4 class="text-muted">Solicitado</h4>
             <div class="list-group list-group-flush">
                 <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" v-for="purchaseItem in quote.purchaseRequest.listProducts">
                     <span class="d-flex flex-column justify-content-around align-items-start">
@@ -55,10 +55,11 @@
                 </li>
             </div>
         </div>
+
         <div class="card-body">
             <div class="d-flex flex-row justify-content-between align-items-center">
-                <h4>Fornecido</h4>
-                <h5 class="font-italic font-weight-normal text-muted">Desconto: {{ quote.discount }}</h5>
+                <h4 class="text-muted">Fornecido</h4>
+                <h5 class="font-italic font-weight-normal text-muted">Desconto: {{ quote.discount }}&#37;</h5>
             </div>
             <div class="list-group list-group-flush">
                 <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" v-for="quotationItem in quote.customListProduct">
@@ -73,6 +74,32 @@
                 </li>
             </div>
         </div>
+
+        <div class="card-body">
+            <h4 class="text-muted">Dados do vendedor</h4>
+            <span class="text-muted">Empresa: <strong>{{ seller.corporateName }}</strong></span>
+            <br>
+            <span class="text-muted">Responsável: <strong>{{ seller.accountOwner }}</strong></span>
+            <br>
+            <span class="text-muted">Telefone: <strong>{{ formatTel(seller.tel) }}</strong></span>
+        </div>
+
+        <div class="card-body">
+            <h4 class="text-muted">Frete</h4>
+            <p class="text-muted">Abaixo escolha uma das opções de frete disponibilizadas pelo vendedor.</p>
+            <div class="d-flex flex-sm-column flex-md-row flex-lg-row justify-content-center align-items-stretch">
+                <div class="d-flex flex-column align-items-center justify-content-center text-muted shipment-options" v-for="(shipment, index) in quote.shipmentOptions" @click="onSelectShipment(index, shipment.id)">
+                    <strong class="text-uppercase font-italic">{{ getShipmentMethod(shipment.method) }}</strong>
+                    <span v-if="shipment.estimatedTime">Prazo de entrega: {{ formatDate(shipment.estimatedTime) }}</span>
+                    <span v-if="shipment.method === 'CUSTOM'">Custo do frete: <strong>{{ formatCurrency(shipment.cost) }}</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-sm-column flex-md-row flex-lg-row justify-content-between align-items-center">
+            <button type="button" class="btn btn-block btn-light" @click="onClickRefuse">Recusar</button>
+            <button type="button" class="btn btn-block btn-info" @click="onClickAccept">Aceitar</button>
+        </div>
     </div>
 
 </div>
@@ -82,6 +109,7 @@
 <script src="<%=request.getContextPath()%>/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/inputmask/dist/jquery.inputmask.bundle.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/axios/axios-dist.min.js"></script>
+<script src="<%=request.getContextPath()%>/assets/libs/qs/index.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/moment.js"></script>
 <script src="<%=request.getContextPath()%>/assets/libs/vuejs/vue-dist.js"></script>
 <script src="<%=request.getContextPath()%>/assets/js/quote-detail.js"></script>
