@@ -1,4 +1,4 @@
-package database.elasticsearch;
+package services.elasticsearch;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;

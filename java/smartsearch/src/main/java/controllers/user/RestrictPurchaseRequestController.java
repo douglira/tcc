@@ -49,7 +49,7 @@ import models.Quote;
 import models.Seller;
 import models.User;
 import models.socket.Notification;
-import services.ElasticsearchService;
+import services.elasticsearch.ElasticsearchService;
 import services.mail.MailSMTPService;
 import services.mail.MailerService;
 import services.mail.PublishedPurchaseRequest;

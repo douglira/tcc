@@ -1,4 +1,4 @@
-package services;
+package services.elasticsearch;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,13 +28,12 @@ import org.elasticsearch.search.suggest.completion.CompletionSuggestion;
 
 import com.google.gson.Gson;
 
-import database.elasticsearch.ElasticsearchClient;
+import services.elasticsearch.ElasticsearchClient;
 import models.ProductItem;
 
 public class ElasticsearchService {
 
     private RestHighLevelClient client;
-    private final Gson gJson = new Gson();
 
     public ElasticsearchService() {
         this.client = ElasticsearchClient.getTransport();
@@ -81,7 +80,7 @@ public class ElasticsearchService {
     }
 
     public List<ProductItem> getProductsItemPredict(String productItemTitle) {
-
+        Gson gJson = new Gson();
         if (productItemTitle == null || productItemTitle.isEmpty()) {
             return null;
         }
@@ -112,7 +111,7 @@ public class ElasticsearchService {
 
                 compSuggestion.getOptions().forEach(suggestion -> {
                     synchronized (suggestion) {
-                        ProductItem productItem = this.gJson.fromJson(suggestion.getHit().getSourceAsString(), ProductItem.class);
+                        ProductItem productItem = gJson.fromJson(suggestion.getHit().getSourceAsString(), ProductItem.class);
                         productItem.setId(Integer.parseInt(suggestion.getHit().getId()));
                         products.add(productItem);
                     }
@@ -137,6 +136,7 @@ public class ElasticsearchService {
     }
 
     public ArrayList<ProductItem> getProductsItemHomepage(int page, int perPage) {
+        Gson gJson = new Gson();
         ArrayList<ProductItem> products = new ArrayList<ProductItem>();
         try {
             int from = (page - 1) * perPage;
@@ -149,7 +149,7 @@ public class ElasticsearchService {
 
             searchHits.forEach(hit -> {
                 synchronized (hit) {
-                    ProductItem productItem = this.gJson.fromJson(hit.getSourceAsString(), ProductItem.class);
+                    ProductItem productItem = gJson.fromJson(hit.getSourceAsString(), ProductItem.class);
                     productItem.setId(Integer.parseInt(hit.getId()));
                     products.add(productItem);
                 }

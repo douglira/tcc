@@ -31,7 +31,7 @@ import models.Person;
 import models.Product;
 import models.ProductItem;
 import models.Seller;
-import services.ElasticsearchService;
+import services.elasticsearch.ElasticsearchService;
 
 @WebServlet(name = "RestrictProductController", urlPatterns = {
         "/account/products",

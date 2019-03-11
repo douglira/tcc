@@ -17,7 +17,7 @@ import enums.MessengerType;
 import libs.Helper;
 import models.Messenger;
 import models.ProductItem;
-import services.ElasticsearchService;
+import services.elasticsearch.ElasticsearchService;
 
 @SuppressWarnings("serial")
 @WebServlet(name = "ProductItemController", urlPatterns = {
