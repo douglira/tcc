@@ -132,10 +132,7 @@
 }
 
 .shipment-options {
-    padding: 20px;
     cursor: pointer;
-    flex: 1;
-    max-width: fit-content;
 }
 
 .shipment-options:hover {

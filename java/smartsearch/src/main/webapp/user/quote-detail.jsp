@@ -87,8 +87,13 @@
         <div class="card-body">
             <h4 class="text-muted">Frete</h4>
             <p class="text-muted">Abaixo escolha uma das opções de frete disponibilizadas pelo vendedor.</p>
-            <div class="d-flex flex-sm-column flex-md-row flex-lg-row justify-content-center align-items-stretch">
-                <div class="d-flex flex-column align-items-center justify-content-center text-muted shipment-options" v-for="(shipment, index) in quote.shipmentOptions" @click="onSelectShipment(index, shipment.id)">
+            <div class="d-flex flex-sm-column flex-md-row flex-lg-row justify-content-start align-items-stretch">
+                <div
+                    style="padding: 20px; flex: 1; max-width: fit-content;"
+                    class="d-flex flex-column align-items-center justify-content-center text-muted"
+                    :class="{'shipment-options': quote.status === 'UNDER_REVIEW'}"
+                    v-for="(shipment, index) in quote.shipmentOptions"
+                    @click="onSelectShipment(index, shipment.id)">
                     <strong class="text-uppercase font-italic">{{ getShipmentMethod(shipment.method) }}</strong>
                     <span v-if="shipment.estimatedTime">Prazo de entrega: {{ formatDate(shipment.estimatedTime) }}</span>
                     <span v-if="shipment.method === 'CUSTOM'">Custo do frete: <strong>{{ formatCurrency(shipment.cost) }}</strong></span>
@@ -96,9 +101,32 @@
             </div>
         </div>
 
-        <div class="d-flex flex-sm-column flex-md-row flex-lg-row justify-content-between align-items-center">
-            <button type="button" class="btn btn-block btn-light" @click="onClickRefuse">Recusar</button>
+        <div v-if="quote.status === 'UNDER_REVIEW'" class="d-flex flex-sm-column flex-md-row flex-lg-row justify-content-between align-items-stretch">
+            <button type="button" class="btn btn-block btn-light" data-toggle="modal" data-target="#modalRefuse">Recusar</button>
             <button type="button" class="btn btn-block btn-info" @click="onClickAccept">Aceitar</button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalRefuse" tabindex="-1" role="dialog" aria-labelledby="modalRefuse" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Recusar cotação</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="modalRefuseTextarea">Motivo</label>
+                        <textarea class="form-control" id="modalRefuseTextarea" rows="3" v-model="quoteReason"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Voltar</button>
+                    <button type="button" class="btn btn-info" data-dismiss="modal" @click="onClickRefuse">Confirmar</button>
+                </div>
+            </div>
         </div>
     </div>
 

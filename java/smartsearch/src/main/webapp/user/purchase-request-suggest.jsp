@@ -144,6 +144,9 @@
                                             <div :class="['d-flex flex-row w-100', quote.seller.id === loggedSeller.id ? 'justify-content-end' : 'justify-content-start']">
                                                 <div class="d-flex flex-column w-50">
                                                     <span class="text-muted text-uppercase font-italic" style="padding-bottom: 10px;">{{ getDisplayQuoteStatus(quote.status) }}</span>
+                                                    <small class="text-muted font-italic">
+                                                        {{ quote.reason }}
+                                                    </small>
                                                     <div class="d-flex flex-row">
                                                         <div class="d-flex flex-column align-items-start" style="flex: 1;">
                                                             <h6 class="align-self-start">Cotação</h6>
@@ -229,7 +232,7 @@
                         </div>
                         <div class="card-body">
                             <h2 style="font-size: 16px;" class="card-title">Visualização indisponível</h2>
-                            <p class="card-text font-italic">As cotações para este pedido de compra são restritas apenas ao comprador, podendo visualizar somente suas próprias cotações abaixo.</p>
+                            <p class="card-text font-italic">As cotações para este pedido de compra são restritas e visíveis apenas ao comprador, podendo visualizar somente suas próprias cotações abaixo.</p>
                             <i class="far fa-eye-slash" style="font-size: 32px"></i>
                             <div class="d-flex flex-row flex justify-content-center w-100" style="padding: 15px;">
                                 <div class="list-group list-group-flush" style="width: 100%; max-width: 720px">
@@ -243,6 +246,9 @@
                                                 aria-expanded="true"
                                                 :aria-controls="'collapse' + quote.id">
                                             <span class="text-muted text-uppercase font-italic" style="padding-bottom: 10px;">{{ getDisplayQuoteStatus(quote.status) }}</span>
+                                            <small class="text-muted font-italic">
+                                                {{ quote.reason }}
+                                            </small>
                                             <div class="d-flex flex-row">
                                                 <div class="d-flex flex-column align-items-start" style="flex: 1;">
                                                     <h6 class="align-self-start">Cotação</h6>

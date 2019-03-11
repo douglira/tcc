@@ -13,6 +13,7 @@ public class Quote {
     private ArrayList<Shipment> shipmentOptions;
     private String additionalData;
     private QuoteStatus status;
+    private String reason;
     private double discount;
     private double totalAmount;
     private Calendar expirationDate;
@@ -81,6 +82,14 @@ public class Quote {
 
     public void setStatus(QuoteStatus status) {
         this.status = status;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     public double getDiscount() {

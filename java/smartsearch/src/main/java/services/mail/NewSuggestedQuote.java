@@ -4,10 +4,10 @@ import java.text.NumberFormat;
 
 public class NewSuggestedQuote extends MailerService {
 
-    public NewSuggestedQuote(String corporateName, int purchaseRequestId, double totalAmount, String urlQuote) {
+    public NewSuggestedQuote(String corporateName, int purchaseRequestId, double quoteTotalAmount, String urlQuote) {
         super();
 
-        String displayTotalAmount = NumberFormat.getCurrencyInstance().format(totalAmount);
+        String displayTotalAmount = NumberFormat.getCurrencyInstance().format(quoteTotalAmount);
 
         this.context.put("corporateName", corporateName);
         this.context.put("purchaseRequestId", purchaseRequestId);

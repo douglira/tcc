@@ -1,0 +1,5 @@
+COTAÇÃO RECUSADA
+
+$buyerName recusou sua cotação do pedido de compra Nº $purchaseRequestId no valor de $quoteTotalAmount.
+
+Motivo: $refusedReason

@@ -58,6 +58,7 @@ public class QuoteDAO extends GenericDAO {
         quote.setSeller(new Seller(rs.getInt("seller_id")));
         quote.setAdditionalData(rs.getString("additional_data"));
         quote.setStatus(QuoteStatus.valueOf(rs.getString("status")));
+        quote.setReason(rs.getString("reason"));
         quote.setDiscount(rs.getDouble("discount"));
         quote.setTotalAmount(rs.getDouble("total_amount"));
 
@@ -203,6 +204,38 @@ public class QuoteDAO extends GenericDAO {
                 } catch (SQLException err) {
                     err.printStackTrace();
                     System.out.println("QuoteDAO.updateStatus [ERROR](2): " + err);
+                }
+            }
+        }
+    }
+
+    public void updateStatusAndReason(Quote quote) {
+        PreparedStatement stmt = null;
+        StringBuilder sql = new StringBuilder()
+                .append("UPDATE ")
+                .append(TABLE_NAME)
+                .append(" SET ")
+                .append(" status = CAST (? AS quote_status), ")
+                .append(" reason = ? ")
+                .append(" WHERE ")
+                .append(" id = ? ");
+        try {
+            stmt = this.conn.prepareStatement(sql.toString());
+            stmt.setString(1, quote.getStatus().toString());
+            stmt.setString(2, quote.getReason());
+            stmt.setInt(3, quote.getId());
+            stmt.executeUpdate();
+
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("QuoteDAO.updateStatusAndReason [ERROR](1): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException err) {
+                    err.printStackTrace();
+                    System.out.println("QuoteDAO.updateStatusAndReason [ERROR](2): " + err);
                 }
             }
         }

@@ -18,20 +18,25 @@ new Vue({
       quote: {},
       seller: {},
       selectedShipment: null,
+      quoteReason: '',
     }
   },
   created() {
     this.loadData();
   },
   updated() {
-    if (this.quote.id && this.quote.shipmentOptions.length === 1) {
-      const shipmentEl = document.getElementsByClassName('shipment-options').item(0);
-      const shipment = this.quote.shipmentOptions[0];
+    if (this.quote.id && this.quote.shipmentOptions.length === 1 && this.quote.status === 'UNDER_REVIEW') {
+      try {
+        const shipmentEl = document.getElementsByClassName('shipment-options').item(0);
+        const shipment = this.quote.shipmentOptions[0];
 
-      this.selectedShipment = shipment.id;
-      shipmentEl.classList.remove('text-muted');
-      shipmentEl.classList.add('bg-info');
-      shipmentEl.classList.add('text-white');
+        this.selectedShipment = shipment.id;
+        shipmentEl.classList.remove('text-muted');
+        shipmentEl.classList.add('bg-info');
+        shipmentEl.classList.add('text-white');
+      } catch(err) {
+
+      }
     }
   },
   methods: {
@@ -75,11 +80,16 @@ new Vue({
     },
     async onClickRefuse() {
       const quoteId = this.quote.id;
+      const quoteReason = this.quoteReason;
+
+      if (!String(quoteReason).trim()) {
+        return this.showMessage('Por favor descreva o motivo', 'WARNING');
+      }
 
       try {
         const { data } = await axios.post(
           '/account/quote/refuse',
-          Qs.stringify({ quoteId }),
+          Qs.stringify({ quoteId, quoteReason }),
           {
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'
@@ -87,6 +97,10 @@ new Vue({
           }
         );
 
+        this.quoteReason = '';
+        this.selectedShipment = null;
+        this.quote.reason = quoteReason;
+        this.quote.status = 'DECLINED';
         const { content, type } = data;
         this.showToast(content, type);
       } catch (err) {
@@ -94,6 +108,10 @@ new Vue({
       }
     },
     onSelectShipment(shipmentIndex, shipmentId) {
+      if (this.quote.status !== 'UNDER_REVIEW') {
+        return null;
+      }
+
       this.selectedShipment = shipmentId;
       this.quote.shipmentOptions.forEach((shipment, index) => {
         const el = document.getElementsByClassName('shipment-options').item(index);

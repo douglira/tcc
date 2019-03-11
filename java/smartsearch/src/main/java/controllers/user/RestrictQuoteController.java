@@ -38,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import services.mail.MailSMTPService;
 import services.mail.MailerService;
 import services.mail.NewSuggestedQuote;
+import services.mail.RefusedSuggestedQuote;
 
 @SuppressWarnings("serial")
 @WebServlet(name = "RestrictQuoteController", urlPatterns = {
@@ -162,7 +163,7 @@ public class RestrictQuoteController extends HttpServlet {
             shipmentDao.closeConnection();
 
             QuoteNotifierSocket.notifyUpdatedQuotes(quote.getPurchaseRequest());
-            sendNotificationsToBuyer(user, quote, getQuotesUrl(request, quote));
+            notifyCreationToBuyer(user, quote, getQuotesUrl(request, quote));
 
             response.setStatus(200);
             PrintWriter out = response.getWriter();
@@ -181,10 +182,54 @@ public class RestrictQuoteController extends HttpServlet {
     }
 
     private void refuse(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        response.setStatus(400);
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
 
+        try {
+            String quoteId = request.getParameter("quoteId");
+            String quoteReason = request.getParameter("quoteReason");
+            Person buyerPerson = (Person) request.getSession().getAttribute("loggedPerson");
+
+            if (StringUtils.isBlank(quoteReason)) {
+                Helper.responseMessage(out, new Messenger("Obrigatório descrever o motivo da negação desta cotação", MessengerType.ERROR));
+                return;
+            }
+
+            Quote quote = validateQuoteId(quoteId, buyerPerson);
+
+            if (quote == null) {
+                Helper.responseMessage(out, new Messenger("Operação inválida", MessengerType.ERROR));
+                return;
+            }
+
+            if (quote.getStatus().equals(QuoteStatus.UNDER_REVIEW) && quote.isExpired()) {
+                new QuoteDAO(true).updateStatus(quote);
+                Helper.responseMessage(out, new Messenger("Esta cotação não é válida", MessengerType.ERROR));
+                return;
+            }
+
+            quote.setStatus(QuoteStatus.DECLINED);
+            quote.setReason(quoteReason);
+            new QuoteDAO(true).updateStatusAndReason(quote);
+
+            QuoteNotifierSocket.notifyUpdatedQuotes(quote.getPurchaseRequest());
+            notifyDenialToSeller(buyerPerson, quote, getPurchaseRequestUrl(request, quote.getPurchaseRequest()));
+
+            response.setStatus(200);
+            out = response.getWriter();
+            Helper.responseMessage(out, new Messenger("Cotação recusada!", MessengerType.SUCCESS));
+        } catch (Exception err) {
+            err.printStackTrace();
+            response.setStatus(500);
+            out = response.getWriter();
+            System.out.println("RestrictQuoteController.refuse [ERROR]: " + err);
+            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
+        }
     }
 
-    private void sendNotificationsToBuyer(User sellerUser, Quote quote, String urlQuote) {
+    private void notifyCreationToBuyer(User sellerUser, Quote quote, String urlQuote) {
         User buyerUser = new UserDAO(true).findByPerson(quote.getPurchaseRequest().getBuyer().getId());
 
         final MailerService mailer = new NewSuggestedQuote(
@@ -208,6 +253,44 @@ public class RestrictQuoteController extends HttpServlet {
         new NotificationDAO(true).create(notification);
 
         Runnable socketNotification = () -> NotificationSocket.pushLastNotifications(buyerUser);
+
+        new Thread(mailTask).start();
+        new Thread(socketNotification).start();
+    }
+
+    private void notifyDenialToSeller(Person buyerPerson, Quote quote, String urlPurchaseRequest) {
+        User sellerUser = new UserDAO(true).findByPerson(quote.getSeller().getId());
+
+        final MailerService mailer = new RefusedSuggestedQuote(
+                buyerPerson.getAccountOwner(),
+                quote.getReason(),
+                quote.getPurchaseRequest().getId(),
+                quote.getTotalAmount(),
+                urlPurchaseRequest
+        );
+        mailer.setTo(sellerUser.getEmail());
+        mailer.setMail(MailSMTPService.getInstance());
+
+        Runnable mailTask = (mailer::send);
+
+        Notification notification = new Notification();
+        notification.setFrom(buyerPerson.getUser());
+        notification.setTo(sellerUser);
+        notification.setResourceId(quote.getPurchaseRequest().getId());
+        notification.setResourceType(NotificationResource.PURCHASE_REQUEST);
+        notification.setStatus(NotificationStatus.PENDING);
+        notification.setContent(
+            new StringBuilder()
+                .append("[COTAÇÃO RECUSADA]: Sua cotação de ")
+                .append(NumberFormat.getCurrencyInstance().format(quote.getTotalAmount()))
+                .append(" do pedido Nº")
+                .append(quote.getPurchaseRequest().getId())
+                .append(" foi recusada :(")
+                .toString()
+        );
+        new NotificationDAO(true).create(notification);
+
+        Runnable socketNotification = () -> NotificationSocket.pushLastNotifications(sellerUser);
 
         new Thread(mailTask).start();
         new Thread(socketNotification).start();
@@ -276,6 +359,11 @@ public class RestrictQuoteController extends HttpServlet {
         return baseUrl + "/account/quote/detail?q=" + quote.getId();
     }
 
+    private String getPurchaseRequestUrl(HttpServletRequest request, PurchaseRequest purchaseRequest) {
+        String baseUrl = Helper.getBaseUrl(request);
+        return baseUrl + "/account/purchase_request/suggest?pr=" + String.valueOf(purchaseRequest.getId());
+    }
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String uri = request.getRequestURI();
         String action = uri.replace("/account", "");
@@ -305,7 +393,7 @@ public class RestrictQuoteController extends HttpServlet {
             return;
         }
 
-        if (quote.isExpired()) {
+        if (quote.getStatus().equals(QuoteStatus.UNDER_REVIEW) && quote.isExpired()) {
             new QuoteDAO(true).updateStatus(quote);
         }
 
