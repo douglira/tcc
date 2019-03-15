@@ -177,8 +177,87 @@ public class RestrictQuoteController extends HttpServlet {
         }
     }
 
+    /**
+     * TODO Criar ordem de compra
+     * TODO Notificar fornecedor
+     */
     private void accepted(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        response.setStatus(400);
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
 
+        try {
+            String quoteId = request.getParameter("quoteId");
+            String shipmentId = request.getParameter("shipmentId");
+            Person buyerPerson = (Person) request.getSession().getAttribute("loggedPerson");
+
+            if (StringUtils.isBlank(quoteId) || StringUtils.isBlank(shipmentId)) {
+                Helper.responseMessage(out, new Messenger("Operação inválida", MessengerType.ERROR));
+                return;
+            }
+
+            Quote quote = validateQuoteId(quoteId, buyerPerson);
+
+            if (quote == null) {
+                Helper.responseMessage(out, new Messenger("Operação inválida", MessengerType.ERROR));
+                return;
+            }
+
+            populatePurchaseRequest(quote.getPurchaseRequest());
+
+            if (!quote.getPurchaseRequest().getStage().equals(PRStage.UNDER_QUOTATION)) {
+                Helper.responseMessage(out, new Messenger("Pedido de compra não se encontra sob cotação", MessengerType.ERROR));
+                return;
+            }
+
+            if (!quote.getStatus().equals(QuoteStatus.UNDER_REVIEW)) {
+                Helper.responseMessage(out, new Messenger("Cotação não se encontra sob análise", MessengerType.ERROR));
+                return;
+            }
+
+            populateProductsAndShipments(quote, Helper.getBaseUrl(request));
+            Shipment selectedShipment = quote.getShipmentOptions().stream()
+                    .filter(shipment -> shipment.getId().equals(Integer.valueOf(Integer.parseInt(shipmentId))))
+                    .findFirst()
+                    .orElse(null);
+
+            if (selectedShipment == null) {
+                Helper.responseMessage(out, new Messenger("Método de envio inválido", MessengerType.ERROR));
+                return;
+            }
+
+            Item quoteItem = quote.getCustomListProduct().stream()
+                    .filter(quoteProduct -> quoteProduct.getQuantity() > ((Product) quoteProduct.getProduct()).getAvailableQuantity())
+                    .findFirst()
+                    .orElse(null);
+
+            if (quoteItem != null) {
+                notifyUnavailableQuantityToSeller(buyerPerson, quote, quoteItem, getPurchaseRequestUrl(request, quote.getPurchaseRequest()));
+                Helper.responseMessage(out, new Messenger("COTAÇÂO ENCERRADA: Produto com quantidade insuficiente em estoque - " + ((Product) quoteItem.getProduct()).getTitle(), MessengerType.ERROR, "UNAVAILABLE_QUANTITY"));
+                return;
+            }
+
+            ProductDAO productDao = new ProductDAO(true);
+            productDao.initTransaction();
+            quote.getCustomListProduct().forEach(quoteProduct -> {
+                Product product = (Product) quoteProduct.getProduct();
+                product.updateSale(quoteProduct.getQuantity());
+                productDao.updateSale(product);
+            });
+            new QuoteDAO(productDao.getConnection()).updateAcceptedStatus(quote);
+            new PurchaseRequestDAO(productDao.getConnection()).updateClosedStage(quote.getPurchaseRequest());
+
+            response.setStatus(200);
+            out = response.getWriter();
+            Helper.responseMessage(out, new Messenger("Cotação aceita com sucesso!", MessengerType.SUCCESS));
+        } catch (Exception err) {
+            err.printStackTrace();
+            response.setStatus(500);
+            out = response.getWriter();
+            System.out.println("RestrictQuoteController.accepted [ERROR]: " + err);
+            Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
+        }
     }
 
     private void refuse(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -294,6 +373,25 @@ public class RestrictQuoteController extends HttpServlet {
 
         new Thread(mailTask).start();
         new Thread(socketNotification).start();
+    }
+
+    private void notifyUnavailableQuantityToSeller(Person buyerPerson, Quote quote, Item unavailableQuoteItem, String urlPurchaseRequest) {
+        String quoteReason = new StringBuilder()
+                .append("PRODUTO COM QUANTIDADE INSUFICIENTE: ")
+                .append(((Product) unavailableQuoteItem.getProduct()).getTitle())
+                .append(" - ")
+                .append("Quantidade em estoque: ")
+                .append(((Product) unavailableQuoteItem.getProduct()).getAvailableQuantity())
+                .append(" - ")
+                .append("Quantidade cotada: ")
+                .append(unavailableQuoteItem.getQuantity())
+                .toString();
+        quote.setReason(quoteReason);
+        quote.setStatus(QuoteStatus.DECLINED);
+        new QuoteDAO(true).updateStatusAndReason(quote);
+
+        QuoteNotifierSocket.notifyUpdatedQuotes(quote.getPurchaseRequest());
+        notifyDenialToSeller(buyerPerson, quote, urlPurchaseRequest);
     }
 
     private void setShippingReceiverAddress(Shipment shipment, PurchaseRequest purchaseRequest) {

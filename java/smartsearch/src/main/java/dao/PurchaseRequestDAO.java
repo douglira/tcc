@@ -366,4 +366,33 @@ public class PurchaseRequestDAO extends GenericDAO {
             }
         }
     }
+
+    public void updateClosedStage(PurchaseRequest purchaseRequest) {
+        PreparedStatement stmt = null;
+        String sql = "UPDATE " + TABLE_NAME + " SET stage = CAST('CLOSED' as pr_stage), closed_at = NOW(), updated_at = NOW() WHERE id = ?";
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, purchaseRequest.getId());
+            stmt.execute();
+        } catch (SQLException err) {
+            try {
+                this.conn.rollback();
+            } catch (SQLException error) {
+                error.printStackTrace();
+                System.out.println("PurchaseRequest.updateClosedStage [ERROR](1): " + err);
+            }
+            err.printStackTrace();
+            System.out.println("PurchaseRequest.updateClosedStage [ERROR](2): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    System.out.println("PurchaseRequest.updateClosedStage [ERROR](3): " + e);
+                }
+            }
+        }
+    }
 }

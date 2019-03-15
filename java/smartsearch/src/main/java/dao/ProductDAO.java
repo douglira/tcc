@@ -226,15 +226,23 @@ public class ProductDAO extends GenericDAO {
     
     public void update(Product product) {
     	PreparedStatement stmt = null;
-    	String sql = "UPDATE " + TABLE_NAME + " SET description = ?, available_quantity = ?, "
-    			+ "category_id = ?, base_price = ?";
-    	
+
+    	String sql = new StringBuilder()
+                .append("UPDATE ")
+                .append(TABLE_NAME)
+                .append(" SET ")
+                .append("description = ?, available_quantity = ?, ")
+                .append("category_id = ?, base_price = ?")
+                .append("WHERE id = ?")
+                .toString();
+
     	try {
     		stmt = this.conn.prepareStatement(sql);
     		stmt.setString(1, product.getDescription());
     		stmt.setInt(2, product.getAvailableQuantity());
     		stmt.setInt(3, product.getCategory().getId());
     		stmt.setDouble(4, product.getBasePrice());
+    		stmt.setInt(5, product.getId());
     		stmt.executeUpdate();
     		
     		this.conn.commit();
@@ -320,5 +328,44 @@ public class ProductDAO extends GenericDAO {
         }
 
         return products;
+    }
+
+    public void updateSale(Product product) {
+        PreparedStatement stmt = null;
+        String sql = new StringBuilder()
+                .append("UPDATE ")
+                .append(TABLE_NAME)
+                .append(" SET ")
+                .append("available_quantity = ?, sold_quantity = ? ")
+                .append("WHERE id = ?")
+                .toString();
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, product.getAvailableQuantity());
+            stmt.setInt(2, product.getSoldQuantity());
+            stmt.setInt(3, product.getId());
+            stmt.executeUpdate();
+
+
+        } catch (SQLException err) {
+            try {
+                this.conn.rollback();
+            } catch (Exception error) {
+                error.printStackTrace();
+                System.out.println("ProductDAO.updateAvailableQuantity [ERROR](1): " + err);
+            }
+            err.printStackTrace();
+            System.out.println("ProductDAO.updateAvailableQuantity [ERROR](2): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException sqlException) {
+                    sqlException.printStackTrace();
+                    System.out.println("ProductDAO.updateAvailableQuantity [ERROR](3): " + sqlException);
+                }
+            }
+        }
     }
 }

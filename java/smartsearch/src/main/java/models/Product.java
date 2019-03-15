@@ -92,4 +92,9 @@ public class Product extends ProductRepresentation {
 			this.status = Status.ACTIVE;
 		}
 	}
+
+	public void updateSale(int quoteQuantity) {
+		this.availableQuantity-= quoteQuantity;
+		this.soldQuantity+= quoteQuantity;
+	}
 }

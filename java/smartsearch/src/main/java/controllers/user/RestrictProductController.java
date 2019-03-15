@@ -196,7 +196,7 @@ public class RestrictProductController extends HttpServlet {
         		product.setDescription(request.getParameter("description"));
         	}
         	
-        	if (StringUtils.isNotBlank(request.getParameter("availableQuantity"))) {
+        	if (StringUtils.isNotBlank(request.getParameter("availableQuantity")) && Integer.parseInt(request.getParameter("availableQuantity")) > 0) {
         		product.setAvailableQuantity(Integer.parseInt(request.getParameter("availableQuantity")));
         	}
         	

@@ -185,7 +185,8 @@ public class QuoteDAO extends GenericDAO {
                 .append("UPDATE ")
                 .append(TABLE_NAME)
                 .append(" SET ")
-                .append(" status = CAST (? AS quote_status) ")
+                .append(" status = CAST (? AS quote_status), ")
+                .append(" updated_at = NOW() ")
                 .append("WHERE ")
                 .append("id = ?");
         try {
@@ -216,6 +217,7 @@ public class QuoteDAO extends GenericDAO {
                 .append(TABLE_NAME)
                 .append(" SET ")
                 .append(" status = CAST (? AS quote_status), ")
+                .append(" updated_at = NOW(), ")
                 .append(" reason = ? ")
                 .append(" WHERE ")
                 .append(" id = ? ");
@@ -236,6 +238,34 @@ public class QuoteDAO extends GenericDAO {
                 } catch (SQLException err) {
                     err.printStackTrace();
                     System.out.println("QuoteDAO.updateStatusAndReason [ERROR](2): " + err);
+                }
+            }
+        }
+    }
+
+    public void updateAcceptedStatus(Quote quote) {
+        PreparedStatement stmt = null;
+        String sql = "UPDATE " + TABLE_NAME + " SET status = CAST ('ACCEPTED' as quote_status), updated_at = NOW() WHERE id = ?";
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, quote.getId());
+            stmt.executeUpdate();
+        } catch (SQLException err) {
+            try {
+                this.conn.rollback();
+            } catch (SQLException error) {
+                error.printStackTrace();
+                System.out.println("QuoteDAO.updateAcceptedStatus [ERROR](1): " + err);
+            }
+            err.printStackTrace();
+            System.out.println("QuoteDAO.updateAcceptedStatus [ERROR](2): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException err) {
+                    err.printStackTrace();
+                    System.out.println("QuoteDAO.updateAcceptedStatus [ERROR](3): " + err);
                 }
             }
         }

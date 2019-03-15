@@ -72,9 +72,15 @@ new Vue({
           }
         );
 
+        this.selectedShipment = null;
+        this.quote.status = 'ACCEPTED';
         const { content, type } = data;
         this.showToast(content, type);
       } catch (err) {
+        if (err.response.data.cause === 'UNAVAILABLE_QUANTITY') {
+          this.selectedShipment = null;
+          this.quote.status = 'DECLINED';
+        }
         this.showMessage(err.response.data.content, err.response.data.type);
       }
     },

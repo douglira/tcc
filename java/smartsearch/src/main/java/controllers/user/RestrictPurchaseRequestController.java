@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import enums.*;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.gson.Gson;
@@ -33,10 +34,6 @@ import dao.QuoteDAO;
 import dao.SellerDAO;
 import dao.ShipmentDAO;
 import dao.UserDAO;
-import enums.MessengerType;
-import enums.NotificationResource;
-import enums.NotificationStatus;
-import enums.PRStage;
 import libs.Helper;
 import models.Address;
 import models.Buyer;
@@ -216,7 +213,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         }
     }
 
-    private void updatePurchaseRequestData(User user, int purchaseRequestId, PurchaseItemDAO PurchaseItemDao, String baseUrl) throws SQLException {
+    private void updatePurchaseRequestData(User user, int purchaseRequestId, PurchaseItemDAO purchaseItemDao, String baseUrl) throws SQLException {
         PurchaseRequest purchaseRequest = new PurchaseRequest();
         purchaseRequest.setId(purchaseRequestId);
 
@@ -227,9 +224,9 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         purchaseRequest.setListProducts(products);
         purchaseRequest.calculateAmount();
 
-        PurchaseRequestDAO purchaseRequestDao = new PurchaseRequestDAO(PurchaseItemDao.getConnection());
+        PurchaseRequestDAO purchaseRequestDao = new PurchaseRequestDAO(purchaseItemDao.getConnection());
         purchaseRequestDao.updateTotalAmount(purchaseRequest);
-        ArrayList<Seller> sellers = new SellerDAO(PurchaseItemDao.getConnection()).findByPurchaseRequest(purchaseRequest.getId());
+        ArrayList<Seller> sellers = new SellerDAO(purchaseItemDao.getConnection()).findByPurchaseRequest(purchaseRequest.getId());
 
         purchaseRequest.setPropagationCount(sellers.size());
 
@@ -703,6 +700,9 @@ public class RestrictPurchaseRequestController extends HttpServlet {
                 quotes.forEach(quote -> {
                     if (person.getId() == quote.getSeller().getId()) {
                         this.populateQuote(quote);
+                    }
+                    if (QuoteStatus.UNDER_REVIEW.equals(quote.getStatus()) && quote.isExpired()) {
+                        new QuoteDAO(true).updateStatus(quote);
                     }
                 });
                 purchaseRequest.setQuotes(quotes);
