@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
@@ -652,6 +653,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
                             new PurchaseRequestDAO(true).updateStage(purchaseRequest);
                         }
                     })
+                    .sorted(Comparator.comparing(PurchaseRequest::getId))
                     .collect(Collectors.toCollection(ArrayList::new));
 
             out.print(gJson.toJson(purchaseRequests));
@@ -709,10 +711,12 @@ public class RestrictPurchaseRequestController extends HttpServlet {
                         new QuoteDAO(true).updateStatus(quote);
                     }
                 });
+                quotes.sort(Comparator.comparing(Quote::getCreatedAt));
                 purchaseRequest.setQuotes(quotes);
             } else {
                 ArrayList<Quote> restrictQuotes = new QuoteDAO(true).findRestrictQuotes(purchaseRequest.getId(), person.getId());
                 restrictQuotes.forEach(this::populateQuote);
+                restrictQuotes.sort(Comparator.comparing(Quote::getCreatedAt));
                 purchaseRequest.setQuotes(restrictQuotes);
             }
 

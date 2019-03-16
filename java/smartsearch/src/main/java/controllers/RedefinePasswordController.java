@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import dao.UserDAO;
 import libs.Helper;
+import org.apache.commons.lang.StringUtils;
 import services.mail.MailSMTPService;
 import services.mail.MailerService;
 import services.mail.ResetPassword;
@@ -36,7 +37,7 @@ public class RedefinePasswordController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		String token = request.getParameter("t");
-		if (token == null || token.length() <= 15) {
+		if (StringUtils.isBlank(token) || token.length() <= 15) {
 			response.sendRedirect(request.getContextPath() + "/form/forgot_pass");
 			return;
 		}
@@ -100,7 +101,7 @@ public class RedefinePasswordController extends HttpServlet {
 		String token = request.getParameter("token");
 		request.setAttribute("t", token);
 
-		if (password == null || confirmPassword == null) {
+		if (StringUtils.isBlank(password) || StringUtils.isBlank(confirmPassword)) {
 			System.out.println("Campos inválidos");
 			response.sendRedirect("/form/reset_pass?t=" + token);
 //			request.getRequestDispatcher(request.getContextPath() + "/form/reset_pass?t=" + token).forward(request, response);

@@ -61,7 +61,7 @@ public class AuthController extends HttpServlet {
             request.setAttribute("error", "Email ou senha inválida");
             request.getRequestDispatcher("/signin").forward(request, response);
             return;
-        } else if (loggedUser.getStatus() == Status.INACTIVE) {
+        } else if (loggedUser.getStatus().equals(Status.INACTIVE)) {
             request.setAttribute("error", "Cadastro desativado");
             request.getRequestDispatcher("/signin").forward(request, response);
             return;
@@ -107,7 +107,7 @@ public class AuthController extends HttpServlet {
 
             UserDAO userDao = new UserDAO(true);
             userDao.initTransaction();
-            user = userDao.create(user);
+            userDao.create(user);
 
             person.setUser(user);
 

@@ -17,6 +17,7 @@ import enums.MessengerType;
 import libs.Helper;
 import models.Messenger;
 import models.ProductItem;
+import org.apache.commons.lang.StringUtils;
 import services.elasticsearch.ElasticsearchService;
 
 @SuppressWarnings("serial")
@@ -52,11 +53,11 @@ public class ProductItemController extends HttpServlet {
             String page = request.getParameter("page");
             String perPage = request.getParameter("perPage");
 
-            if (page == null) {
+            if (StringUtils.isBlank(page)) {
                 page = "1";
             }
 
-            if (perPage == null) {
+            if (StringUtils.isBlank(perPage)) {
                 perPage = "15";
             }
 

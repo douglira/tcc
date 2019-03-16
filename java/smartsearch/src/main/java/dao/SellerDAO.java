@@ -8,7 +8,7 @@ import java.util.Calendar;
 
 public class SellerDAO extends GenericDAO {
     private final static String TABLE_NAME = "sellers";
-    private final static String PIVOT_TABLE = "people";
+    private final static String TABLE_RELATION_PERSON = "people";
 
     public SellerDAO(boolean getConnection) {
         super(getConnection);
@@ -82,7 +82,7 @@ public class SellerDAO extends GenericDAO {
                 .append("SELECT * FROM ")
                 .append(TABLE_NAME)
                 .append(" s INNER JOIN ")
-                .append(PIVOT_TABLE)
+                .append(TABLE_RELATION_PERSON)
                 .append(" p ON s.person_id = p.id ")
                 .append(" WHERE s.person_id = ?")
                 .toString();
