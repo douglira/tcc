@@ -589,6 +589,10 @@ public class RestrictPurchaseRequestController extends HttpServlet {
             purchaseRequest.setQuotes(new QuoteDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
             purchaseRequest.setListProducts(new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
 
+            if (!PRStage.EXPIRED.equals(purchaseRequest.getStage()) && purchaseRequest.isExpired()) {
+                new PurchaseRequestDAO(true).updateStage(purchaseRequest);
+            }
+
             out.print(gson.toJson(purchaseRequest));
             out.close();
         } catch (Exception err) {

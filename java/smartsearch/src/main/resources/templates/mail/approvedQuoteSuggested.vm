@@ -1,0 +1,23 @@
+<html>
+
+<body style="background-color: #e1e1e1; display: flex; justify-content: center;">
+<div style="font-family: sans-serif; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; background-color: #f5f5f5; width: fit-content; padding: 35px; margin: 25px;">
+    <h1 style="color: #f5f5f5; font-size: 24px; padding: 20px 20px; width: 100%; background-color: #45568C; text-align: center;">
+        COTAÇÃO APROVADA
+    </h1>
+    <main style="font-size: 16px; color: #666; width: auto; max-width: 650px; line-height: 1.5; text-align: center">
+        <h2 style="font-size: 20px; color: #666;">ORDEM DE COMPRA&colon;&nbsp;&numero;$orderId</h2>
+        <p>
+            <strong style="text-transform: uppercase;">$buyerName</strong> aprovou sua cotação no valor de <strong style="color: #228B22">$orderTotalAmount</strong>.
+        </p>
+        <div style="display: flex; flex-direction: row; width: 100%; justify-content: center;">
+            <a style="color: #228B22; border: 1px solid #228B22; padding: 5px 40px; font-size: 18px; align-self: center; text-decoration: none; text-transform: uppercase; width: 100%; text-align: center; border-radius: 3px;"
+               href="$urlOrder">
+                Visualizar
+            </a>
+        </div>
+    </main>
+</div>
+</body>
+
+</html>

@@ -8,6 +8,7 @@ import java.util.Calendar;
 
 public class SellerDAO extends GenericDAO {
     private final static String TABLE_NAME = "sellers";
+    private final static String PIVOT_TABLE = "people";
 
     public SellerDAO(boolean getConnection) {
         super(getConnection);
@@ -52,6 +53,17 @@ public class SellerDAO extends GenericDAO {
     }
 
     private Seller fetch(ResultSet rs, Seller seller) throws SQLException {
+        try {
+            seller.setId(rs.getInt("id"));
+            seller.setAccountOwner(rs.getString("account_owner"));
+            seller.setTel(rs.getLong("tel"));
+            seller.setCnpj(rs.getLong("cnpj"));
+            seller.setCorporateName(rs.getString("corporate_name"));
+            seller.setStateRegistration(rs.getLong("state_registration"));
+        } catch(SQLException | NullPointerException err) {
+
+        }
+
         seller.setId(rs.getInt("person_id"));
         seller.setPositiveSalesCount(rs.getInt("positive_sales_count"));
         seller.setNegativeSalesCount(rs.getInt("negative_sales_count"));
@@ -66,7 +78,14 @@ public class SellerDAO extends GenericDAO {
     public Seller findById(Seller seller) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE person_id = ?";
+        String sql = new StringBuilder()
+                .append("SELECT * FROM ")
+                .append(TABLE_NAME)
+                .append(" s INNER JOIN ")
+                .append(PIVOT_TABLE)
+                .append(" p ON s.person_id = p.id ")
+                .append(" WHERE s.person_id = ?")
+                .toString();
 
         try {
             stmt = this.conn.prepareStatement(sql);

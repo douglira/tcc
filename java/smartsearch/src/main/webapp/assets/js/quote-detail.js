@@ -75,7 +75,7 @@ new Vue({
         this.selectedShipment = null;
         this.quote.status = 'ACCEPTED';
         const { content, type } = data;
-        this.showToast(content, type);
+        this.showMessage(content, type);
       } catch (err) {
         if (err.response.data.cause === 'UNAVAILABLE_QUANTITY') {
           this.selectedShipment = null;

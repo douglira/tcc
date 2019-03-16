@@ -72,4 +72,8 @@ public class Order {
     public void setUpdatedAt(Calendar updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public void calculateTotalAmount() {
+        this.totalAmount = this.quote.getTotalAmount() + this.shipment.getCost();
+    }
 }

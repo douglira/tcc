@@ -68,6 +68,8 @@ const VueHeader = new Vue({
 					return `/account/purchase_request/suggest?pr=${notification.resourceId}`;
 				case 'QUOTE':
 					return `/account/quote/detail?q=${notification.resourceId}`;
+				case 'ORDER':
+					return `/account/order/detail?order=${notification.resourceId}`;
 				default:
 					return 'javascript:void(0)';
 			}
@@ -78,6 +80,8 @@ const VueHeader = new Vue({
 					return 'fas fa-file-invoice-dollar';
 				case 'QUOTE':
 					return 'fas fa-hand-holding-usd';
+				case 'ORDER':
+					return 'fas fa-handshake';
 				default:
 					return null;
 			}

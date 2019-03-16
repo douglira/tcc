@@ -22,23 +22,10 @@ import controllers.socket.QuoteNotifierSocket;
 import dao.*;
 import enums.*;
 import libs.Helper;
-import models.Address;
-import models.Buyer;
-import models.Item;
-import models.Messenger;
-import models.Person;
-import models.Product;
-import models.PurchaseRequest;
-import models.Quote;
-import models.Seller;
-import models.Shipment;
-import models.User;
+import models.*;
 import models.socket.Notification;
 import org.apache.commons.lang.StringUtils;
-import services.mail.MailSMTPService;
-import services.mail.MailerService;
-import services.mail.NewSuggestedQuote;
-import services.mail.RefusedSuggestedQuote;
+import services.mail.*;
 
 @SuppressWarnings("serial")
 @WebServlet(name = "RestrictQuoteController", urlPatterns = {
@@ -177,10 +164,6 @@ public class RestrictQuoteController extends HttpServlet {
         }
     }
 
-    /**
-     * TODO Criar ordem de compra
-     * TODO Notificar fornecedor
-     */
     private void accepted(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(400);
@@ -247,6 +230,18 @@ public class RestrictQuoteController extends HttpServlet {
             });
             new QuoteDAO(productDao.getConnection()).updateAcceptedStatus(quote);
             new PurchaseRequestDAO(productDao.getConnection()).updateClosedStage(quote.getPurchaseRequest());
+
+            Order order = new Order();
+            order.setQuote(quote);
+            order.setShipment(selectedShipment);
+            order.setStatus(OrderStatus.CONFIRMED);
+            order.calculateTotalAmount();
+            new OrderDAO(productDao.getConnection()).create(order);
+            productDao.getConnection().commit();
+            productDao.getConnection().close();
+
+            QuoteNotifierSocket.notifyUpdatedQuotes(order.getQuote().getPurchaseRequest());
+            notifyApprovalToSeller(buyerPerson, order, getOrderUrl(request, order));
 
             response.setStatus(200);
             out = response.getWriter();
@@ -332,6 +327,41 @@ public class RestrictQuoteController extends HttpServlet {
         new NotificationDAO(true).create(notification);
 
         Runnable socketNotification = () -> NotificationSocket.pushLastNotifications(buyerUser);
+
+        new Thread(mailTask).start();
+        new Thread(socketNotification).start();
+    }
+
+    private void notifyApprovalToSeller(Person buyerPerson, Order order, String urlOrder) {
+        User sellerUser = new UserDAO(true).findByPerson(order.getQuote().getSeller().getId());
+
+        final MailerService mailer = new ApprovedSuggestedQuote(
+                buyerPerson.getAccountOwner(),
+                order.getId(),
+                order.getTotalAmount(),
+                urlOrder
+        );
+        mailer.setTo(sellerUser.getEmail());
+        mailer.setMail(MailSMTPService.getInstance());
+
+        Runnable mailTask = (mailer::send);
+
+        Notification notification = new Notification();
+        notification.setFrom(buyerPerson.getUser());
+        notification.setTo(sellerUser);
+        notification.setResourceId(order.getId());
+        notification.setResourceType(NotificationResource.ORDER);
+        notification.setStatus(NotificationStatus.PENDING);
+        notification.setContent(
+            new StringBuilder()
+                .append("[COTAÇÃO ACEITA]: Sua cotação feita para ")
+                .append(buyerPerson.getAccountOwner())
+                .append(" foi aprovada!!!")
+                .toString()
+        );
+        new NotificationDAO(true).create(notification);
+
+        Runnable socketNotification = () -> NotificationSocket.pushLastNotifications(sellerUser);
 
         new Thread(mailTask).start();
         new Thread(socketNotification).start();
@@ -450,6 +480,11 @@ public class RestrictQuoteController extends HttpServlet {
         }
 
         return validationMessage;
+    }
+
+    private String getOrderUrl(HttpServletRequest request, Order order) {
+        String baseUrl = Helper.getBaseUrl(request);
+        return baseUrl + "/account/order/detail?order=" + String.valueOf(order.getId());
     }
 
     private String getQuotesUrl(HttpServletRequest request, Quote quote) {

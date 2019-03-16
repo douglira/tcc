@@ -65,13 +65,19 @@
                     {{ formatFullDate(purchaseRequest.createdAt) }}
                 </small>
             </h1>
-            <div v-if="countdown" class="countdown text-danger">
+            <div v-if="countdown && purchaseRequest.stage === 'UNDER_QUOTATION'" class="countdown text-danger">
                 <span class="font-weight-bold text-muted">Expira em&colon;</span>
                 &nbsp;
                 {{ countdown }}
             </div>
-            <div v-else class="countdown text-danger text-uppercase">
-                EXPIRADO!!
+            <div v-if="(purchaseRequest.stage === 'EXPIRED') || (!countdown && purchaseRequest.stage === 'UNDER_QUOTATION')" class="countdown text-danger text-uppercase">
+                EXPIRADO
+            </div>
+            <div v-if="purchaseRequest.stage === 'CLOSED'" class="countdown text-info text-uppercase">
+                ENCERRADO
+            </div>
+            <div v-if="purchaseRequest.stage === 'CANCELLED'" class="countdown text-muted text-uppercase">
+                CANCELADO
             </div>
         </div>
     </div>

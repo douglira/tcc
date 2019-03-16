@@ -245,10 +245,13 @@ public class QuoteDAO extends GenericDAO {
 
     public void updateAcceptedStatus(Quote quote) {
         PreparedStatement stmt = null;
-        String sql = "UPDATE " + TABLE_NAME + " SET status = CAST ('ACCEPTED' as quote_status), updated_at = NOW() WHERE id = ?";
+        String sql = "UPDATE " + TABLE_NAME + " SET status = CAST (? as quote_status), updated_at = NOW() WHERE id = ?";
+        quote.setStatus(QuoteStatus.ACCEPTED);
+
         try {
             stmt = this.conn.prepareStatement(sql);
-            stmt.setInt(1, quote.getId());
+            stmt.setString(1, quote.getStatus().toString());
+            stmt.setInt(2, quote.getId());
             stmt.executeUpdate();
         } catch (SQLException err) {
             try {
@@ -259,15 +262,6 @@ public class QuoteDAO extends GenericDAO {
             }
             err.printStackTrace();
             System.out.println("QuoteDAO.updateAcceptedStatus [ERROR](2): " + err);
-        } finally {
-            if (this.conn != null) {
-                try {
-                    this.conn.close();
-                } catch (SQLException err) {
-                    err.printStackTrace();
-                    System.out.println("QuoteDAO.updateAcceptedStatus [ERROR](3): " + err);
-                }
-            }
         }
     }
 }

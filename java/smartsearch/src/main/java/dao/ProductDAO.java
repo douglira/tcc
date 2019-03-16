@@ -357,15 +357,6 @@ public class ProductDAO extends GenericDAO {
             }
             err.printStackTrace();
             System.out.println("ProductDAO.updateAvailableQuantity [ERROR](2): " + err);
-        } finally {
-            if (this.conn != null) {
-                try {
-                    this.conn.close();
-                } catch (SQLException sqlException) {
-                    sqlException.printStackTrace();
-                    System.out.println("ProductDAO.updateAvailableQuantity [ERROR](3): " + sqlException);
-                }
-            }
         }
     }
 }
