@@ -226,6 +226,33 @@ public class ElasticsearchService {
             }
     	}
     }
+
+    public void updateProductItemRelevance(ProductItem productItem) {
+        try {
+            XContentBuilder builder = XContentFactory.jsonBuilder();
+
+            builder.startObject();
+            builder.field("relevance", productItem.getRelevance());
+            builder.endObject();
+
+            this.client.update(
+                    new UpdateRequest("product_items", "_doc", String.valueOf(productItem.getId())).doc(builder),
+                    RequestOptions.DEFAULT
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Elasticsearch.updateProductItemRelevance - [ERROR](1): " + e);
+        } finally {
+            if (this.client != null) {
+                try {
+                    this.client.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.out.println("Elasticsearch.updateProductItemRelevance - [ERROR](2): " + e);
+                }
+            }
+        }
+    }
     
     public void inactiveProductItem(Integer productItemId) {
     	try {

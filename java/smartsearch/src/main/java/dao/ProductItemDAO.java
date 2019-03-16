@@ -8,6 +8,7 @@ import java.util.Calendar;
 
 public class ProductItemDAO extends GenericDAO {
     private static final String TABLE_NAME = "product_items";
+    private static final String TABLE_PRODUCT = "products";
 
     public ProductItemDAO(boolean getConnection) {
         super(getConnection);
@@ -102,6 +103,44 @@ public class ProductItemDAO extends GenericDAO {
             }
         }
 
+        return productItem;
+    }
+
+    public ProductItem findByProduct(int productId) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = new StringBuilder()
+                .append("SELECT pitem.* FROM ")
+                .append(TABLE_NAME)
+                .append(" pitem ")
+                .append(" INNER JOIN ")
+                .append(TABLE_PRODUCT)
+                .append(" p ON pitem.id = p.product_item_id ")
+                .append(" WHERE p.id = ? ")
+                .toString();
+        ProductItem productItem = null;
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, productId);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                productItem = this.fetch(rs, new ProductItem());
+            }
+        } catch (SQLException sqlError) {
+            sqlError.printStackTrace();
+            System.out.println("ProductItemDAO.findByProduct [ERROR](1): " + sqlError);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException sqlException) {
+                    sqlException.printStackTrace();
+                    System.out.println("ProductItemDAO.findByProduct [ERROR](2): " + sqlException);
+                }
+            }
+        }
         return productItem;
     }
 

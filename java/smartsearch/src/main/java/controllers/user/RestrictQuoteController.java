@@ -2,6 +2,7 @@ package controllers.user;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,6 +26,7 @@ import libs.Helper;
 import models.*;
 import models.socket.Notification;
 import org.apache.commons.lang.StringUtils;
+import services.elasticsearch.ElasticsearchService;
 import services.mail.*;
 
 @SuppressWarnings("serial")
@@ -168,7 +170,6 @@ public class RestrictQuoteController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(400);
         PrintWriter out = response.getWriter();
-        Gson gson = new Gson();
 
         try {
             String quoteId = request.getParameter("quoteId");
@@ -223,13 +224,7 @@ public class RestrictQuoteController extends HttpServlet {
 
             ProductDAO productDao = new ProductDAO(true);
             productDao.initTransaction();
-            quote.getCustomListProduct().forEach(quoteProduct -> {
-                Product product = (Product) quoteProduct.getProduct();
-                product.updateSale(quoteProduct.getQuantity());
-                productDao.updateSale(product);
-            });
-            new QuoteDAO(productDao.getConnection()).updateAcceptedStatus(quote);
-            new PurchaseRequestDAO(productDao.getConnection()).updateClosedStage(quote.getPurchaseRequest());
+            updateInventory(quote, productDao.getConnection());
 
             Order order = new Order();
             order.setQuote(quote);
@@ -259,7 +254,6 @@ public class RestrictQuoteController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(400);
         PrintWriter out = response.getWriter();
-        Gson gson = new Gson();
 
         try {
             String quoteId = request.getParameter("quoteId");
@@ -422,6 +416,28 @@ public class RestrictQuoteController extends HttpServlet {
 
         QuoteNotifierSocket.notifyUpdatedQuotes(quote.getPurchaseRequest());
         notifyDenialToSeller(buyerPerson, quote, urlPurchaseRequest);
+    }
+
+    private void updateInventory(Quote quote, Connection connection) {
+        ProductDAO productDao = new ProductDAO(connection);
+        quote.getCustomListProduct().forEach(quoteProduct -> {
+            Product product = (Product) quoteProduct.getProduct();
+            product.updateSale(quoteProduct.getQuantity());
+            productDao.updateSale(product);
+
+
+            if (product.getAvailableQuantity() == 0) {
+                ProductItem productItem = new ProductItemDAO(true).findByProduct(product.getId());
+
+                if (productItem != null) {
+                    productItem.setRelevance(productItem.getRelevance() - 1);
+                    new ElasticsearchService().updateProductItemRelevance(productItem);
+                }
+            }
+            quoteProduct.setProduct(product);
+        });
+        new QuoteDAO(productDao.getConnection()).updateAcceptedStatus(quote);
+        new PurchaseRequestDAO(productDao.getConnection()).updateClosedStage(quote.getPurchaseRequest());
     }
 
     private void setShippingReceiverAddress(Shipment shipment, PurchaseRequest purchaseRequest) {
