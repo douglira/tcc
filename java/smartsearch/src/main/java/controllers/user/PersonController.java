@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import com.google.gson.Gson;
 
+import com.sun.istack.internal.NotNull;
 import dao.AddressDAO;
 import dao.PersonDAO;
 import dao.UserDAO;
@@ -21,6 +22,7 @@ import models.Address;
 import models.Messenger;
 import models.Person;
 import models.User;
+import org.apache.commons.lang.StringUtils;
 
 @WebServlet(name = "PersonController", urlPatterns = "/account/me/data")
 public class PersonController extends HttpServlet {
@@ -34,11 +36,9 @@ public class PersonController extends HttpServlet {
 			throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
 		PrintWriter out = response.getWriter();
-
 		Gson gJson = new Gson();
 
-		HttpSession session = request.getSession();
-		Person person = (Person) session.getAttribute("loggedPerson");
+		Person person = (Person) request.getSession().getAttribute("loggedPerson");
 
 		Address address = new AddressDAO(true).findByPerson(person.getId());
 
@@ -64,8 +64,8 @@ public class PersonController extends HttpServlet {
 			String corporateName = request.getParameter("corporateName");
 			long stateRegistration = Long.parseLong(request.getParameter("stateRegistration"));
 
-			int addressId = 0;
-			if (request.getParameter("addressId").length() != 0 && request.getParameter("addressId") != null) {
+			Integer addressId = null;
+			if (StringUtils.isNotBlank(request.getParameter("addressId"))) {
 				addressId = Integer.parseInt(request.getParameter("addressId"));
 			}
 			String street = request.getParameter("street");
@@ -95,8 +95,7 @@ public class PersonController extends HttpServlet {
 			address.setPostalCode(postalCode);
 			address.setPerson(person);
 
-			HttpSession session = request.getSession();
-			User user = (User) session.getAttribute("loggedUser");
+			User user = (User) request.getSession().getAttribute("loggedUser");
 
 			user.generateDisplayName(person.getAccountOwner());
 			UserDAO userDao = new UserDAO(true);
@@ -106,10 +105,11 @@ public class PersonController extends HttpServlet {
 			PersonDAO personDao = new PersonDAO(userDao.getConnection());
 			personDao.update(person);
 
-			if (addressId == 0) {
-				address = new AddressDAO(personDao.getConnection()).create(address);
+			AddressDAO addressDao = new AddressDAO(personDao.getConnection());
+			if (addressId == null) {
+				addressDao.create(address);
 			} else {
-				new AddressDAO(personDao.getConnection()).update(address);
+				addressDao.update(address);
 			}
 
 			person.setUser(user);

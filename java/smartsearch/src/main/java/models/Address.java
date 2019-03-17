@@ -3,7 +3,7 @@ package models;
 import java.util.Calendar;
 
 public class Address {
-	private int id;
+	private Integer id;
 	private Person person;
 	private String postalCode;
 	private String street;
@@ -20,15 +20,15 @@ public class Address {
 
 	}
 
-	public Address(int id) {
+	public Address(Integer id) {
 		this.id = id;
 	}
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 

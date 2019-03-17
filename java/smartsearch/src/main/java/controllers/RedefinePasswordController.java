@@ -81,7 +81,7 @@ public class RedefinePasswordController extends HttpServlet {
 		}
 
 		final MailerService mailer = new ResetPassword(user.getDisplayName(),
-				this.getUrlRedirect(request, user.getPasswordResetToken()));
+				getUrlRedirect(request, user.getPasswordResetToken()));
 		mailer.setMail(MailSMTPService.getInstance());
 		mailer.setTo(user.getEmail());
 

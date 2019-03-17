@@ -35,11 +35,9 @@ public class FilesController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final String UPLOAD_PICTURES_DIRECTORY = "pictures";
     private static final String BUCKET_KEY_PRODUCT_PICTURES = "product_pictures/";
-    private S3Service s3Service;
 
     public FilesController() {
         super();
-        this.s3Service = new S3Service();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -77,22 +75,8 @@ public class FilesController extends HttpServlet {
             ArrayList<File> pictures = new ArrayList<File>();
 
             for (Part part : request.getParts()) {
-                String filename = System.currentTimeMillis() + "_" + part.getSubmittedFileName();
-                String fileS3Key = BUCKET_KEY_PRODUCT_PICTURES + user.getUsername() + "/" + filename;
-                String type = part.getContentType().split("/")[0];
-                String subtype = part.getContentType().split("/")[1];
-
-                String urlPath = this.s3Service.uploadObject(part.getInputStream(), part.getContentType(), fileS3Key);
-
-                File picture = new File();
-                picture.setName(part.getSubmittedFileName());
-                picture.setFilePath(fileS3Key);
-                picture.setUrlPath(urlPath);
-                picture.setSize(part.getSize());
-                picture.setType(type);
-                picture.setSubtype(subtype);
-
-                pictures.add(picture);
+                File file = saveS3File(part, user);
+                pictures.add(file);
             }
 
             out.println(gJson.toJson(pictures));
@@ -114,7 +98,7 @@ public class FilesController extends HttpServlet {
             ArrayList<File> pictures = gJson.fromJson(request.getParameter("pictures"), new TypeToken<ArrayList<File>>(){}.getType());
 
             for (File picture : pictures) {
-                this.s3Service.deleteObject(picture.getFilePath());
+                new S3Service().deleteObject(picture.getFilePath());
             }
             Helper.responseMessage(out, new Messenger("Foto do produto excluída com sucesso", MessengerType.SUCCESS));
         } catch (Exception e) {
@@ -134,30 +118,52 @@ public class FilesController extends HttpServlet {
 
         if (!uploadDir.exists()) uploadDir.mkdir();
 
-        String baseUrl = Helper.getBaseUrl(request);
-
         ArrayList<File> pictures = new ArrayList<File>();
 
         for (Part part : request.getParts()) {
-            String filename = System.currentTimeMillis() + "_" + part.getSubmittedFileName();
-            String filenamePath = uploadPath + java.io.File.separator + filename;
-            String urlPath = baseUrl + java.io.File.separator + UPLOAD_PICTURES_DIRECTORY + java.io.File.separator + filename;
-            String type = part.getContentType().split("/")[0];
-            String subtype = part.getContentType().split("/")[1];
-            part.write(filenamePath);
-
-            File picture = new File();
-            picture.setName(part.getSubmittedFileName());
-            picture.setFilePath(filenamePath);
-            picture.setUrlPath(urlPath);
-            picture.setSize(part.getSize());
-            picture.setType(type);
-            picture.setSubtype(subtype);
-
-            pictures.add(picture);
+            File file = saveServerFile(part, uploadPath, Helper.getBaseUrl(request));
+            pictures.add(file);
         }
 
         out.println(gJson.toJson(pictures));
         out.close();
+    }
+
+    private File saveS3File(Part part, User user) throws Exception {
+        String filename = System.currentTimeMillis() + "_" + part.getSubmittedFileName();
+        String fileS3Key = BUCKET_KEY_PRODUCT_PICTURES + user.getUsername() + "/" + filename;
+        String type = part.getContentType().split("/")[0];
+        String subtype = part.getContentType().split("/")[1];
+
+        String urlPath = new S3Service().uploadObject(part.getInputStream(), part.getContentType(), fileS3Key);
+
+        File file = new File();
+        file.setName(part.getSubmittedFileName());
+        file.setFilePath(fileS3Key);
+        file.setUrlPath(urlPath);
+        file.setSize(part.getSize());
+        file.setType(type);
+        file.setSubtype(subtype);
+
+        return file;
+    }
+
+    private File saveServerFile(Part part, String uploadPath, String baseUrl) throws IOException {
+        String filename = System.currentTimeMillis() + "_" + part.getSubmittedFileName();
+        String filenamePath = uploadPath + java.io.File.separator + filename;
+        String urlPath = baseUrl + java.io.File.separator + UPLOAD_PICTURES_DIRECTORY + java.io.File.separator + filename;
+        String type = part.getContentType().split("/")[0];
+        String subtype = part.getContentType().split("/")[1];
+        part.write(filenamePath);
+
+        File file = new File();
+        file.setName(part.getSubmittedFileName());
+        file.setFilePath(filenamePath);
+        file.setUrlPath(urlPath);
+        file.setSize(part.getSize());
+        file.setType(type);
+        file.setSubtype(subtype);
+
+        return file;
     }
 }

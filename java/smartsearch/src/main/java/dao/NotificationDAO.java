@@ -114,7 +114,7 @@ public class NotificationDAO extends GenericDAO {
     public ArrayList<Notification> findLastOnes(int userId) {
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE to_user_id = ? ORDER BY created_at DESC LIMIT 15";
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE to_user_id = ? ORDER BY created_at DESC LIMIT 10";
         ArrayList<Notification> notifications = new ArrayList<Notification>();
 
         try {
@@ -165,5 +165,40 @@ public class NotificationDAO extends GenericDAO {
                 }
             }
         }
+    }
+
+    public ArrayList<Notification> pagination(int userId, int page, int perPage) {
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "SELECT * FROM " + TABLE_NAME + " WHERE to_user_id = ? ORDER BY created_at DESC OFFSET ? LIMIT ?";
+        ArrayList<Notification> notifications = new ArrayList<Notification>();
+        int offset = (page - 1) * perPage;
+
+        try {
+            stmt = this.conn.prepareStatement(sql);
+            stmt.setInt(1, userId);
+            stmt.setInt(2, offset);
+            stmt.setInt(3, perPage);
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Notification notification = this.fetch(rs, new Notification());
+
+                notifications.add(notification);
+            }
+        } catch (SQLException err) {
+            err.printStackTrace();
+            System.out.println("NotificationDAO.findLastOnes [ERROR](1): " + err);
+        } finally {
+            if (this.conn != null) {
+                try {
+                    this.conn.close();
+                } catch (SQLException err) {
+                    err.printStackTrace();
+                    System.out.println("NotificationDAO.findLastOnes [ERROR](2): " + err);
+                }
+            }
+        }
+        return notifications;
     }
 }
