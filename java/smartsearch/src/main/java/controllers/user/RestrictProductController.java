@@ -204,13 +204,7 @@ public class RestrictProductController extends HttpServlet {
         		product.setBasePrice(Double.parseDouble(request.getParameter("basePrice")));
         		
         		ProductItem productItem = new ProductItemDAO(true).findById(product.getProductItem());
-        		productItem.setBasedProducts(
-        				new ProductDAO(true).findByProductItem(productItem.getId())
-        					.stream()
-	        				.filter(productFilter -> !productFilter.getId().equals(product.getId()))
-	        				.collect(Collectors.toCollection(ArrayList::new)));
-        		productItem.addBasedProduct(product);
-        		productItem.updatePrices();
+                updateMarketPrices(productItem, product);
         		
         		ProductItemDAO productItemDao = new ProductItemDAO(true);
         		productItemDao.initTransaction();
@@ -311,6 +305,16 @@ public class RestrictProductController extends HttpServlet {
         return isValid;
     }
 
+    private void updateMarketPrices(ProductItem productItem, Product product) {
+        productItem.setBasedProducts(
+                new ProductDAO(true).findByProductItem(productItem.getId())
+                        .stream()
+                        .filter(productFilter -> !productFilter.getId().equals(product.getId()))
+                        .collect(Collectors.toCollection(ArrayList::new)));
+        productItem.addBasedProduct(product);
+        productItem.updatePrices();
+    }
+
     private void getSellerProducts(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
@@ -326,15 +330,13 @@ public class RestrictProductController extends HttpServlet {
             String baseUrl = Helper.getBaseUrl(request);
             ArrayList<Product> products = null;
 
-            if (searchTitle != null && searchTitle.length() > 2) {
-                products = new ProductDAO(true)
-                        .searchByTitle(searchTitle, person.getId());
+            if (StringUtils.isNotBlank(searchTitle)) {
+                products = new ProductDAO(true).searchByTitle(searchTitle, person.getId());
             } else if (validatePagination(page, perPage)) {
                 products = new ProductDAO(true)
                         .pagination(Integer.parseInt(page, 10), Integer.parseInt(perPage, 10), person.getId());
             } else {
-                products = new ProductDAO(true)
-                        .pagination(1, 15, person.getId());
+                products = new ProductDAO(true).pagination(1, 15, person.getId());
             }
 
             fetchProductPictures(products, baseUrl);

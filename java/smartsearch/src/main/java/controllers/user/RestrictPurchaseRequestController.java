@@ -54,11 +54,13 @@ import services.mail.PublishedPurchaseRequest;
 
 @SuppressWarnings("serial")
 @WebServlet(name = "RestrictPurchaseRequestController", urlPatterns = {
+        // GET
         "/account/purchase_request",
         "/account/purchase_request/list",
         "/account/purchase_request/creation",
         "/account/purchase_request/details",
 
+        // POST
         "/account/purchase_request/new",
         "/account/purchase_request/save",
         "/account/purchase_request/remove",
@@ -490,7 +492,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         try {
             String purchaseRequestId = request.getParameter("pr");
 
-            if (purchaseRequestId == null || purchaseRequestId.length() < 4) {
+            if (StringUtils.isBlank(purchaseRequestId) || purchaseRequestId.length() < 4) {
                 response.sendRedirect(request.getContextPath() + "/");
                 return;
             }
