@@ -124,7 +124,7 @@
                                         <div class="pr-header-item-title text-muted">{{ prItem.product.title }}</div>
                                     </li>
                                     <a class="dropdown-item text-center text-danger p-3 p-sm-3 p-md-3 p-lg-3"
-                                       :href="'/account/purchase_request/new?pr=' + purchaseRequest.id">Ver pedido</a>
+                                       :href="'/account/purchase_request/creation?pr=' + purchaseRequest.id">Ver pedido</a>
                                 </ul>
                             </template>
                             <template v-else>

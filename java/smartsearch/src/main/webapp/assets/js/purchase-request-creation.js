@@ -116,17 +116,13 @@ const VuePRCreation = new Vue({
         })
     },
     saveEditProduct() {
-      const payload = {
-        quantity: this.modalData.quantity,
-        additionalSpec: this.modalData.additionalSpec
-      };
-
       $.post(
         '/account/purchase_request/save',
         {
           purchaseRequestId: this.purchaseRequest.id,
           productItemId: this.modalData.productItemId,
-          purchaseItem: JSON.stringify(payload),
+          productItemQuantity: this.modalData.quantity,
+          productItemAdditionalSpec: this.modalData.additionalSpec
         }
       )
         .always(() => {

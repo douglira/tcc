@@ -59,6 +59,7 @@ import services.mail.PublishedPurchaseRequest;
         "/account/purchase_request/list",
         "/account/purchase_request/creation",
         "/account/purchase_request/details",
+        "/account/purchase_request/suggest",
 
         // POST
         "/account/purchase_request/new",
@@ -66,7 +67,6 @@ import services.mail.PublishedPurchaseRequest;
         "/account/purchase_request/remove",
         "/account/purchase_request/abort",
         "/account/purchase_request/publish",
-        "/account/purchase_request/suggest"
 })
 public class RestrictPurchaseRequestController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -97,12 +97,12 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try {
-            HttpSession session = request.getSession();
-            User user = (User) session.getAttribute("loggedUser");
-            Person person = (Person) session.getAttribute("loggedPerson");
+            Person person = (Person) request.getSession().getAttribute("loggedPerson");
+            person.setUser(null);
+            User user = (User) request.getSession().getAttribute("loggedUser");
             user.setPerson(person);
 
-            if (missingAddressRegister(user)) {
+            if (missingAddressRegister(person)) {
                 response.setStatus(400);
                 out = response.getWriter();
                 Helper.responseMessage(out, new Messenger("Cadastre seu endereço para criar um pedido de compra", MessengerType.WARNING, "ERROR_MISSING_ADDRESS"));
@@ -113,23 +113,22 @@ public class RestrictPurchaseRequestController extends HttpServlet {
             String productItemQuantity = request.getParameter("productItemQuantity");
             String productItemAdditionalSpec = request.getParameter("productItemAdditionalSpec");
 
-            if (productItemId == null || productItemId.length() == 0) {
+            if (StringUtils.isBlank(productItemId)) {
                 Helper.responseMessage(out, new Messenger("Operação inválida.", MessengerType.ERROR));
                 return;
             }
-            ProductItem productItem = new ProductItem();
-            productItem.setId(Integer.parseInt(productItemId));
 
-            updateViewsCount(Integer.parseInt(productItemId), Helper.getBaseUrl(request));
+            ProductItem productItem = new ProductItem(Integer.parseInt(productItemId));
+            updateViewsCount(productItem.getId());
 
             Item item = new Item();
             item.setAdditionalSpec(productItemAdditionalSpec);
             item.setProduct(productItem);
 
-            if (productItemQuantity != null && productItemQuantity.length() > 0) {
+            if (StringUtils.isNotBlank(productItemQuantity)) {
                 item.setQuantity(Integer.parseInt(productItemQuantity));
             } else {
-                item.setQuantity(0);
+                item.setQuantity(1);
             }
 
             addProductItem(out, Helper.getBaseUrl(request), user, item);
@@ -148,21 +147,24 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         try {
             int purchaseRequestId = Integer.parseInt(request.getParameter("purchaseRequestId"));
             int productItemId = Integer.parseInt(request.getParameter("productItemId"));
+            int productItemQuantity = Integer.parseInt(request.getParameter("productItemQuantity"));
+            String productItemAdditionalSpec = request.getParameter("productItemAdditionalSpec");
 
-            HttpSession session = request.getSession();
-            Person person = (Person) session.getAttribute("loggedPerson");
+            Person person = (Person) request.getSession().getAttribute("loggedPerson");
             person.setUser(null);
-            User user = (User) session.getAttribute("loggedUser");
+            User user = (User) request.getSession().getAttribute("loggedUser");
             user.setPerson(person);
 
-            Item item = gJson.fromJson(request.getParameter("purchaseItem"), Item.class);
+            Item item = new Item();
+            item.setQuantity(productItemQuantity);
+            item.setAdditionalSpec(productItemAdditionalSpec);
 
             if (item.getQuantity() <= 0) {
+                out.close();
                 return;
             }
 
-            ProductItem productItem = new ProductItem();
-            productItem.setId(productItemId);
+            ProductItem productItem = new ProductItem(productItemId);
             item.setProduct(productItem);
 
             PurchaseItemDAO PurchaseItemDao = new PurchaseItemDAO(true);
@@ -193,21 +195,21 @@ public class RestrictPurchaseRequestController extends HttpServlet {
             User user = (User) session.getAttribute("loggedUser");
             user.setPerson(person);
 
-            PurchaseItemDAO PurchaseItemDao = new PurchaseItemDAO(true);
-            PurchaseItemDao.initTransaction();
-            PurchaseItemDao.remove(purchaseRequestId, productItemId);
+            PurchaseItemDAO purchaseItemDao = new PurchaseItemDAO(true);
+            purchaseItemDao.initTransaction();
+            purchaseItemDao.remove(purchaseRequestId, productItemId);
 
             ArrayList<Item> products = new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequestId);
             if (products.isEmpty()) {
-                PurchaseRequest pr = new PurchaseRequest();
-                new PurchaseRequestDAO(PurchaseItemDao.getConnection()).destroyCreation(purchaseRequestId, user.getPerson().getId());
+                new PurchaseRequestDAO(purchaseItemDao.getConnection()).destroyCreation(purchaseRequestId, user.getPerson().getId());
 
+                PurchaseRequest pr = new PurchaseRequest();
                 pr.setId(null);
                 PRCreationSocket.sendUpdatedPRCreation(user, pr, null);
                 return;
             }
 
-            updatePurchaseRequestData(user, purchaseRequestId, PurchaseItemDao, Helper.getBaseUrl(request));
+            updatePurchaseRequestData(user, purchaseRequestId, purchaseItemDao, Helper.getBaseUrl(request));
             out.close();
         } catch (Exception err) {
             err.printStackTrace();
@@ -252,8 +254,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
             User user = (User) request.getSession().getAttribute("loggedUser");
             Person person = (Person) request.getSession().getAttribute("loggedPerson");
 
-            PurchaseRequest purchaseRequest = new PurchaseRequest();
-            purchaseRequest.setId(Integer.parseInt(purchaseRequestId));
+            PurchaseRequest purchaseRequest = new PurchaseRequest(Integer.parseInt(purchaseRequestId));
             purchaseRequest.setBuyer(new Buyer(person.getId()));
             purchaseRequestDelete(user, purchaseRequest);
 
@@ -364,21 +365,22 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         return baseUrl + "/account/purchase_request/suggest?pr=" + String.valueOf(purchaseRequest.getId());
     }
 
-    private boolean missingAddressRegister(User user) {
-        Address address = new AddressDAO(true).findByPerson(user.getPerson().getId());
+    private boolean missingAddressRegister(Person person) {
+        Address address = new AddressDAO(true).findByPerson(person.getId());
 
         return address == null;
     }
 
-    private void updateViewsCount(int productItemId, String baseUrl) {
-        ProductItem productItem = new ProductItem();
-        productItem.setId(productItemId);
-
+    private void updateViewsCount(int productItemId) {
+        ProductItem productItem = new ProductItem(productItemId);
         productItem = new ProductItemDAO(true).findById(productItem);
-        productItem.setViewsCount(productItem.getViewsCount() + 1);
-        new ProductItemDAO(true).updateViewsCount(productItem);
 
-        new ElasticsearchService().updateProductItemViewsCount(productItemId, productItem.getViewsCount());
+        if (productItem != null) {
+            productItem.setViewsCount(productItem.getViewsCount() + 1);
+            new ProductItemDAO(true).updateViewsCount(productItem);
+
+            new ElasticsearchService().updateProductItemViewsCount(productItemId, productItem.getViewsCount());
+        }
     }
 
     private void addProductItem(PrintWriter out, String baseUrl, User user, Item item) throws SQLException {
@@ -471,11 +473,8 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         String action = uri.replace("/account/purchase_request/", "");
 
         switch (action) {
-            case "new":
-                renderCreationPage(request, response);
-                break;
             case "creation":
-                getCreation(request, response);
+                creation(request, response);
                 break;
             case "details":
                 getDetails(request, response);
@@ -488,7 +487,15 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         }
     }
 
-    private void renderCreationPage(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void creation(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (request.getHeader("Accept").contains("application/json")) {
+            responseCreationJson(request, response);
+        } else {
+            renderCreation(request, response);
+        }
+    }
+
+    private void renderCreation(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             String purchaseRequestId = request.getParameter("pr");
 
@@ -518,7 +525,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         }
     }
 
-    private void getCreation(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void responseCreationJson(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         Gson gJson = new Gson();
@@ -589,10 +596,16 @@ public class RestrictPurchaseRequestController extends HttpServlet {
 
         try {
             PurchaseRequest purchaseRequest = new PurchaseRequestDAO(true).findById(new PurchaseRequest(Integer.parseInt(request.getParameter("id"))));
+
+            if (purchaseRequest.getBuyer().getId() != ((Person) request.getSession().getAttribute("loggedPerson")).getId()) {
+                response.sendRedirect("/");
+                return;
+            }
+
             purchaseRequest.setQuotes(new QuoteDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
             purchaseRequest.setListProducts(new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
 
-            if (!PRStage.EXPIRED.equals(purchaseRequest.getStage()) && purchaseRequest.isExpired()) {
+            if (PRStage.UNDER_QUOTATION.equals(purchaseRequest.getStage()) && purchaseRequest.isExpired()) {
                 new PurchaseRequestDAO(true).updateStage(purchaseRequest);
             }
 
@@ -600,7 +613,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
             out.close();
         } catch (Exception err) {
             err.printStackTrace();
-            System.out.println("RestrictPurchaseRequestController.doPost [ERROR]: " + err);
+            System.out.println("RestrictPurchaseRequestController.responseJsonDetails [ERROR]: " + err);
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
     }
@@ -651,7 +664,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
                         purchaseRequest.setListProducts(new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
                         fetchPictures(purchaseRequest.getListProducts(), Helper.getBaseUrl(request));
                         purchaseRequest.setQuotes(new QuoteDAO(true).findByPurchaseRequest(purchaseRequest.getId()));
-                        if (!PRStage.EXPIRED.equals(purchaseRequest.getStage()) && purchaseRequest.isExpired()) {
+                        if (PRStage.UNDER_QUOTATION.equals(purchaseRequest.getStage()) && purchaseRequest.isExpired()) {
                             new PurchaseRequestDAO(true).updateStage(purchaseRequest);
                         }
                     })
@@ -666,7 +679,6 @@ public class RestrictPurchaseRequestController extends HttpServlet {
             Helper.responseMessage(out, new Messenger("Algo inesperado aconteceu, tente mais tarde.", MessengerType.ERROR));
         }
     }
-
 
     private void suggest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         if (request.getHeader("Accept").contains("application/json")) {
@@ -691,6 +703,12 @@ public class RestrictPurchaseRequestController extends HttpServlet {
             }
 
             PurchaseRequest purchaseRequest = new PurchaseRequestDAO(true).findById(new PurchaseRequest(Integer.parseInt(purchaseRequestIdString)));
+
+            if (purchaseRequest.getBuyer().getId() == person.getId()) {
+                response.sendRedirect("/");
+                return;
+            }
+
             ArrayList<Item> prProducts = new PurchaseItemDAO(true).findByPurchaseRequest(purchaseRequest.getId());
 
             prProducts.forEach(item -> {
