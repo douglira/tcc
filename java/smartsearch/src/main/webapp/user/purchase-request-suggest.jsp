@@ -365,7 +365,7 @@
                                     <a
                                         href="javascript:void(0)"
                                         v-for="item in productsQuote"
-                                        @click="onClickRemoveProject(item)"
+                                        @click="onClickRemoveProduct(item)"
                                         class="d-flex justify-content-between align-items-center list-group-item list-group-item-action list-item-selected-product">
                                         {{ item.product.title }}
                                         <span class="badge badge-info badge-pill">{{ item.quantity }}</span>

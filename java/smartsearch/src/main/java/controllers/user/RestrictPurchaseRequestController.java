@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
@@ -670,7 +671,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
                     })
                     .sorted(Comparator.comparing(PurchaseRequest::getId))
                     .collect(Collectors.toCollection(ArrayList::new));
-
+            Collections.reverse(purchaseRequests);
             out.print(gJson.toJson(purchaseRequests));
             out.close();
         } catch (Exception error) {

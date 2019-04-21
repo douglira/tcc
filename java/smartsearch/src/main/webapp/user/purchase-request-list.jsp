@@ -60,8 +60,8 @@
                    style="text-decoration: none; background-color: inherit !important; border-bottom: none !important;"
                    class="card-header d-flex justify-content-between align-items-center">
                     <h5>&numero;&nbsp;<i>{{ pr.id }}</i></h5>
-                    <small v-if="!isExpired(pr.dueDate)">Expira em: {{ formatDatetime(pr.dueDate) }}</small>
-                    <small v-else class="text-danger text-uppercase">Expirado</small>
+                    <small v-if="!isExpired(pr.dueDate) && pr.stage === 'UNDER_QUOTATION'">Expira em: {{ formatDate(pr.dueDate) }}</small>
+                    <small v-else-if="isExpired(pr.dueDate) && pr.stage === 'EXPIRED'" class="text-danger text-uppercase">Expirado</small>
                 </a>
                 <div class="card-body">
                     <h6 class="card-title text-center text-uppercase">{{ getPRStage(pr.stage) }}</h6>
@@ -74,8 +74,8 @@
                         <div class="d-flex flex-column align-items-md-end align-items-center">
                             <span>Total: <strong class="text-success">{{ formatCurrency(pr.totalAmount) }}</strong></span>
                             <span>Visibilidade: <strong>{{ pr.quotesVisibility ? 'Permitida' : 'Restrita' }}</strong></span>
-                            <span v-if="!isExpired(pr.dueDate)">Expira em: <strong>{{ formatDate(pr.dueDate) }}</strong></span>
-                            <span v-else class="text-danger">Expirou em: <strong>{{ formatDate(pr.dueDate) }}</strong></span>
+                            <span v-if="!isExpired(pr.dueDate) && pr.stage === 'UNDER_QUOTATION'">Expira em: <strong>{{ formatDate(pr.dueDate) }}</strong></span>
+                            <span v-else-if="pr.stage === 'EXPIRED'" class="text-danger">Expirou em: <strong>{{ formatDate(pr.dueDate) }}</strong></span>
                         </div>
                     </div>
                 </div>

@@ -148,6 +148,9 @@ const VueComponent = new Vue({
 
       this.productsInventory = responseSearchProducts.data;
     },
+    /*
+    * Ação disparada ao adicionar produto(s) na cotação
+    * */
     onClickAddProduct() {
       if (!this.selectedProducts.length) return;
       let isValid = true;
@@ -155,6 +158,9 @@ const VueComponent = new Vue({
       this.selectedProducts.forEach(prod => {
         const badgeElement = $(`#listItemProduct${prod.id} .badge`);
 
+        /*
+        * Verifica a quantidade inserida com a quantidade disponível do produto
+        * */
         if (prod.availableQuantity < this.inputProductQuantity) {
           isValid = false;
           badgeElement.removeClass('badge-secondary').addClass('badge-danger');
@@ -176,6 +182,9 @@ const VueComponent = new Vue({
 
         const quoteProductIndex = quoteList.findIndex(productList => productList.product.id === selectedProd.id);
 
+        /*
+        * Atualiza o produto já contido na cotação somando a quatidade inserida
+        * */
         if (quoteProductIndex !== -1) {
           const quoteProduct = quoteList[quoteProductIndex];
           quoteProduct.quantity = Number.parseInt(quoteProduct.quantity, 10) + Number.parseInt(this.inputProductQuantity, 10);
@@ -183,6 +192,9 @@ const VueComponent = new Vue({
           return quoteList;
         }
 
+        /*
+        * Adiciona produto na cotação
+        * */
         quoteList.push({
           product: {
             id: selectedProd.id,
@@ -198,7 +210,7 @@ const VueComponent = new Vue({
       this.selectedProducts = [];
       this.updateQuoteTotalAmount();
     },
-    onClickRemoveProject(prodList) {
+    onClickRemoveProduct(prodList) {
       const isSelectedIndex = this.productsQuote.findIndex(productList => productList.product.id === prodList.product.id);
 
       if (isSelectedIndex !== -1) {
@@ -217,7 +229,8 @@ const VueComponent = new Vue({
       if (!shipmentOptionValue) return;
 
       if (
-        this.quoteShipmentOptions.map(ship => ship.method)
+        this.quoteShipmentOptions
+          .map(ship => ship.method)
           .includes(shipmentOptionValue)
       ) {
         return;

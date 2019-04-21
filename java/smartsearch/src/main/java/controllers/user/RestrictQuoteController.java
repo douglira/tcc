@@ -58,6 +58,45 @@ public class RestrictQuoteController extends HttpServlet {
         }
     }
 
+    /*
+    -------------------- Exemplo de payload [QUOTE] -------------------
+    {
+        "purchaseRequest": {
+            "id": 10030
+        },
+        "customListProduct": [{
+            "product": {
+                "id": 23,
+                "title": "Playstation 4 Pro",
+                "basePrice": 4249.9
+            },
+            "quantity": "1"
+        }],
+        "quoteAdditionalData": "",
+        "discount": "5",
+        "expirationDate": {
+            "year": 2019,
+            "month": 3,
+            "dayOfMonth": 26,
+            "hourOfDay": 0,
+            "minute": 0,
+            "second": 0
+        },
+        "shipmentOptions": [{
+            "method": "CUSTOM",
+            "estimatedTime": {
+                "year": 2019,
+                "month": 4,
+                "dayOfMonth": 9,
+                "hourOfDay": 0,
+                "minute": 0,
+                "second": 0
+            },
+            "cost": "41.50"
+        }]
+    }
+
+     */
     private void create(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(400);
@@ -430,8 +469,11 @@ public class RestrictQuoteController extends HttpServlet {
                 ProductItem productItem = new ProductItemDAO(true).findByProduct(product.getId());
 
                 if (productItem != null) {
+                    productItem.setBasedProducts(new ProductDAO(true).findByProductItem(productItem.getId()));
                     productItem.setRelevance(productItem.getRelevance() - 1);
-                    new ElasticsearchService().updateProductItemRelevance(productItem);
+                    productItem.updatePrices();
+                    new ProductItemDAO(productDao.getConnection()).updatePricesAndRelevance(productItem);
+                    new ElasticsearchService().updateProductItemPricesAndRelevance(productItem);
                 }
             }
             quoteProduct.setProduct(product);
