@@ -17,13 +17,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import controllers.socket.PurchaseRequestCreationSocket;
 import enums.*;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.gson.Gson;
 
 import controllers.socket.NotificationSocket;
-import controllers.socket.PRCreationSocket;
 import dao.AddressDAO;
 import dao.FileDAO;
 import dao.NotificationDAO;
@@ -206,7 +206,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
 
                 PurchaseRequest pr = new PurchaseRequest();
                 pr.setId(null);
-                PRCreationSocket.sendUpdatedPRCreation(user, pr, null);
+                PurchaseRequestCreationSocket.sendUpdatedPRCreation(user, pr, null);
                 return;
             }
 
@@ -242,7 +242,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         purchaseRequestDao.closeTransaction();
         purchaseRequestDao.closeConnection();
 
-        PRCreationSocket.sendUpdatedPRCreation(user, null, baseUrl);
+        PurchaseRequestCreationSocket.sendUpdatedPRCreation(user, null, baseUrl);
     }
 
     private void abortCreation(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -275,7 +275,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         new PurchaseRequestDAO(PurchaseItemDao.getConnection()).destroyCreation(purchaseRequest.getId(), purchaseRequest.getBuyer().getId());
 
         purchaseRequest.setId(null);
-        PRCreationSocket.sendUpdatedPRCreation(user, purchaseRequest, null);
+        PurchaseRequestCreationSocket.sendUpdatedPRCreation(user, purchaseRequest, null);
     }
 
     private void publish(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -456,7 +456,7 @@ public class RestrictPurchaseRequestController extends HttpServlet {
         purchaseRequest.setListProducts(products);
 
         user.setPerson(null);
-        PRCreationSocket.sendUpdatedPRCreation(user, purchaseRequest, baseUrl);
+        PurchaseRequestCreationSocket.sendUpdatedPRCreation(user, purchaseRequest, baseUrl);
     }
 
     private void fetchPictures(ArrayList<Item> products, String baseUrl) {

@@ -19,7 +19,7 @@ import com.google.gson.Gson;
 
 import com.google.gson.JsonObject;
 import controllers.socket.NotificationSocket;
-import controllers.socket.QuoteNotifierSocket;
+import controllers.socket.PurchaseRequestNotifierSocket;
 import dao.*;
 import enums.*;
 import libs.Helper;
@@ -190,7 +190,7 @@ public class RestrictQuoteController extends HttpServlet {
             shipmentDao.closeTransaction();
             shipmentDao.closeConnection();
 
-            QuoteNotifierSocket.notifyUpdatedQuotes(quote.getPurchaseRequest());
+            PurchaseRequestNotifierSocket.notifyUpdatedQuotes(quote.getPurchaseRequest());
             notifyCreationToBuyer(user, quote, getQuotesUrl(request, quote));
 
             response.setStatus(200);
@@ -274,7 +274,7 @@ public class RestrictQuoteController extends HttpServlet {
             productDao.getConnection().commit();
             productDao.getConnection().close();
 
-            QuoteNotifierSocket.notifyUpdatedQuotes(order.getQuote().getPurchaseRequest());
+            PurchaseRequestNotifierSocket.notifyUpdatedQuotes(order.getQuote().getPurchaseRequest());
             notifyApprovalToSeller(buyerPerson, order, getOrderUrl(request, order));
 
             response.setStatus(200);
@@ -321,7 +321,7 @@ public class RestrictQuoteController extends HttpServlet {
             quote.setReason(quoteReason);
             new QuoteDAO(true).updateStatusAndReason(quote);
 
-            QuoteNotifierSocket.notifyUpdatedQuotes(quote.getPurchaseRequest());
+            PurchaseRequestNotifierSocket.notifyUpdatedQuotes(quote.getPurchaseRequest());
             notifyDenialToSeller(buyerPerson, quote, getPurchaseRequestUrl(request, quote.getPurchaseRequest()));
 
             response.setStatus(200);
@@ -453,7 +453,7 @@ public class RestrictQuoteController extends HttpServlet {
         quote.setStatus(QuoteStatus.DECLINED);
         new QuoteDAO(true).updateStatusAndReason(quote);
 
-        QuoteNotifierSocket.notifyUpdatedQuotes(quote.getPurchaseRequest());
+        PurchaseRequestNotifierSocket.notifyUpdatedQuotes(quote.getPurchaseRequest());
         notifyDenialToSeller(buyerPerson, quote, urlPurchaseRequest);
     }
 

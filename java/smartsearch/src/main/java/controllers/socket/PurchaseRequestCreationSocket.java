@@ -18,10 +18,10 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @ServerEndpoint(value = "/account/purchase_request/{username}", encoders = PurchaseRequestEncoder.class, decoders = PurchaseRequestDecoder.class)
-public class PRCreationSocket {
+public class PurchaseRequestCreationSocket {
 
     private Session session;
-    private static Set<PRCreationSocket> endpoints = new CopyOnWriteArraySet<>();
+    private static Set<PurchaseRequestCreationSocket> endpoints = new CopyOnWriteArraySet<>();
     private static HashMap<String, String> users = new HashMap<>();
 
     @OnOpen
@@ -42,19 +42,19 @@ public class PRCreationSocket {
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        System.out.println("PRCreationSocket error on connect: " + throwable.getMessage());
+        System.out.println("PurchaseRequestCreationSocket error on connect: " + throwable.getMessage());
     }
 
     public static void sendUpdatedPRCreation(User user, PurchaseRequest purchaseRequest, String baseUrl) {
         if (purchaseRequest == null) {
-            purchaseRequest = PRCreationSocket.getPurchaseRequest(user, baseUrl);
+            purchaseRequest = PurchaseRequestCreationSocket.getPurchaseRequest(user, baseUrl);
         }
 
         PurchaseRequest prPayload = purchaseRequest;
 
         endpoints.forEach(endpoint -> {
             synchronized (endpoint) {
-                String username = PRCreationSocket.users.get(endpoint.session.getId());
+                String username = PurchaseRequestCreationSocket.users.get(endpoint.session.getId());
 
                 if (username.equals(user.getUsername())) {
                     try {

@@ -12,9 +12,9 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 @ServerEndpoint(value = "/account/purchase_request/{purchaseRequestId}/quotes", encoders = PurchaseRequestEncoder.class, decoders = PurchaseRequestDecoder.class)
-public class QuoteNotifierSocket {
+public class PurchaseRequestNotifierSocket {
     private Session session;
-    private static Set<QuoteNotifierSocket> endpoints = new CopyOnWriteArraySet<>();
+    private static Set<PurchaseRequestNotifierSocket> endpoints = new CopyOnWriteArraySet<>();
     private static HashMap<String, Integer> purchaseRequests = new HashMap<>();
 
     @OnOpen
@@ -37,7 +37,7 @@ public class QuoteNotifierSocket {
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        System.out.println("QuoteNotifierSocket ERROR: " + throwable.getMessage());
+        System.out.println("PurchaseRequestNotifierSocket ERROR: " + throwable.getMessage());
         purchaseRequests.remove(this.session.getId());
         endpoints.remove(this);
     }
