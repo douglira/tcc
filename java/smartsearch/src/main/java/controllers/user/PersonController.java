@@ -38,8 +38,10 @@ public class PersonController extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		Gson gJson = new Gson();
 
+		User user = (User) request.getSession().getAttribute("loggedUser");
 		Person person = (Person) request.getSession().getAttribute("loggedPerson");
 
+		person.setUser(user);
 		Address address = new AddressDAO(true).findByPerson(person.getId());
 
 		if (address != null) {

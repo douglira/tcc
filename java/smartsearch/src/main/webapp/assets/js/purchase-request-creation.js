@@ -137,7 +137,7 @@ const VuePRCreation = new Vue({
         $('#popoverPropagationCount').popover({
           trigger: 'hover focus',
           placement: 'right',
-          title: 'Abrangência',
+          title: 'Fornecedores',
           content: `Esta é a quantidade de fornecedores que possuem os items requisitados abaixo em estoque. 
             Ao lançar este pedido de compra uma notificação será enviada a eles, portanto quanto 
             maior este número maior serão as chances de concluir um orçamento.`,

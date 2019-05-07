@@ -105,7 +105,7 @@
                 tabindex="0"
                 data-toggle="popover"
                 class="text-white pr-propagation-text">
-                Abrangência atual
+                Fornecedores encontrados
                 &nbsp;
                 <strong class="bg-light text-dark pr-propagation-count">
                     {{ purchaseRequest.propagationCount }}
