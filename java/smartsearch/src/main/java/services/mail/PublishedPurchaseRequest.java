@@ -19,7 +19,7 @@ public class PublishedPurchaseRequest extends MailerService {
         this.subject = "OPORTUNIDADE | Pedido de compra";
 
         this.template = "publishedPurchaseRequest";
-        this.context.put("shortName", "SmartSearch");
+        this.context.put("shortName", "Smartsearch");
 
         this.mail.sendHTML(this);
     }

@@ -21,7 +21,7 @@ public class NewSuggestedQuote extends MailerService {
         this.subject = "OPORTUNIDADE | Nova Cotação";
 
         this.template = "newQuoteSuggested";
-        this.context.put("shortName", "SmartSearch");
+        this.context.put("shortName", "Smartsearch");
 
         this.mail.sendHTML(this);
     }

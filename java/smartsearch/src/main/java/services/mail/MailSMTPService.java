@@ -20,10 +20,17 @@ import java.util.Properties;
 public class MailSMTPService extends Mailer {
     private static MailSMTPService mailServiceInstance = null;
 
+//    Mailtrap config
     private static final String HOST = "smtp.mailtrap.io";
     private static final int PORT = 2525;
     private static final String USER = "34840dc96cad6b";
     private static final String PASS = "1fc688566cacdf";
+
+//    Gmail config
+//    private static final String HOST = "smtp.gmail.com";
+//    private static final int PORT = 587;
+//    private static final String USER = "noreply.smartsearch@gmail.com";
+//    private static final String PASS = "dodolira18";
 
     private Properties propsConfig;
     private VelocityEngine ve;
@@ -34,6 +41,10 @@ public class MailSMTPService extends Mailer {
         this.propsConfig.put("mail.smtp.starttls.enable", "true");
         this.propsConfig.put("mail.smtp.host", HOST);
         this.propsConfig.put("mail.smtp.port", PORT);
+
+//        Configuração GMAIL
+//        this.propsConfig.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+//        this.propsConfig.put("mail.smtp.socketFactory.port", "587");
 
         this.ve = new VelocityEngine();
         this.ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");

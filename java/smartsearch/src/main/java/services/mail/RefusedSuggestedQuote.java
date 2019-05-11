@@ -22,7 +22,7 @@ public class RefusedSuggestedQuote extends MailerService {
         this.subject = "COTAÇÂO | Sua cotação foi recusada :(";
 
         this.template = "refusedQuoteSuggested";
-        this.context.put("shortName", "SmartSearch");
+        this.context.put("shortName", "Smartsearch");
 
         this.mail.sendHTML(this);
     }
