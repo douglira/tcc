@@ -31,7 +31,7 @@
                     </a>
                     <div class="card-body-product_secondary--info">
                         <div>
-                            <p class="text-dark ">Abrangência: {{ product.relevance }}</p>
+                            <p class="text-dark ">Fornecedores: {{ product.relevance }}</p>
                         </div>
                         <small class="text-muted">
                             Flutuação (R$)

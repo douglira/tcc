@@ -126,7 +126,7 @@
                                                 <div class="info_content-product-item">
                                                     <p class="text-dark">{{ productItemPreview.title }}</p>
                                                     <small class="text-secondary">
-                                                        Abrangência:
+                                                        Fornecedores:
                                                         &nbsp;
                                                         {{ productItemPreview.relevance }}
                                                     </small>

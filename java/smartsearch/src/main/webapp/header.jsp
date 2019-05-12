@@ -108,7 +108,7 @@
                                     <h6
                                         style="display: flex !important; justify-content: space-between !important; align-items: center !important;"
                                         class="text-info dropdown-header text-justify d-flex align-items-center justify-content-center text-uppercase">
-                                        Abrangência
+                                        Fornecedores
                                         &nbsp;
                                         <span :class="['badge', 'text-white', purchaseRequest.propagationCount <= 1 ? 'badge-danger' : 'badge-info']">
                                             {{ purchaseRequest.propagationCount }}
@@ -123,7 +123,7 @@
                                              :alt="prItem.product.thumbnail.name">
                                         <div class="pr-header-item-title text-muted">{{ prItem.product.title }}</div>
                                     </li>
-                                    <a class="dropdown-item text-center text-danger p-3 p-sm-3 p-md-3 p-lg-3"
+                                    <a class="dropdown-item text-center text-dark p-3 p-sm-3 p-md-3 p-lg-3"
                                        :href="'/account/purchase_request/creation?pr=' + purchaseRequest.id">Ver pedido</a>
                                 </ul>
                             </template>
