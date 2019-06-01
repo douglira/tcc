@@ -1,0 +1,5 @@
+- Doc Visão: Atualizar e adicionar riscos;
+- Doc Caso de Uso Geral: Herança do ator Usuário, remover casos de uso não implementados e unificar casos de notificação; [OK]
+- Doc Diagrama Arquitetura: Adicionar comunicação JDBC e linkar DAO com Model; [OK]
+- Doc de Pacotes: Linkar DAO com Model; [OK]
+- Doc Requisitos do sistema: regras de negócio mais específicas; [OK]
