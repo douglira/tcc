@@ -94,4 +94,10 @@ const Formatter = {
     }
     return tel;
   },
+  postalCode(postalCode) {
+    if (String(postalCode).length === 8) {
+      return `${String(postalCode).slice(0, 5)}-${String(postalCode).slice(5, 8)}`;
+    }
+    return String(postalCode);
+  },
 };

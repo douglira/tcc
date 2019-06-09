@@ -24,6 +24,10 @@ public class Shipment {
         this.id = id;
     }
 
+    public Shipment(ShipmentMethod method) {
+        this.method = method;
+    }
+
     public Integer getId() {
         return id;
     }

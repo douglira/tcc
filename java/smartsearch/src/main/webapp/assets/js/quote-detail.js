@@ -6,6 +6,7 @@ let formatterMixin = {
     formatCurrency: Formatter.currency,
     formatTel: Formatter.telephone,
     getCalendar: Formatter.getCalendar,
+    formatCep: Formatter.postalCode,
   },
 };
 

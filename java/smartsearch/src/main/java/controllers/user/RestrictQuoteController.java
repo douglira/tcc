@@ -627,7 +627,10 @@ public class RestrictQuoteController extends HttpServlet {
 
     private Person getQuoteSeller(Quote quote) {
         Person sellerPerson = (Person) quote.getSeller();
-        return new PersonDAO(true).findById(sellerPerson);
+        Person person = new PersonDAO(true).findById(sellerPerson);
+        Address address = new AddressDAO(true).findByPerson(person.getId());
+        person.setAddress(address);
+        return person;
     }
 
     private void populateProductsAndShipments(Quote quote, String baseUrl) {

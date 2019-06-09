@@ -84,6 +84,17 @@
             <span class="text-muted">Telefone: <strong>{{ formatTel(seller.tel) }}</strong></span>
         </div>
 
+        <div v-if="seller.address && seller.address.id" class="card-body">
+            <h4 class="text-muted">Endereço do vendedor</h4>
+            <span class="text-muted">Endereço: <strong>{{ seller.address.street }}, {{ seller.address.buildingNumber }}</strong></span>
+            <br>
+            <span class="text-muted">Bairro: <strong>{{ seller.address.district }}</strong></span>
+            <br>
+            <span class="text-muted">Cidade: <strong>{{ seller.address.city }} - {{ seller.address.provinceCode }}</strong></span>
+            <br>
+            <span class="text-muted">CEP: <strong>{{ formatCep(seller.address.postalCode) }}</strong></span>
+        </div>
+
         <div class="card-body">
             <h4 class="text-muted">Frete</h4>
             <p class="text-muted">Abaixo escolha uma das opções de frete disponibilizadas pelo vendedor.</p>

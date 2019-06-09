@@ -42,9 +42,10 @@ public class NotificationSocket {
     @OnMessage
     public void onMessage(Session session, ArrayList<Notification> notifications) throws IOException {
         if (notifications != null && !notifications.isEmpty()) {
-            Notification notification = notifications.get(0);
-            notification.setStatus(NotificationStatus.VIEWED);
-            new NotificationDAO(true).updateStatus(notification);
+            notifications.forEach(notification -> {
+                notification.setStatus(NotificationStatus.VIEWED);
+                new NotificationDAO(true).updateStatus(notification);
+            });
         }
     }
 

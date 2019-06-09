@@ -9,6 +9,12 @@ const FormatterMixin = {
   }
 };
 
+const availableShipmentOptionsSelect = {
+  CUSTOM: 'Customizado',
+  FREE: 'Frete grátis',
+  LOCAL_PICK_UP: 'Retirada no local',
+};
+
 const VueComponent = new Vue({
   el: '#userPRSuggest',
   name: 'PurchaseRequestSuggest',
@@ -31,11 +37,7 @@ const VueComponent = new Vue({
       quoteAdditionalData: '',
       quoteShipmentOptions: [],
       invalidQuote: true,
-      shipmentOptionsSelect: [
-        {text: 'Customizado', value: 'CUSTOM'},
-        {text: 'Frete grátis', value: 'FREE'},
-        {text: 'Retirada no local', value: 'LOCAL_PICK_UP'},
-      ],
+      shipmentOptionsSelect: [],
       selectedShipmentOption: null,
     };
   },
@@ -378,10 +380,11 @@ const VueComponent = new Vue({
       const {page, perPage} = this;
       purchaseRequestId = window.location.search.split('?pr=')[1];
 
-      const [responseSeller, responsePurchaseRequest, responseProducts] = await Promise.all([
+      const [responseSeller, responsePurchaseRequest, responseProducts, responserAvailableShipments] = await Promise.all([
         axios.get('/account/me/data'),
         axios.get(`/account/purchase_request/suggest?pr=${purchaseRequestId || ''}`),
         this.getProductsInventory({page, perPage}),
+        axios.get('/shipments/available')
       ]);
 
       if (responsePurchaseRequest.data.cause && responsePurchaseRequest.data.cause === 'INVALID_PURCHASE_REQUEST_ID') {
@@ -391,6 +394,11 @@ const VueComponent = new Vue({
       this.purchaseRequest = responsePurchaseRequest.data;
       this.productsInventory = responseProducts.data;
       this.loggedSeller = responseSeller.data;
+      this.shipmentOptionsSelect = responserAvailableShipments.data
+        .map(shipment => ({
+          value: shipment.method,
+          text: availableShipmentOptionsSelect[shipment.method]
+        }));
       this.initWebsocket();
     },
     initWebsocket() {
