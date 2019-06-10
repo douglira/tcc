@@ -14,6 +14,7 @@ public class ConnectionFactory {
 	static {
 		config.setDriverClassName("org.postgresql.Driver");
 		config.setJdbcUrl("jdbc:postgresql://127.0.0.1/smartsearch");
+		// config.setJdbcUrl("jdbc:postgresql://db/smartsearch");
 		config.setUsername("douglas");
 		config.setPassword("docker");
 		config.addDataSourceProperty("cachePrepStmts", "true");

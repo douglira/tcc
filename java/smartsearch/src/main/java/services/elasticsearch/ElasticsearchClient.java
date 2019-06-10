@@ -24,5 +24,6 @@ public class ElasticsearchClient {
 	public static RestHighLevelClient getTransport() {
 		return new RestHighLevelClient(RestClient.builder(
                 new HttpHost("localhost", 9200, "http")));
+                // new HttpHost("elasticsearch", 9200, "http")));
 	}
 }

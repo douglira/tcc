@@ -2,11 +2,9 @@ version: '3.7'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: douglira/smartsearch:latest
     ports:
-      - "8080:8080"
+      - "80:8080"
     networks:
       - smart
       - elk
@@ -21,10 +19,10 @@ services:
 
   sgbd:
     image: dpage/pgadmin4:latest
-    container_name: pgadmin
-    restart: always
     ports:
       - 8092:80
+    networks:
+      - smart
     environment:
       PGADMIN_DEFAULT_EMAIL: douglas.vclira@gmail.com
       PGADMIN_DEFAULT_PASSWORD: pgadmindocker
@@ -32,7 +30,6 @@ services:
   elasticsearch:
     # image: docker.elastic.co/elasticsearch/elasticsearch:6.4.0
     image: docker.elastic.co/elasticsearch/elasticsearch:6.7.2
-    container_name: elasticsearch
     environment:
       - cluster.name=docker-cluster
       - transport.host=0.0.0.0
@@ -54,7 +51,6 @@ services:
   elasticsearch2:
     # image: docker.elastic.co/elasticsearch/elasticsearch:6.4.0
     image: docker.elastic.co/elasticsearch/elasticsearch:6.7.2
-    container_name: elasticsearch2
     environment:
       - cluster.name=docker-cluster
       - transport.host=0.0.0.0
@@ -73,9 +69,8 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:6.7.2
-    container_name: kibana
     ports:
-      - 5601:5601
+      - 5602:5601
     environment:
       SERVER_NAME: kibana.elastic.io
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
