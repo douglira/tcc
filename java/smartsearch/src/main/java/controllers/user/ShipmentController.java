@@ -48,10 +48,10 @@ public class ShipmentController extends HttpServlet {
             Person loggedPerson = (Person) request.getSession().getAttribute("loggedPerson");
             Address address = new AddressDAO(true).findByPerson(loggedPerson.getId());
 
-            List<Shipment> availableShipmentOptions = Arrays.asList(
-                    new Shipment(ShipmentMethod.CUSTOM),
-                    new Shipment(ShipmentMethod.FREE)
-            );
+            ArrayList<Shipment> availableShipmentOptions = new ArrayList<Shipment>();
+
+            availableShipmentOptions.add(new Shipment(ShipmentMethod.CUSTOM));
+            availableShipmentOptions.add(new Shipment(ShipmentMethod.FREE));
 
             if (address != null) {
               availableShipmentOptions.add(new Shipment(ShipmentMethod.LOCAL_PICK_UP));
